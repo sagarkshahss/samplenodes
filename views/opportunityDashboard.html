@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Solution Advisor</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="description" content="An interactive getting started guide for Edge Code CC.">
+	<link rel="stylesheet" href="static/css/style.css">
+	<link rel="stylesheet" href="static/css/jquery.modal.css">
+	<script	src="static/js/main.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.min.js"></script>
+	<script	src="static/js/jquery.modal.js"></script>	
+	<script	src="static/js/close.js"></script>
+<script language="javascript">
+
+function setServiceLineId(serviceLineId) {
+	document.getElementById("serviceLineInfo").value=serviceLineId;
+	document.getElementById("captureRequirementsForm").submit();
+	return true;
+}
+
+</script>
+
+</head>
+<body class="mainInner">
+	<div class="divWidth">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+			<div class="NavDiv">
+				<div class="nav">
+					<ul>
+						<li class="home"><a href="advisorHome">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,satyajit_patra@in.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+					</ul>
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop">
+							<img src="/static/images/search.jpg">
+							<div id="two" class="popupBox">
+							<form method="post" action="/getSolutionInfo" id="search">
+								<input type="text" value="" name="searchSolId" id="searchSolId" required class="popInput placeholder-fix" pattern="[0-9]*" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Solution Id">
+								<input type="submit" value="Search" class="popButton">
+							</form>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="InnDiv" ></div>
+	<div class="divWidth">
+		<div class="loginInfo ">Hello {{ user.attributes.firstName }} {{user.attributes.lastName}}</div> 
+		<p>Solution Dashboard</p>
+
+		<form method="post" action="/captureRequirements" id="captureRequirementsForm">
+		<input type="hidden" name="serviceLineInfo" id="serviceLineInfo">
+		<table width="100%" cellpadding="1" cellspacing="0" border="0" style="border: 1px dotted #FFFFFF;">		
+			<tr>
+				<td colspan="3" class="tdmarg">Solution Details by Opportunity</td>
+
+				<td colspan="1" class="tdmarg" align=center><input type="button" class="greenbutton" value="New Opportunity" ></td>
+			</tr>
+			<tr>
+				<td class="tdTableHeaderLabel" align=center width=10%><strong>	Opportunities</strong></td>
+				<td class="tdTableHeaderLabel" align=center width=35%><strong>Service Line</strong></td>
+				<td class="tdTableHeaderLabel" align=center width=25%><strong>Number of Solutions</strong></td>
+				<td class="tdTableHeaderLabel" align=center width=30%>&nbsp;</td>
+			</tr>
+			{% if errorMessage %}
+			<tr>
+				<td colspan="4" class="tdErrorMsg">{{errorMessage}}</td>
+			</tr>
+			{% endif %}
+			{% for ob in solDashboardResult %}
+			
+			{% if  (ob.sl_id % 2) == 0 %}
+				<tr bgcolor='#cccccc'>
+			{% endif %}
+			{% if  (ob.sl_id % 2) == 1 %}
+				<tr bgcolor='#e1e0e0'>
+			{% endif %}
+				<td class="tdTableLabel" align=center>{{ ob.sl_id }}</td>
+				<td class="tdTableLabel">{{ ob.sl_name }}</td>
+			{% if  ob.num_of_solutions > 0 %}
+				<td class="tdTableLabel" align=center><a href="getServiceLineSolutions?sl_id={{ ob.sl_id }}" >{{ ob.num_of_solutions }}</a></td>
+			{% endif %}
+			{% if  ob.num_of_solutions == 0 %}
+				<td class="tdTableLabel" align=center>{{ ob.num_of_solutions }}</td>
+			{% endif %}
+				<td class="tdTableLabel" align=center><input type="button" class="smallgreenbutton" value="New Solution" onclick="javascript:return setServiceLineId({{ ob.sl_id }});"></td>
+			</tr>
+			{% endfor %}
+			<!-- <tr>
+				
+				<td colspan="4" class="tdLabel" style="height:80px">&nbsp;<input type="submit" class="smallgreenbutton" value="Create New Solution" > </td>
+			</tr> -->
+		</table>
+		</form>
+	</div>
+</body>
+</html>

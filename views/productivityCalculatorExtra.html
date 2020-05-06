@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Solution Advisor</title>
+	<!-- Productivity Calculator Extra-->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="description" content="An interactive getting started guide for Edge Code CC.">
+	<link rel="stylesheet" href="static/css/style.css">
+	<link rel="stylesheet" href="static/css/jquery.modal.css">
+	<link rel="stylesheet" href="static/css/icon.css"> 
+ 	<link rel="stylesheet" href="static/css/3.3.7/bootstrap.min.css">
+ 	
+	<script	src="static/js/main.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.min.js"></script>
+	<script	src="static/js/jquery.modal.js"></script>	
+ 	<script	src="static/js/close.js"></script>
+ 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+ 	<script src="static/js/3.3.7/bootstrap.min.js"></script>
+<style type="text/css">
+   .tableWidth {
+    width: 90%;
+ }
+ .tableHeader{
+	background-color:#fff ;//#d6d3d3;
+ }
+
+table.table-bordered td,
+table.table-bordered th
+{
+  border: 1px solid gray !important;
+}
+
+
+  .leverbg{
+  	background-color: #66b0a0b3;
+ }
+  .leftBorder {
+  	border-left:3px solid  #585e5bb3 !important;
+  
+ }
+  .rightBorder {
+  	border-right:3px solid  #585e5bb3 !important;
+	
+ }
+ .calProdBg{
+  	background-color: #c0d0e3b3; 
+ }
+ 
+ .appProdBg{
+	background-color: #ddd2e2b3;
+ }
+.oneTimeCostBg{
+	background-color: #e3e3b9b3;
+ }
+ .totalCostbg{
+	background-color: #66b0a0b3;
+ }
+ </style>
+<script language="javascript">
+
+$(document).ready(function(){
+	checkSolutionStatus(20,{{solId}});
+	
+	
+});//end of ready
+
+
+function checkSolutionStatus(count, solutionId){
+	$("#showmodalid").show();
+	console.log("solutionId: "+solutionId);
+	setTimeout(function() {
+		$.ajaxSetup({async: false});
+		$.post("/checkProductivityStatus",{solId:solutionId}, function(data, status){
+	        console.log("Data: " + data + "\nStatus: " + status+ " count "+count);
+	        if(data!="Error: connect ECONNREFUSED"){
+				if(new String(data).valueOf() == new String("NO").valueOf()){
+					console.log("inside NO");
+					 if(count == 0){
+							console.log("inside count ==0");
+							 var addr= (window.location.href).split('/');	        		 
+							 window.location.href = addr[0]+"//"+addr[2]+"/dashboard";
+						 }else{
+								console.log("inside count !=0");
+								$("#waitImg").hide();
+								$(".center").css("width","350px");
+								$("#waiText").show();
+								count--;
+								setTimeout(function() {
+									var solId = solutionId;
+									console.log("solId:: "+solId);
+									checkSolutionStatus(count, solId);
+								},200);
+						 }
+				}else{
+					console.log("inside YES");
+					$("#showmodalid").hide();
+					getCalProd();
+				}
+	        }else{
+	       		var addr= (window.location.href).split('/');	        		 
+				window.location.href = addr[0]+"//"+addr[2]+"/dashboard";
+	       	}
+	    });
+		$.ajaxSetup({async: true});
+	},2000);
+	
+}
+var jsonArr = { entries: []};
+
+function validate() {
+	
+	
+	//gather all records & make a json out of them
+	$( "tr[id^='row-']" ).each(function( index, element ) {
+		var index=$(this).attr('id').slice(4);
+		var leverDesc = $(this).find('td:eq(1)').text();
+		if(!leverDesc.includes('Sum')){
+			console.log('lever desc '+leverDesc);
+		/* 	var impactCalYr1 = $(this).find('td:eq(2)').text();
+			var impactCalYr2 = $(this).find('td:eq(3)').text();
+			var impactCalYr3 = $(this).find('td:eq(4)').text();
+			var impactCalYr4 = $(this).find('td:eq(5)').text();
+			var impactCalYr5 = $(this).find('td:eq(6)').text();
+			 */
+			var id= $(this).find('td:eq(0)').text();
+			var impactAppYr1 = $("#impactAppYr1-"+index).val();
+			var impactAppYr2 = $("#impactAppYr2-"+index).val();
+			var impactAppYr3 = $("#impactAppYr3-"+index).val();
+			var impactAppYr4 = $("#impactAppYr4-"+index).val();
+			var impactAppYr5 = $("#impactAppYr5-"+index).val();
+			
+			var oneTimeCost= $(this).find('td:eq(12)').text();//$("#oneTimeCost-"+index).val();
+			var totalRecCost=$(this).find('td:eq(13)').text();// $("#totalRecCost-"+index).val();
+			//alert("totalRecCost"+totalRecCost+" index "+ index);	
+			
+			/* allGood = isProperValue(noOfIncidents) ;
+			if(!allGood){
+				return false;
+			} */
+		 
+			allGood=true;
+	 		var obj = {id:0,leverDesc:" ",impactAppYr1:"0.0",impactAppYr2:"0.0",impactAppYr3:"0.0",impactAppYr4:"0.0",impactAppYr5:"0.0",oneTimeCost:"0.0",totalRecCost:"0.0"};
+	 		obj.id=id;
+	 		obj.leverDesc = leverDesc;
+			obj.impactAppYr1 = impactAppYr1;
+			obj.impactAppYr2 = impactAppYr2;
+			obj.impactAppYr3 = impactAppYr3;
+			obj.impactAppYr4 = impactAppYr4;
+			obj.impactAppYr5 = impactAppYr5;
+			obj.oneTimeCost = oneTimeCost;
+			obj.totalRecCost =totalRecCost;
+			
+			jsonArr.entries[index] = obj;  
+		}
+	});
+
+	//alert("allGood"+JSON.stringify(jsonArr));
+	if(allGood){
+		document.getElementById("amsValJson").value = JSON.stringify(jsonArr);
+		window.scrollTo(0, 0);
+		$(".showmodal").show();
+		//checkSaveStatus(0);
+		return true;		
+	} else{
+		alert("Please provide proper values ");
+		return false;
+	}		
+	
+	
+}
+function copyCalculatedRow(index){
+	$('#impactAppYr1'+index).val($('#impactCalYr1-'+index).text());
+	$('#impactAppYr2'+index).val($('#impactCalYr2-'+index).text());
+	$('#impactAppYr3'+index).val($('#impactCalYr3-'+index).text());
+	$('#impactAppYr4'+index).val($('#impactCalYr4-'+index).text());
+	$('#impactAppYr5'+index).val($('#impactCalYr5-'+index).text());
+ 	
+	
+}
+function getCalProd(){
+	$.ajax({
+			url : '/getCalProductivity',
+		    type : 'GET',
+		    dataType:'json',
+		    data : {
+		    	'solId':$("#solId").val()
+		    },
+		    success : function(data) {  
+		    	for (var i = 0; i < data.length; i++) {
+		    		console.log(" lever "+ data[i].LEVER_DESC +" exit ? "+ data[i].LEVER_DESC.includes('Sum'))
+		    		if(data[i].LEVER_DESC.includes('Sum')){
+		    			if(data[i].LEVER_DESC.includes('Y'))
+		    					$("table#calProdTable").append('<tr height = 20px></tr>');	
+		    			
+			       		 var row = '<tr id="row-'+i+'">' +
+			       				'<td class="" ></td>'+
+			       				'<td class="" name="leverDesc-'+i+'" id="leverDesc-'+i+'" ><strong>'+data[i].LEVER_DESC+'</strong></td>'+
+			       				'<td class="calProdBg" name="impactCalYr1-'+i+'" id="impactCalYr1-'+i+'" >'+parseFloat(data[i].YR1_IMPACT_CALC).toFixed(1)+'</td>'+
+			       				'<td class="calProdBg" name="impactCalYr2-'+i+'" id="impactCalYr2-'+i+'" >'+parseFloat(data[i].YR2_IMPACT_CALC).toFixed(1)+'</td>'+
+			       				'<td class="calProdBg" name="impactCalYr3-'+i+'" id="impactCalYr3-'+i+'" >'+parseFloat(data[i].YR3_IMPACT_CALC).toFixed(1)+'</td>'+
+			       				'<td class="calProdBg" name="impactCalYr4-'+i+'" id="impactCalYr4-'+i+'" >'+parseFloat(data[i].YR4_IMPACT_CALC).toFixed(1)+'</td>'+
+			       				'<td class="calProdBg" name="impactCalYr5-'+i+'" id="impactCalYr5-'+i+'" >'+parseFloat(data[i].YR5_IMPACT_CALC).toFixed(1)+'</td>'+
+			       				'<td  class="appProdBg"></td>'+
+			       				'<td  class="appProdBg"></td>'+
+			       				'<td  class="appProdBg"></td>'+
+			       				'<td  class="appProdBg"></td>'+
+			       				'<td  class="appProdBg"></td>'+
+			       				'<td class="oneTimeCostBg" id="oneTimeCost-'+i+'" name="oneTimeCost-'+i+'" >'+parseFloat(data[i].ONE_TIME_COST).toFixed(1)+'</td>'+
+			       				'<td class="oneTimeCostBg" name="totalRecCost-'+i+'" id="totalRecCost-'+i+'">'+parseFloat(data[i].TOTAL_RECURRING_COST).toFixed(1)+'</td>'+
+			       				
+			       			'</tr>'; 
+		    		}
+		    		else{
+			       		var row = '<tr id="row-'+i+'">' +
+		       				'<td class="" name="id-'+i+'" id="id'+i+'" >'+data[i].ID+'</td>'+
+		       				'<td class="" name="leverDesc-'+i+'" id="leverDesc-'+i+'" ><strong>'+data[i].LEVER_DESC+'</strong></td>'+
+		       				'<td class="calProdBg" name="impactCalYr1-'+i+'" id="impactCalYr1-'+i+'" >'+parseFloat(data[i].YR1_IMPACT_CALC).toFixed(1)+'</td>'+
+		       				'<td class="calProdBg" name="impactCalYr2-'+i+'" id="impactCalYr2-'+i+'" >'+parseFloat(data[i].YR2_IMPACT_CALC).toFixed(1)+'</td>'+
+		       				'<td class="calProdBg" name="impactCalYr3-'+i+'" id="impactCalYr3-'+i+'" >'+parseFloat(data[i].YR3_IMPACT_CALC).toFixed(1)+'</td>'+
+		       				'<td class="calProdBg" name="impactCalYr4-'+i+'" id="impactCalYr4-'+i+'" >'+parseFloat(data[i].YR4_IMPACT_CALC).toFixed(1)+'</td>'+
+		       				'<td class="calProdBg" name="impactCalYr5-'+i+'" id="impactCalYr5-'+i+'" >'+parseFloat(data[i].YR5_IMPACT_CALC).toFixed(1)+'</td>'+
+		       				'<td  class="appProdBg"><input type="number" class="form-control" style="padding:6px 6px;" step="0.1" min="0" name="impactAppYr1-'+i+'" id="impactAppYr1-'+i+'" value="'+parseFloat(data[i].YR1_IMPACT_APPLIED).toFixed(1)+'" ></td>'+
+		       				'<td  class="appProdBg"><input type="number" class="form-control" style="padding:6px 6px;" step="0.1" min="0" name="impactAppYr2-'+i+'" id="impactAppYr2-'+i+'" value="'+parseFloat(data[i].YR2_IMPACT_APPLIED).toFixed(1)+'" ></td>'+
+		       				'<td  class="appProdBg"><input type="number" class="form-control" style="padding:6px 6px;" step="0.1" min="0" name="impactAppYr3-'+i+'" id="impactAppYr3-'+i+'" value="'+parseFloat(data[i].YR3_IMPACT_APPLIED).toFixed(1)+'" ></td>'+
+		       				'<td  class="appProdBg"><input type="number" class="form-control" style="padding:6px 6px;" step="0.1" min="0" name="impactAppYr4-'+i+'" id="impactAppYr4-'+i+'" value="'+parseFloat(data[i].YR4_IMPACT_APPLIED).toFixed(1)+'" ></td>'+
+		       				'<td  class="appProdBg"><input type="number" class="form-control" style="padding:6px 6px;" step="0.1" min="0" name="impactAppYr5-'+i+'" id="impactAppYr5-'+i+'" value="'+parseFloat(data[i].YR5_IMPACT_APPLIED).toFixed(1)+'" ></td>'+
+		       				/* '<td ><input name="checkBox-'+i+'" id="checkBox-'+i+'" type="checkbox" value="" ></td>'+ */
+		       				'<td class="oneTimeCostBg" id="oneTimeCost-'+i+'" name="oneTimeCost-'+i+'" >'+parseFloat(data[i].ONE_TIME_COST).toFixed(1)+'</td>'+
+		       				'<td class="oneTimeCostBg" name="totalRecCost-'+i+'" id="totalRecCost-'+i+'">'+parseFloat(data[i].TOTAL_RECURRING_COST).toFixed(1)+'</td>'+
+		       				/* '<td class="oneTimeCostBg"><input type="text" class="form-control" step="0.01" min="0" readonly="readonly" name="oneTimeCost-'+i+'" id="oneTimeCost-'+i+'" value="'+parseFloat(data[i].ONE_TIME_COST)+'" ></td>'+
+		       				'<td class="oneTimeCostBg"><input type="text" class="form-control" step="0.01" min="0" readonly="readonly" name="totalRecCost-'+i+'" id="totalRecCost-'+i+'" value="'+parseFloat(data[i].TOTAL_RECURRING_COST)+'" ></td>'+
+		        		  */
+		       			'</tr>';		
+		    		}		
+		     		$("table#calProdTable").append(row);	
+		    	}
+		    
+		    	var amsyears= Number({{amsYears}});
+		    	for(var i=amsyears+1;i<=5;i++){
+			    	 $( "tr[id^='row-']" ).each(function( index, element ){
+			    			//console.log("disabling1 index  #impactAppYr"+i+"-"+index);
+			    			var index=$(this).attr('id').slice(4);
+			    			$("table#calProdTable #impactAppYr"+i+"-"+index).prop('disabled', 'disabled'); 
+			    	});
+		    	}
+		    	$('input[type="number"]').change(function () {
+		    		//console.log(" vale "+$(this).val());
+		    		var currVal=parseFloat($(this).val());
+		    		if(currVal<0){
+		    			alert("Applied productivity cant be less than Zero ");
+		    			$("#submit-form").prop("disabled", true);
+		    		}
+		    		else
+		    			$("#submit-form").removeAttr('disabled')
+		    		
+		    	}); 
+		    	
+		    	
+		    },
+		    
+		});
+	  
+}
+
+
+</script>
+
+</head>
+<body class="mainInner">
+<div id="showmodalid" class="showmodal" style="display:none">
+	<div class="center" style="width:423px" >
+	    <img id="waitImg" alt="" src="/static/images/loader.gif" />
+  	
+	   <span id="waiText2" style="font-weight: bolder;font-size: large;"> This may take few seconds..</span>
+	   </div>
+</div>
+<div class="divWidth">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+			<div class="NavDiv">
+				<div class="nav">
+					<ul>
+					
+						<li class="home"><a href="dashboard">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+					</ul>
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop">
+							<img src="/static/images/search.jpg">
+							<div id="two" class="popupBox">
+							<form method="post" action="/searchOpportunity" id="search">
+								<input type="text" value="" name="searchOpportunity" id="searchOpportunity" required class="popInput placeholder-fix" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Opportunity Name">
+								<input type="submit" value="Search" class="popButton">
+							</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+</div>
+
+<div class="InnDiv" ></div>
+	
+<!-- TABLE start -->	
+
+<div class="divWidth"> <!--<div class="col-md-offset-2 col-md-10"> -->	
+<div class="container">
+	<div class="text-left" style="padding-bottom:4px">
+	   <h1>Productivity Calculator </h1>
+	</div>
+	<hr style="height: 5px !important; border: 0 !important;	box-shadow: 0 5px 5px -5px #8c8b8b inset !important; margin-top:0px;">
+	<form method="post" id="saveSecondProdCalculator" action="/saveSecondProdCalculator" onsubmit="return validate()" > <!-- onsubmit="return validate()" -->
+	<input type=hidden id="solId" name="solId" value="{{solId}}">
+	<input type=hidden id="solAreaId" name="solAreaId" value="{{solAreaId}}">
+	<input type=hidden id="optyName" name="optyName" value="{{optyName}}">
+	<input type=hidden id="amsValJson" name="amsValJson" value="" />
+	<div class="text-left" style="padding-bottom:4px">
+	   <table class="table" style="width: 30%;">
+	   <tbody>
+			<tr>
+				<td style="border-top: none;" class="text-left"><strong>Opportunity Name</strong> </td>
+				<td style="border-top: none;" class="text-left" name="optyName" >{{optyName}}</td>
+			</tr>
+			<tr>
+				<td style="border-top: none;" class="text-left"><strong>Solution ID</strong> </td>
+				<td style="border-top: none;" class="text-left" name="solutionId" >{{solId}}</td>
+			</tr>
+	   </tbody>
+	   </table>
+	</div>
+	
+	<div>
+	<table id="calProdTable" class="table  table-bordered table-condensed  tableWidth" align="left">
+		 <caption style="text-align: center;">Calculated Productivity </caption>
+		 <thead>
+		 		<col>
+				<colgroup span="2"></colgroup>
+				
+		 		<tr  class="tableHeader">
+		 			<th class="" rowspan="2">S No. </th>
+		 			<th class="col-xs-3" rowspan="2">Productivity Lever</th>
+					<th class="text-center" colspan="5" scope="colgroup">Calculated Productivity Percentages</th>
+					<th class="text-center" colspan="5" scope="colgroup">Applied Productivity Percentages</th>
+					<th class="oneTimeCostBg" rowspan="2">One Time Cost(in US$)</th>
+					<th class=" oneTimeCostBg" rowspan="2">Total Recuring cost(in US$)</th>
+				  </tr>
+			  	<tr class="tableHeader">
+					
+					<th class="calProdBg" scope="col">Yr-1</th>
+					<th class="calProdBg" scope="col">Yr-2</th>
+					<th class="calProdBg" scope="col">Yr-3</th>
+					<th class="calProdBg" scope="col">Yr-4</th>
+					<th class="calProdBg" scope="col">Yr-5</th>
+					<th class="appProdBg col-xs-1" scope="col">Yr-1</th>
+					<th class="appProdBg col-xs-1" scope="col">Yr-2</th>
+					<th class="appProdBg col-xs-1" scope="col">Yr-3</th>
+					<th class="appProdBg col-xs-1" scope="col">Yr-4</th>
+					<th class="appProdBg col-xs-1" scope="col">Yr-5</th>
+					<!-- <th scope="col">Copy Cal</th> -->
+				</tr>
+		</thead>
+		<tbody>
+			
+			
+		</tbody>
+	</table>
+	</div>
+	
+	<!-- TABLE END -->				
+</div><!-- end of container -->
+
+<div class="container" >
+	<div class="alert alert-warning" style="width: 90%;">
+		<div class="row"><strong>* AQL Cost provided is for Ref, Include AQL as Staffing and ignore the cost</strong></div>
+		<div class="row"><strong>* Future Productivity Cost Should be calculated from your Solution as 1.5% of Total AMS Cost each Year from Y2</strong></div>
+		<div class="row"><strong>* ECA cost includes CAST and Ticket Analytics Costs</strong></div>
+		<div class="row"><strong>* DRI Cost is included in AMS Tools Cost</strong></div>
+	</div>
+	<table align="center" width="100%" cellpadding="1" cellspacing="0" border="0">
+	
+			<tr>
+				<td class="tdspace">
+					&nbsp;&nbsp;
+					<button name="submit-form" id="submit-form" class="bluebutton" >Apply Final Productivity</button>  
+					&nbsp;&nbsp;&nbsp;&nbsp;
+					<!-- <input type="button" id="backButton" class="cancelbutton" value="Back" onclick="javascript:history.go(-1);"> -->
+				</td>
+			</tr>
+	</table> 
+</div>
+
+</div>	
+</form>	
+    
+	</body>
+</html>

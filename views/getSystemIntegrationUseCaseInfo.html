@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+		<title>Solution Advisor</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta "description" content="An interactive getting started guide for Edge Code CC.">
+	<link rel="stylesheet" href="static/css/style.css">
+	<link rel="stylesheet" href="static/css/jquery.modal.css">
+	<link rel="stylesheet" href="static/css/icon.css"> 
+ 	<link rel="stylesheet" href="static/css/3.3.7/bootstrap.min.css">
+	<script	src="static/js/main.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.min.js"></script>
+	<script	src="static/js/jquery.modal.js"></script>	
+ 	<script	src="static/js/close.js"></script>
+ 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+ 	<script src="static/js/3.3.7/bootstrap.min.js"></script>
+
+<style type="text/css">
+   .select-editable1 {
+     position:relative;
+     background-color:white;
+    /*  border:solid grey 1px; */
+     border:none;
+     width:120px;
+     height:18px;
+ }
+ .select-editable2 {
+     position:relative;
+     background-color:white;
+    /*  border:solid grey 1px; */
+     border:none;
+     width:120px;
+     height:18px;
+ }
+ .select-editable3 {
+     position:relative;
+     background-color:white;
+    /*  border:solid grey 1px; */
+     border:none;
+     width:120px;
+     height:18px;
+ }
+ .select-editable1 select {
+     position:absolute;
+     top:0px;
+     left:0px;
+     border-style: solid;
+     width:240px;
+     margin:0;
+ }
+  .select-editable2 select {
+     position:absolute;
+     top:0px;
+     left:0px;
+     border-style: solid;
+     width:198px;
+     margin:0;
+ }
+  .select-editable3 select {
+     position:absolute;
+     top:0px;
+     left:0px;
+     border-style: solid;
+     width:169px;
+     margin:0;
+ }
+ .select-editable1 input {
+     position:absolute;
+     top:1px;
+     left:3px;
+     width:217px;
+     padding:1px;
+     font-size:12px;
+     /* border-style: solid; */
+     border:none;
+ }
+ .select-editable2 input {
+     position:absolute;
+     top:1px;
+     left:3px;
+     width:173px;
+     padding:1px;
+     font-size:12px;
+     /* border-style: solid; */
+     border:none;
+ }
+ .select-editable3 input {
+     position:absolute;
+     top:1px;
+     left:3px;
+     width:146px;
+     padding:1px;
+     font-size:12px;
+     /* border-style: solid; */
+     border:none;
+ }
+ 
+ .select-editable select:focus, .select-editable input:focus {
+     outline:none;
+ }
+    .table-title {
+        padding-bottom: 10px;
+        margin: 0 0 10px;
+    }
+    .table-title h2 {
+        margin: 6px 0 0;
+        font-size: 22px;
+    }
+    .table-title .add-new {
+        float: right;
+		height: 30px;
+		font-weight: bold;
+		font-size: 12px;
+		text-shadow: none;
+		min-width: 100px;
+		border-radius: 50px;
+		line-height: 13px;
+    }
+    
+	.table-title .add-new i {
+		margin-right: 7px;
+	}
+    table.table {
+        table-layout: fixed;
+    }
+    table.table tr th, table.table tr td {
+        border-color: #B2B2B2;
+    } 
+    table.table th i {
+        font-size: 13px;
+        margin: 0 5px;
+        cursor: pointer;
+    }
+    table.table th:last-child {
+        width: 100px;
+    }
+    table.table td a {
+		cursor: pointer;
+        display: inline-block;
+        margin: 0 1px;
+		min-width: 24px;
+    }    
+	table.table td a.add {
+        color: #27C46B;
+    }
+    table.table td a.edit {
+        color: #FFC107;
+    }
+    table.table td a.delete {
+        color: #E34724;
+    }
+    table.table td i {
+        font-size: 19px;
+    }
+	table.table td a.add i {
+        font-size: 24px;
+    	margin-right: -1px;
+        position: relative;
+        top: 3px;
+    }    
+    table.table .form-control {
+        height: 32px;
+        line-height: 32px;
+        box-shadow: none;
+        border-radius: 2px;
+        padding: 6px 8px;
+        font-family: sans-serif;
+        font-style: italic;
+        font-size: 12px;
+        color: #6a858c;
+    }
+	table.table .form-control.error {
+		border-color: #f50000;
+	}
+	table.table td .add {
+		display: none;
+	}
+	
+	.btn-color{
+		color:#fff;
+		background-color:#005eb5;
+		border-color:#2e6da4;
+		padding: 6px 20px;
+		font-size: 15px;
+	}
+	th {
+	    background-color: #C5C3C3;
+	 } 
+	
+	
+</style>
+	 
+<script type="text/javascript">
+var timeCount = 10000;
+
+function isProperValue(val){
+	
+	var temp = ""+val;
+	if(temp.length > 1 && temp.indexOf("0") == 0 ){
+		return false;
+	}
+	
+	return ($.isNumeric(val) && (val >= 0) && (Math.floor(val) == val) && (val <= 200));
+}
+
+var jsonArr = { 
+				"perfPercent":0, 
+				"entries": [],
+				"adapters": []
+			};
+//var jsonArr = { entries: []};
+function validate() {
+	if ($("tr[id^='row']").length  == 0 ){
+		alert("Please provide atleast one service combination.");
+		return false;
+	}
+	
+	var allGood = false;
+	
+	//gather all records & make a json out of them
+	$( "tr[id^='row']" ).each(function( index, element ) {
+		var simple = $(this).find('td:eq(3)').text()
+		var medium = $(this).find('td:eq(4)').text()
+		var complex = $(this).find('td:eq(5)').text()
+		allGood = isProperValue(simple) && isProperValue(medium) && isProperValue(complex);
+		if(!allGood){
+			return false;
+		}
+		var obj = {simple:"0",medium:"0",complex:"0"};
+		obj.simple = simple;
+		obj.medium = medium;
+		obj.complex = complex;
+		obj.indusId = $("#indusId").val();
+			
+		var tech1 = $(this).find('td:eq(0)').attr('id');
+		var tech2 = $(this).find('td:eq(1)').attr('id');
+		var tech3 = $(this).find('td:eq(2)').attr('id');
+		
+		var tech1_name = $(this).find('td:eq(0)').text();
+		var tech2_name = $(this).find('td:eq(1)').text();
+		var tech3_name = $(this).find('td:eq(2)').text();
+		
+		obj.tech1 = tech1;
+		obj.tech2 = tech2;
+		obj.tech3 = tech3;
+		obj.tech1_name = tech1_name;
+		obj.tech2_name = tech2_name;
+		obj.tech3_name = tech2_name;
+		
+		/* var temp = middlewares.filter(function (val) {
+			var flag = (val.Technology_id==tech3);
+			return flag;
+		}); */
+		//alert("usecaseId: "+ temp[0].use_case_id);
+		obj.usecaseId=9999; ///test
+		//alert("obj.usecaseId = "+obj.usecaseId);
+		jsonArr.entries[index] = obj;  
+	});
+	jsonArr.perfPercent=parseInt(document.querySelector("#perf-percent").value);
+	
+	
+	/*var adaptersObj = {simple:"0",medium:"0",complex:"0"};
+	adaptersObj.simple = document.querySelector("#adapters-simple").value;
+	adaptersObj.medium = document.querySelector("#adapters-medium").value;
+	adaptersObj.complex = document.querySelector("#adapters-complex").value;
+	jsonArr.adapters=adaptersObj; */
+	//alert(JSON.stringify(jsonArr));
+	//alert("value of all good "+allGood);
+	if(allGood){
+		document.getElementById("siValJSON").value = JSON.stringify(jsonArr);
+		window.scrollTo(0, 0);
+		$(".showmodal").show();
+		checkSaveStatus(0);
+		return true;		
+	} else{
+		alert("Please provide proper +ve integer value <= 200 for complexity level of Service Endpoints. ");
+		return false;
+	}		
+}
+
+function setLoad(){
+	//consol.log(window.pageYOffset +" "+window.pageXOffset);
+	if($(".showmodal").css("display") != 'none'){
+		$(".showmodal").css("top",window.pageYOffset);
+	}
+}
+
+function checkSaveStatus(count){
+	//alert($('#serviceURL').val()+'/download/query?solId='+$('#solId').val()+'&solAreaId='+$('#solAreaId').val());
+	var values = new Array();
+	/* $.each($("input['testFlagId']:checked"), function() {
+  		values.push($(this).val());
+	});  */
+	
+	setTimeout(function() {
+		$.ajaxSetup({async: false});
+		$.post("/checkSaveStatus",
+				{
+					solId:$('#solId').val(),
+					solAreaId:$('#currentSolAreaId').val(), 
+					testSolId:$("#testSolId").val(),
+					enbTestBtn:values.length
+				}, 
+				function(data, status){
+					//alert("Data: " + data + "\nStatus: " + status);
+					if(data!="Error: connect ECONNREFUSED"){
+						
+						if(data=="No"){
+							 if(count > 0){
+								 //$('a#advisorHome').click();
+								  console.log("data is NO and now dashboard");
+								 var addr= (window.location.href).split('/');	        		 
+								 window.location.href = addr[0]+"//"+addr[2]+"/dashboard";
+							 }else{
+								 console.log("data is NO and count <0");
+								$("#waitImg").hide();
+								$(".center").css("width","350px");
+								$("#waiText").show();
+								count++;
+								setTimeout(function() {
+									checkSaveStatus(1);
+								},timeCount);
+							}
+						}else{
+							//$("#waiText").hide();
+							//$(".showmodal").hide();
+							console.log("data is YES and now gotoSolutionsDetails");
+							document.getElementById("saveSolution").action = "/gotoSolutionDetails";
+							if(document.getElementById("testSolId").value == 'Y'){
+								document.getElementById("enbTestBtn").value = 1;
+							} else{
+								document.getElementById("enbTestBtn").value = 0;
+							}
+							document.getElementById("saveSolution").submit();
+							/* $.post("/gotoSolutionDetails",{solId:$('#solId').val(),enbTestBtn:values.length}, function(data, status){
+								
+							}); */
+						}
+					}else{
+						console.log("data can be Error: connect ECONNREFUSED");
+						$("#waitImg").hide();
+						$(".center").css("width","350px");
+						$("#waiText").hide();
+						$("#downText").show();
+						setTimeout(function() {
+							$("#downText").hide();
+							$(".showmodal").hide();
+						},3000);
+					}
+				}
+		);
+		$.ajaxSetup({async: true});
+	},timeCount);
+	
+}
+
+var choicesjson = {};
+var middlewares = {};
+
+$(document).ready(function(){
+	//beg
+	var buttonState="new";
+	var isPerfTested = $('#testSolId').val();
+	if(isPerfTested != 'Y'){
+		$('#perf-percent-col').hide();
+		$('#perf-percent-value').hide();
+		$('#interface-overview').css('width','67%');
+		$('#perf-percent').val(null);
+		$('#perf-percent').hide().prop('required',false);
+		$('#perf-critical').hide().prop('required',false);
+	}
+	else
+		$('#interface-overview').css('width','59%');
+	
+	$('[data-toggle="tooltip"]').tooltip();
+	var actions = $("table#SystemTable td:last-child").html();
+	// Append table with add row form on add new button click
+    $(".add-new").click(function(){
+		$(this).attr("disabled", "disabled");
+		$("#submit-form").prop("disabled", true);
+		buttonState = "add-new";
+		var index = $("table#SystemTable tbody tr:last-child").index();
+		var currentIndex=index+1;
+		console.log("currentIndex--- "+currentIndex);
+		
+		var row = '<tr id="row'+currentIndex+'">' +
+         '<td ><div class="select-editable1"><select class="form-control" id="System-1-Options-'+currentIndex+'" onChange="updateSelectionUsing1('+currentIndex+')"><input type="text" id="System-1-input-'+currentIndex+'" onChange="updateInputUsing1('+currentIndex+')" value=""/></div></td>'+
+		 '<td ><div class="select-editable2"><select class="form-control" id="System-2-Options-'+currentIndex+'" onChange="updateSelectionUsing2('+currentIndex+')"><input type="text" id="System-2-input-'+currentIndex+'" onChange="updateInputUsing2('+currentIndex+')" value=""/></div></td>'+
+		 '<td ><select class="form-control" id="System-3-Options-'+currentIndex+'" onChange="enableAddIntegration('+currentIndex+')"></td>'+
+		 '<td class="text-right"><input  class="form-control" style="line-height:30px;width:111%;" type="number" min="0" max="200"  id="si-simple-'+currentIndex+'" "si-simple" value="" ></td>'+
+		 '<td class="text-right"><input  class="form-control" style="line-height:30px;width:111%;" type="number" min="0" max="200"  id="si-medium-'+currentIndex+'" "si-medium" value="" ></td>'+
+		 '<td class="text-right"><input  class="form-control" style="line-height:30px;width:111%;" type="number" min="0" max="200"  id="si-complex-'+currentIndex+'" "si-complex" value="" ></td>'+
+         '<td id="action-'+currentIndex+'">'+
+         	'<a class="add"  id="add" title="Add" data-toggle="tooltip"><i class="material-icons">check</i></a>'+
+         	'<a class="edit" id="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">build</i></a>'+
+         	'<a class="delete" id="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>' +
+         	'<a class="help" id="help-'+currentIndex+'" title="Complexity Definition" target="popup" data-toggle="tooltip"><i class="material-icons">help</i></a></td>'+
+         	 '</tr>';
+        
+       	$("table#SystemTable").append(row);	
+    	$("table#SystemTable tbody tr").eq(index + 1).find(".add, .edit").toggle();
+        $('[data-toggle="tooltip"]').tooltip();
+        $("#help"+currentIndex).attr("disabled", "disabled");
+        loadNewRow(currentIndex);
+       
+     });
+	
+    $(".editableBox").change(function(){         
+        $(".timeTextBox").val($(".editableBox option:selected").html());
+    });
+	// Add row on add button click
+	$(document).on("click", ".add", function(){
+		var empty = false;
+		var selectedVal=[];
+		var currentIndex=$(this).parents("tr").attr('id').slice(3);
+		var system1Id=$(this).parents("tr").find("td:eq(0)").attr('id');
+	    var system2Id=$(this).parents("tr").find("td:eq(1)").attr('id');
+	    var system3Id=$(this).parents("tr").find("td:eq(2)").attr('id');
+	    
+	    var existingKey=system1Id+system2Id+system3Id;
+	    console.log("existing key "+existingKey);
+	 	
+		var input = $(this).parents("tr").find('input[type="number"]');
+		var inputSelect = $(this).parents("tr").find("td:eq(2)").find('select');
+		var inputText = $(this).parents("tr").find('input[type="text"]');
+				
+		input.each(function(){
+				if(!$(this).val()){
+				$(this).addClass("error");
+				empty = true;
+			} else{
+                $(this).removeClass("error");
+             }
+		});
+        	 	
+        inputText.each(function(index, element){
+			if(!$(this).val()){
+				$(this).addClass("error");
+				empty = true;
+			} else{
+				selectedVal.push($(this).text());
+           		$(this).removeClass("error");
+        	 }
+		});
+		inputSelect.each(function(){
+			if(!$(this).val()){
+				$(this).addClass("error");
+				empty = true;
+			} else{
+				 selectedVal.push($(this).find('option:selected').val());
+				 $(this).removeClass("error");
+              }
+		}); 
+		
+	    //checking in combination already exist of not
+	     var key =selectedVal[0];
+	     for(sel = 1; sel<selectedVal.length; sel++){
+	    	  key+=selectedVal[sel];
+	      }
+	     console.log("current row new key "+key+ " buttonstate "+buttonState);
+		var obj = entryList[key];
+		if(key.length<11)
+		{
+			console.log("length is les than 11");	
+		}else{		
+			if(buttonState=="add-new"){
+				if(obj == undefined){
+				   		entryList[key]=10;
+				   } 
+				else{
+						alert("Given combination has already been added");
+				   		return;
+					}
+			}
+			else if(buttonState="edit"){
+				if(obj == undefined){
+			   		entryList[key]=10;
+			   	} 
+				else{
+					delete entryList[existingKey];
+					if(entryList[key]==undefined){
+			   			entryList[key]=10;
+			   		}
+			   		else{
+			   			alert("Given combination has already been added");
+				   		return;
+			   		}
+				}
+			}
+		}
+		$(this).parents("tr").find(".error").first().focus();
+		if(!empty){
+			input.each(function(){
+				$(this).parent("td").html($(this).val());
+			});	
+			inputText.each(function(){
+				$(this).parents("td").attr('id', $(this).text());
+				$(this).parents("td").html($(this).val());
+					
+			}); 
+			inputSelect.each(function(){
+				var selectedVal=$(this).find('option:selected').val();
+				$(this).parent("td").attr('id', selectedVal);
+				$(this).parent("td").html($(this).find('option:selected').text());
+			});
+			$(this).parents("tr").find(".add, .edit").toggle();
+			$(".add-new").removeAttr("disabled");
+			$("#submit-form").prop("disabled", false);
+		}
+		updatePerfEntries();
+		
+    });
+	
+	// Delete row on delete button click
+	$(document).on("click", ".delete", function(){
+        $(this).parents("tr").remove();
+		$(".add-new").removeAttr("disabled");
+		var currentIndex= $(this).attr('id').slice(3);
+		var system1Id=$(this).parents("tr").find("td:eq(0)").attr('id');
+	    var system2Id=$(this).parents("tr").find("td:eq(1)").attr('id');
+	    var system3Id=$(this).parents("tr").find("td:eq(2)").attr('id');
+		var key = system1Id + system2Id  + system3Id;
+		delete entryList[key];
+		updatePerfEntries();
+		$("#submit-form").prop("disabled", false);
+    });
+	//end
+	
+	// Edit row on edit button click
+	$(document).on("click",".edit", function(){
+		buttonState = "edit";
+		$("#submit-form").prop("disabled", true);
+		var currentIndex= $(this).parents("tr").attr('id').slice(3);
+		var selectedVal1=$(this).parents("tr").find("td:eq(0)").text();
+	    var selectedVal2=$(this).parents("tr").find("td:eq(1)").text();
+	    var selectedVal3=$(this).parents("tr").find("td:eq(2)").text();
+	    
+		var selectedVal4=$(this).parents("tr").find("td:eq(3)").text();
+	    var selectedVal5=$(this).parents("tr").find("td:eq(4)").text();
+	    var selectedVal6=$(this).parents("tr").find("td:eq(5)").text();
+	       
+        $(this).parents("tr").find("td:not(:last-child)").each(function(){
+         
+	       $(this).parents("tr").find("td:eq(0)").html('<div class="select-editable1"><select class="form-control" id="System-1-Options-'+currentIndex+'" onChange="updateSelectionUsing1('+currentIndex+')"><input type="text" id="System-1-input-'+currentIndex+'" onChange="updateInputUsing1('+currentIndex+')" value="'+selectedVal1+'"/></div>');
+	       $(this).parents("tr").find("td:eq(1)").html('<div class="select-editable2"><select class="form-control" id="System-2-Options-'+currentIndex+'" onChange="updateSelectionUsing2('+currentIndex+')"><input type="text" id="System-2-input-'+currentIndex+'" onChange="updateInputUsing2('+currentIndex+')" value="'+selectedVal2+'"/></div>');
+	       $(this).parents("tr").find("td:eq(2)").html('<select class="form-control" id="System-3-Options-'+currentIndex+'" onChange="enableAddIntegration('+currentIndex+')" >');
+	       $(this).parents("tr").find("td:eq(3)").html('<input  class="form-control" style="line-height:30px;width:111%;" id="si-simple-'+currentIndex+'"type="number" min="0" max="200" value="">');
+	       $(this).parents("tr").find("td:eq(4)").html('<input  class="form-control" style="line-height:30px;width:111%;" id="si-medium-'+currentIndex+'"type="number" min="0" max="200" value="'+$(this).text()+'">');
+	       $(this).parents("tr").find("td:eq(5)").html('<input  class="form-control" style="line-height:30px;width:111%;" id="si-complex-'+currentIndex+'"type="number" min="0" max="200" value="'+$(this).text()+'">');
+	    });	
+      
+        loadNewRow(currentIndex);
+        $("#System-1-input-"+currentIndex).text($(this).parents("tr").find("td:eq(0)").attr('id'));
+    	$("#System-2-input-"+currentIndex).text($(this).parents("tr").find("td:eq(1)").attr('id'));
+    	        
+    	$("#si-simple-"+currentIndex).text(selectedVal4);
+    	$("#si-medium-"+currentIndex).text(selectedVal5);
+    	$("#si-complex-"+currentIndex).text(selectedVal6);
+    	
+    	$("#si-simple-"+currentIndex).val(selectedVal4);
+    	$("#si-medium-"+currentIndex).val(selectedVal5);
+    	$("#si-complex-"+currentIndex).val(selectedVal6);
+    	
+    	$(this).parents("tr").find(".add, .edit").toggle();
+		$(".add-new").attr("disabled", "disabled");
+				
+    });
+	$(document).on("click", ".help", function(){
+		var url=$(this).attr("href");
+		window.open(url,"popup" , "width=800,height=600,scrollbars=yes,toolbar=no, menubar=no");
+		return false;
+	});
+
+
+	$(".testCheckBox").each(function(){
+		$(this).change(function(){
+			if(this.checked){			
+				this.value='1';
+			}else{			
+				this.value='0';
+				$("#selectAllPC").prop('checked', $(this).prop("checked")); //change "select all" checked status to false
+			}
+		});		
+	});
+	
+	$("#selectAllLOB").change(function(){  //"select all" change
+		$(".lobCheckBox").each(function(){ 
+			$(this).prop('checked', $("#selectAllLOB").prop("checked"));
+			toggleCheck(this);
+		});
+	    //$(".lobCheckBox").prop('checked', $(this).prop("checked")); //change all ".checkbox" checked status
+	});
+	
+	$("#selectAllPC").change(function(){  //"select all" change
+		
+		$(".testCheckBox").each(function(){ 
+			if(!$(this).attr("disabled")){
+				$(this).prop('checked', $("#selectAllPC").prop("checked"));
+			}
+		});
+	    //$(".testCheckBox").prop('checked', $(this).prop("checked")); //change all ".checkbox" checked status
+	});
+	
+	
+	$.ajaxSetup({async: false});
+	$.ajax({url: "/c-intg/"+document.querySelector("#indusId").value, success: function(data) {
+			//alert("data==="+data);
+			choicesjson = data;
+		}
+	});
+	//var subCatUrl="/mware-subcat/"+document.querySelector("#indusId").value;
+	var subCatUrl="/mware-subcat";
+	$.ajax({url: subCatUrl, success: function(data) {
+			//alert("data==="+data);
+			middlewares = data;
+		}
+	});
+	$.ajaxSetup({async: true});
+		
+	//populate global var with keys for pre entered entries	
+	$( "tr[id^='row']" ).each(function( index, element ) {
+		var index=$(this).attr('id').slice(3);
+		var system1Id=$(this).find('td:eq(0)').attr('id'); 
+	    var system2Id=$(this).find('td:eq(1)').attr('id');
+	    var system3Id=$(this).find('td:eq(2)').attr('id');
+	    var key = system1Id + system2Id  + system3Id;
+		var obj = entryList[key];
+		if(obj == undefined){
+			entryList[key]=10;
+		}
+	});
+	updatePerfEntries();
+});
+
+function getOptionsSystem1(){
+	var indexes =[];
+	var selected =[];
+	
+	for(var i=0;i<choicesjson.length;i++){
+		if(indexes.indexOf(choicesjson[i].name_1) == -1){
+			indexes.push(choicesjson[i].name_1);
+			selected.push(choicesjson[i]);
+		} else{
+			//do nthg
+		}
+	}
+	return selected;
+}
+
+function getOptionsSystem2(currentIndex){
+	
+	//var x1=document.getElementById("System-1-Options-"+currentIndex);
+	//var val1 = x1.options[x1.selectedIndex].value;
+	
+	var x1=document.getElementById("System-1-input-"+currentIndex);
+	var val1 = x1.textContent;
+	
+	console.log(" getOptionsSystem2 "+ x1.value +" val1 "+ val1);
+	var temp = choicesjson.filter(function (val) {
+				  return val.id_system_1==val1;
+			  });
+	var indexes =[];
+	var selected =[];
+	for(var i=0;i<temp.length;i++){
+		if(indexes.indexOf(temp[i].name_2) == -1){
+			indexes.push(temp[i].name_2);
+			selected.push(temp[i]);
+		} else{
+			//do nthg
+			
+		}
+	}
+	return selected;
+}
+
+function getOptionsSystem3(){
+	var x1=document.getElementById("System-1-Options");
+	var val1 = x1.options[x1.selectedIndex].value;
+	var x2=document.getElementById("System-2-Options");
+	var val2 = x2.options[x2.selectedIndex].value;
+	var temp = choicesjson.filter(function (val) {
+				  return (val.id_system_1 == val1) && (val.id_system_2 == val2);
+			  });
+
+	var indexes =[];
+	var selected =[];
+	
+	for(var i=0;i<temp.length;i++){
+		//alert("temp[i].name_3:: "+ temp[i].name_3);
+		if(indexes.indexOf(temp[i].name_3) == -1){
+			indexes.push(temp[i].name_3);
+			selected.push(temp[i]);
+		} else{
+			//do nthg
+		}
+	}
+	return selected;			  
+}
+function toggleCheck(elm){
+	if(elm.checked){
+		$(elm).parent().parent().find('.testCheckBox').removeAttr("disabled");
+	}else{
+		$(elm).parent().parent().find('.testCheckBox').prop("checked", false);		
+		$(elm).parent().parent().find('.testCheckBox').attr("disabled", true);		
+	}
+	if(false == $(elm).prop("checked")){ //if this item is unchecked
+        $("#selectAllLOB").prop('checked', $(elm).prop("checked")); //change "select all" checked status to false
+    }
+}
+
+function loadNewRow(currentIndex){
+	var dropdown1 = $('#System-1-Options-'+currentIndex);
+	var selectedVal1=dropdown1.parents("td").attr('id');
+	dropdown1.empty();
+ 	var option1 = $("<option/>");
+ 	option1.attr("value", "").text("Select");
+ 	dropdown1.append(option1);
+ 	
+ 	var results1 = getOptionsSystem1();
+ 	for(var i=0;i<results1.length;i++){
+ 		if (selectedVal1==results1[i].id_system_1){
+ 				option1 = $("<option selected/>");
+ 			    $('#System-1-input-'+currentIndex).text(selectedVal1);
+			}
+ 		  
+		else
+	 		option1 = $("<option/>");
+	 	option1.attr("value",results1[i].id_system_1).text( results1[i].name_1);
+	 	//$('#System-1-index-'+currentIndex).val(results1[i].name_1);
+	 	dropdown1.append(option1);		
+	 }
+ 	
+ 	var dropdown2 = $('#System-2-Options-'+currentIndex);
+	var selectedVal2=dropdown2.parents("td").attr('id');
+ 	dropdown2.empty();
+ 	var option2 = $("<option/>");
+ 	option2.attr("value", "").text("Select");
+ 	dropdown2.append(option2);
+ 	
+ 	var results2 = getOptionsSystem2(currentIndex);
+ 	for(var i=0;i<results2.length;i++){
+ 		if (selectedVal2==results2[i].id_system_2){
+ 			option2 = $("<option selected/>");
+ 			$('#System-2-input-'+currentIndex).text(selectedVal2);
+ 		}
+		else
+ 			option2 = $("<option/>");
+ 		option2.attr("value",results2[i].id_system_2).text( results2[i].name_2);
+ 		dropdown2.append(option2);		
+ 	}
+ 	
+ 	var dropdown3 = $('#System-3-Options-'+currentIndex);
+ 	var selectedVal3=dropdown3.parents("td").attr('id');
+	dropdown3.empty();
+ 	var option3 = $("<option/>");
+ 	option3.attr("value", "").text("Select");
+ 	dropdown3.append(option3);
+ 	
+ 	var results3 = middlewares;
+ 	for(var i=0;i<results3.length;i++){
+ 		if (selectedVal3==results3[i].Technology_id){
+			option3 = $("<option selected/>");
+			$("#help-"+currentIndex).attr("href","/esb_complexity_def/"+selectedVal3);	
+ 		}
+		else
+ 			option3 = $("<option/>");
+ 		option3.attr("value",results3[i].Technology_id).text( results3[i].Technology_name);
+ 		dropdown3.append(option3);	
+ 	}
+  }
+
+function getSavedValue(sol_id, sol_area_id, subcategory_Id){
+		$.ajaxSetup({async: false});
+		$.get("/getSIUsecaseVal",
+				{
+					solId:sol_id,
+					solAreaId:sol_area_id, 
+					subcategoryId:subcategory_Id
+				}, 
+				function(data, status){
+					//alert("Data: " + data + "\nStatus: " + status);
+					return data;
+				}
+		);
+		$.ajaxSetup({async: true});
+}
+
+function updateSelectionUsing1(currentIndex){
+	
+	//console.log(" val ===="+$('#System-1-Options-'+currentIndex).val()+" text=== "+$('#System-1-Options-'+currentIndex).find('option:selected').text());
+	//$('#System-1-input-'+currentIndex).val(""); 
+	$('#System-1-input-'+currentIndex).val($('#System-1-Options-'+currentIndex).find('option:selected').text()); 
+	$('#System-1-input-'+currentIndex).text($('#System-1-Options-'+currentIndex).val()); 
+	//based on what is selected in 1st dropdown populate other two dropdowns
+	var results2 = getOptionsSystem2(currentIndex);
+	var dropdown2 = $('#System-2-Options-'+currentIndex);
+	dropdown2.empty();
+	var option2 = $("<option/>");
+	option2.attr("value", "").text("Select");
+	dropdown2.append(option2);
+	
+	for(var i=0;i<results2.length;i++){
+		var option = $("<option/>");
+		option.attr("value",results2[i].id_system_2).text( results2[i].name_2);
+		dropdown2.append(option);		
+	}
+}
+
+function updateSelectionUsing2(currentIndex){
+	console.log("system2 dropdown onchange");
+	$('#System-2-input-'+currentIndex).val($('#System-2-Options-'+currentIndex).find('option:selected').text()); 
+	$('#System-2-input-'+currentIndex).text($('#System-2-Options-'+currentIndex).val()); 
+}
+function updateInputUsing1(currentIndex){
+	//$('#System-2-input-'+currentIndex).val($('#System-2-Options-'+currentIndex).find('option:selected').text()); 
+	$('#System-1-input-'+currentIndex).text(""); 
+}
+function updateInputUsing2(currentIndex){
+	console.log("system2 input onchange");
+	//$('#System-2-input-'+currentIndex).val($('#System-2-Options-'+currentIndex).find('option:selected').text()); 
+	$('#System-2-input-'+currentIndex).text(""); 
+}
+/* function updateInputUsing3(currentIndex){
+	//$('#System-2-input-'+currentIndex).val($('#System-2-Options-'+currentIndex).find('option:selected').text()); 
+	$('#System-3-input-'+currentIndex).text(""); 
+}
+ */
+
+
+function enableAddIntegration(currentIndex){
+	
+	/* $('#System-3-input-'+currentIndex).val($('#System-3-Options-'+currentIndex).find('option:selected').text()); 
+	$('#System-3-input-'+currentIndex).text($('#System-3-Options-'+currentIndex).val()); 
+	 */
+    var option1=document.getElementById("System-1-Options-"+currentIndex);
+	var option1Val = option1.options[option1.selectedIndex].text;
+    var option1Id = option1.options[option1.selectedIndex].value;
+    var option2=document.getElementById("System-2-Options-"+currentIndex);
+	var option2Val = option2.options[option2.selectedIndex].text;
+    var option2Id = option2.options[option2.selectedIndex].value;
+	var option3=document.getElementById("System-3-Options-"+currentIndex);
+	var option3Val = option3.options[option3.selectedIndex].text;
+    var option3Id = option3.options[option3.selectedIndex].value;
+        
+	 /* if(option1Id == "" || option2Id == "" || option3Id == ""){ */
+	if(option3Id == ""){	 
+		alert("Please select appropriate Technology from the dropdowns");
+		return;
+	 } 
+	 var choice = choicesjson.filter(function (val) {
+		  return (val.id_system_1 == option1Id) && (val.id_system_2 == option2Id);
+	 });
+	
+	 var simpleVal = choice[0].num_simple;
+	 var mediumVal = choice[0].num_medium;
+	 var complexVal = choice[0].num_complex;
+	// var usecaseId = choice[0].usecaseId;
+	 
+	 //autopopulate simple/medium/complex
+	 $("#si-simple-"+currentIndex).val(simpleVal);
+	 $("#si-medium-"+currentIndex).val(mediumVal);
+	 $("#si-complex-"+currentIndex).val(complexVal);
+	 $("#help-"+currentIndex).attr("href","/esb_complexity_def/"+option3Id);	
+}
+
+function updatePerfEntries(){
+	var sTotal = 0;
+	var mTotal = 0;
+	var cTotal = 0;
+	$( "tr[id^='row']" ).each(function( index, element ) {
+		var simple = $(this).find('td:eq(3)').text()
+		var medium = $(this).find('td:eq(4)').text()
+		var complex = $(this).find('td:eq(5)').text()
+		sTotal += parseInt(simple);
+		mTotal += parseInt(medium);
+		cTotal += parseInt(complex);
+	});
+	console.log("sTotal "+sTotal+" mTotal "+mTotal+" cTotal "+cTotal);
+	document.querySelector("#total-simple").innerHTML=sTotal;
+	document.querySelector("#total-medium").innerHTML=mTotal;
+	document.querySelector("#total-complex").innerHTML=cTotal;
+	var percent = parseInt(document.querySelector("#perf-percent").value);
+	//console.log("percent: "+percent);
+	 document.querySelector("#perf-simple").innerHTML=Math.ceil((percent / 100) * sTotal);
+	document.querySelector("#perf-medium").innerHTML=Math.ceil((percent / 100) * mTotal);
+	document.querySelector("#perf-complex").innerHTML=Math.ceil((percent / 100) * cTotal); 
+}
+
+var entryList = {}; 
+</script>
+  </head>
+  <body class="mainInner" onscroll="setLoad()">
+	<div class="divWidth">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+			<div class="NavDiv">
+				<div class="nav">
+					<ul>
+						<li class="home"><a href="dashboard" id="advisorHome">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+					</ul>
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop">
+							<img src="/static/images/search.jpg">
+							<div id="two" class="popupBox">
+							<form method="post" action="/searchOpportunity" id="search">
+								<input type="text" value="" "searchOpportunity" id="searchOpportunity" required class="popInput placeholder-fix" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Opportunity Name">
+								<input type="submit" value="Search" class="popButton">
+							</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="InnDiv" ></div>
+<div class="container">
+ <form method="post" id="saveSolution" action="/saveSolutionCustomUseCasesInfo" onsubmit="return validate()"> 
+<input type=hidden name="SL_ID" value="{{solAreaResult[0].sl_id}}">
+	<input type=hidden id="solId" name="solId" value="{{solId}}">
+	<input type=hidden id="SOL_AREA_ID" name="SOL_AREA_ID" value="{{solAreaResult[0].sol_area_id}}">
+	<input type=hidden id="indusId" name="INDUS_ID" value="{{solAreaResult[0].indus_id}}">
+	<input type=hidden name="useCaseInfoType" value="{{useCaseInfoType}}">
+	<input type=hidden id="currentSolAreaId" name="currentSolAreaId" value="{{solAreaResult[0].sol_area_id}}">
+	<input type=hidden id="testSolId" name="testSolId" value="{{testSolId}}" />
+	<input type=hidden id="soakTestId" name="soakTestId" value="{{soakTestId}}" />
+	<input type=hidden id="username" name="username" value="{{ user.emp_fname }} {{user.emp_lname}}" />
+
+	<input type=hidden id="model" name="model" value="{{model}}" />
+	<input type=hidden id="sprintWeeks" name="sprintWeeks" value="{{sprintWeeks}}" />
+	<input type=hidden id="enbTestBtn" name="enbTestBtn" value="" />
+	<input type=hidden id="isedit" name="isedit" value="{{isedit}}">
+	<input type=hidden id="siValJSON" name="siValJSON" value="" />
+	&nbsp;&nbsp;
+	<div class="divWidth">
+	<!-- <div class="loginInfo ">Hello {{ user.emp_fname }} {{user.emp_lname}}</div> -->
+	<div class="loginInfo ">Hello {{ user.attributes.firstName }} {{user.attributes.lastName}}</div>
+	
+	<p>Capture your Use cases</p>
+			<table width="100%" cellpadding="1" cellspacing="0" border="0">		
+			<tr>
+				<td colspan="4" class="tdmarg">Solution Details</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Solution Id:</strong></td>
+				<td class="tdInputLabel" colspan="2">{{solId}}</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Lead Service Line:</strong></td>
+				<td class="tdInputLabel" colspan="2">{{solAreaResult[0].sl_name}}</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Solution Area:</strong></td>
+				<td class="tdInputLabel" colspan="2">{{solAreaResult[0].sol_area_name}}</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Industry:</strong></td>
+				<td class="tdInputLabel" colspan="2">{{solAreaResult[0].indus_name}}</td>
+			</tr>
+			<tr>
+				<td colspan="4" class="tdmarg">Interface Counts for <font color="#000099"><b>{{solAreaResult[0].sol_area_name}}</b></font> in <font color="#000099"><b>{{solAreaResult[0].indus_name}}</b></font></td>
+			</tr>
+			<tr>
+				<td colspan="4" class="tdLabel">&nbsp;</td>
+			</tr>
+		{% if errorMessage %}
+			<tr>
+				<td colspan="4" class="tdErrorMsg">{{errorMessage}}</td>
+			</tr>
+		{% endif %}			
+
+		</table>
+
+ &nbsp;&nbsp; &nbsp;&nbsp;
+<div class="col-md-13"> 
+
+<table class="table info table-bordered table-striped " id="totalTable">
+	<thead>
+		<tr>
+			<th id="interface-overview"><strong>Interface Overview </strong></th>
+			<th id="perf-percent-col" width="8%" >Perf %</th>
+			<th  width="7%" >Simple</th>
+			<th  width="7%" >Medium</th>
+			<th  width="7%" >Complex</th>
+			<th  width="10%" ></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr id="total-interface">
+			<td width="25%" >Total Number of Interfaces</td>
+			<td id="perf-percent-value" width="15%" ></td>
+			<td width="15%" id="total-simple"  class="text-right">0</td>
+			<td width="15%" id="total-medium"  class="text-right">0</td>
+			<td width="15%" id="total-complex" class="text-right">0</td>
+		</tr>
+		<tr id="perf-critical">
+			<td width="25%" >Performance Critical</td>
+			<td width="15%"><input  type="number" id="perf-percent"  min="0" max="100" style="line-height:25px;width:90%;" value="{{perfPercent||20}}" oninput="updatePerfEntries()"  ></td>
+			 <td width="15%" id="perf-simple" "perf-simple" class="text-right">0</td>
+			<td width="15%" id="perf-medium" "perf-medium" class="text-right">0</td>
+			<td width="15%" id="perf-complex" "perf-complex" class="text-right">0</td> 
+		</tr> 
+		
+	</tbody>
+</table>
+</div>
+
+
+
+
+<div class="row">
+  <div class="col-sm-10"><Strong>Select Appropriate System and Technology Applicable</Strong></div>
+   <div class="col-sm-1" style="padding-bottom: 6px">
+            <button type="button" class="btn btn-color add-new" > Add Integration</button>
+    </div>
+</div>
+<table class="table table-bordered order-list thead-light" id="SystemTable">
+	<thead>
+		
+		<tr>
+			<th  style="width:26%" >System1</th>
+			<th  style="width:22%" >System2</th>
+			<th  style="width:18%" >Technology</th>
+			<th  style="width:7%" >Simple</th>
+			<th  style="width:7%" >Medium</th>
+			<th  style="width:7%" >Complex</th>
+			<th  style="width:12%" class="text-center" >Actions</th>  
+					
+		</tr>
+	</thead>
+	<tbody>
+	{% for ob in defaultValues %} 
+	
+	 <tr id="row{{loop.index0}}">
+	 
+			<td id="{{ob.id1}}">{{ob.name1}}</td>
+			<td id="{{ob.id2}}">{{ob.name2}}</td>
+			<td id="{{ob.id3}}">{{ob.name3}}</td>
+			<td class="text-right">{{ob.simple}}</td>
+			<td class="text-right">{{ob.medium}}</td>
+			<td class="text-right">{{ob.complex}}</td>
+			<td>
+				<a class="add"  id="add" title="Add" data-toggle="tooltip"><i class="material-icons">check</i></a>
+			 	<a class="edit"  id="edit"title="Edit" data-toggle="tooltip"><i class="material-icons">build</i></a>
+				<a class="delete" id="delete"title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+				<a class="help" id="help" title="Complexity Definition" data-toggle="tooltip" href="/esb_complexity_def/{{ob.id3}}" 
+									target="popup" ><i class="material-icons">help</i>
+				</a>
+            </td>
+		
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+<table align="center" width="100%" cellpadding="1" cellspacing="0" border="0">
+		<tr>
+			<td class="tdspace">
+				&nbsp;&nbsp;
+				<button name="submit-form" id="submit-form" class="bluebutton" >Submit</button>  
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="button" id="backButton" class="cancelbutton" value="Back" onclick="javascript:history.go(-1);">
+			</td>
+		</tr>
+</table> 
+</form> 
+
+<div id="showmodalid" class="showmodal" style="display:none">
+	<div class="center">
+	    <span id="downText" style="font-weight: bolder;font-size: x-large;display: none;"><blink>The back-end service is down. Please try after sometime</blink></span>
+	    <span id="waiText" style="font-weight: bolder;font-size: x-large;display: none;"><blink>We are saving your data...</blink></span>	    
+	     <img id="waitImg" alt="" src="/static/images/loader.gif" />
+   </div>
+</div>
+</body>
+</html>

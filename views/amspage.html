@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <!--<link rel="shortcut icon" type="image/png" href="./assets/favicon.ico" />-->
+  <!-- <link rel="shortcut icon" type="image/png" href="https://pages.github.ibm.com/w3/w3ds-showcase-error/assets/favicon.ico" /> -->
+  <link rel="stylesheet" class="style-switch" href="static/css/instarom/w3ds-compact.css">
+  	
+  <link rel="stylesheet" href="static/css/instarom/w3ds-border-sides.css">
+  <script	src="static/js/instarom/w3ds.js"></script>
+  <script	src="static/js/instarom/masthead.js"></script>
+  <script	src="static/js/lib/jquery-2.1.4.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/additional-methods.min.js"></script>
+  
+  <title>Solution Advisor</title>
+  
+<style type="text/css">
+	.input-holder {
+	  border: 1px solid #cccccc;
+	  display: inline-block;
+	  padding: 5px;
+	}
+	.input-holder > input {
+	  border: 0;
+	  margin: 0;
+	  padding: 0;
+	  outline:none;
+	}
+	.input-holder:after {
+	  content: '%';
+	}
+  .theme-switcher {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .theme-switcher div {
+    cursor: pointer;
+    transition: color 100ms ease-out, transform 100ms ease-out;
+    padding: 9.5px 19px !important;
+  }
+
+  .theme-switcher p {
+    font-size: 17.00006px !important;
+  }
+
+  .active-highlight {
+    position: absolute;
+    background: white;
+    height: 27px;
+    width: 42%;
+    margin: 0 10px;
+    z-index: -1;
+  }
+
+  .active-theme {
+    color: #002236;
+  }
+ 
+
+.LogDiv {
+	width:290px; float:left;
+}
+.divWidth {
+	width:1024px; 
+	margin:auto; 
+}
+.NavDiv {
+	width:657px; 
+	float:right;
+}
+.InnDiv {
+	width:100%; 
+	background-image: url("/static/images/main-contact.jpg");
+	height:30px;
+}
+
+.nav ul {
+	list-style: none;
+	text-align: center; 
+}
+.nav h3 {
+    font-family: 'Oswald', arial;
+	font-size: .2em;
+	line-height: 40px;
+	height: 40px;
+}
+.nav li {
+	font-family: 'Oswald', sans-serif;
+	font-size: .2em;
+	line-height: 40px;
+	height: 40px;
+	border-bottom: 1px solid #888;
+}
+.nav a {
+	text-decoration: none;
+	color: #000;
+	display: block;
+	transition: .3s background-color;
+}
+.nav a:hover {
+	font-weight: bold;
+}
+ 
+.nav a.active {
+	color: #60676d;
+	cursor: default;
+	font-weight: bold;
+}
+@media screen and (min-width: 600px) {
+	.nav li {
+		width: 100px;
+		border-bottom: none;
+		height: 50px;
+		line-height: 50px;
+		font-size: .8em;
+		text-transform: uppercase;
+		border-right:1px solid #e1dfdf;
+	  }
+	 
+	  /* Option 1 - Display Inline */
+	.nav li {
+		display: inline-block;
+		margin-right: -4px;
+	}
+	.nav li:last-child {
+		border: none;
+	}
+}
+
+.SeaDiv {
+	z-index:999; 
+	margin-top:-60px; 
+	align:right; 
+	float:right
+}
+.popupHoverElement:hover > .popupBox {
+	visibility:visible;
+	opacity:1;
+	-webkit-transition: all 0.3s ease;
+	-moz-transition: all 0.3s ease;
+	-o-transition: all 0.3s ease;
+	transition: all 0.3s ease;
+	-webkit-transition-delay: 0s;
+	-moz-transition-delay: 0s;
+	-o-transition-delay: 0s;
+	transition-delay: 0s;
+
+
+}
+.mainOutPop{
+	float: left;
+}
+ .popupBox {
+    visibility:hidden;
+    opacity:0;
+    -webkit-transition:visibility 0s linear 0.3s, opacity 0.3s linear;
+    -moz-transition:visibility 0s linear 0.3s, opacity 0.3s linear;
+    -o-transition:visibility 0s linear 0.3s, opacity 0.3s linear;
+    transition:visibility 0s linear 0.3s, opacity 0.3s linear;
+    -webkit-transition: all 0.4s ease;
+    -moz-transition: all 0.4s ease;
+    -o-transition:all 0.4s ease;
+    transition: all 0.4s ease;
+    -webkit-transition-delay: 0.5s;
+    -moz-transition-delay: 0.5s;
+    -o-transition-delay:0.5s;
+    transition-delay: 0.5s;
+	width:150px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	height: 80px; 
+
+}
+.popButton{
+	width: 90%;
+	height: 30px;
+	margin-top: 10px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	display:inline-block;
+	font-size:15px;
+	font-weight:normal;
+	color:#fff;
+	text-decoration:none;
+	text-transform:uppercase;
+	text-align:center;
+	background-color: #ff6f29;
+	border: none;
+
+}
+.popInput
+{
+	width: 20px;
+	height: 30px;
+	margin-top: 10px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px; 
+	border: 1px solid #c9c8c8; 
+	padding-left: 10px;
+}
+.placeholder-fix:focus::-webkit-input-placeholder  { 
+	color:transparent; 
+	width:20px;
+
+}
+.placeholder-fix:focus::-moz-placeholder   { 
+	color:transparent; 
+	width:20px;
+}
+ 	
+</style>
+<script type="text/javascript">
+var leadCountry_name;
+var sector_id;
+var industry_id;
+var data = {};
+
+
+
+function populateLeadCountry() {
+	var leadCountryInfo = $('#COUNTRY_ID');
+	leadCountryInfo.empty();
+	var selectionValue;
+	$.ajax({url: "/getAmsLeadCountryInfo", success: function(data) {
+    	var option = $("<option/>");
+    	option.attr("value", "0").text("-Select Lead Country-");
+    	leadCountryInfo.append(option);
+    	{% if amsDataJSON %}
+    		 selectionValue= '{{amsDataJSON[0].country_name}}';
+    	{% endif %}
+      	
+    	for (var i = 0; i < data.length; i++) {	
+    		if(selectionValue == data[i].COUNTRY_NAME || leadCountry_name==data[i].COUNTRY_NAME)
+    			option = $("<option selected/>");
+    		else
+    			option = $("<option/>");
+
+    		//option.attr("value", data[i].SELECTION_CODE).text(data[i].COUNTRY_NAME);
+    		option.attr("value",data[i].COUNTRY_NAME).text(data[i].COUNTRY_NAME);
+    		leadCountryInfo.append(option);
+    	}
+    }
+	});
+}
+
+
+function populateSectorInfo() {
+	var sectorInfo = $('#SECTOR_ID');
+	sectorInfo.empty();
+	var selectionValue;
+	$.ajax({url: "/getAmsSectorInfo", success: function(data) {
+    	var option = $("<option/>");
+    	option.attr("value", "0").text("-Select Sector-");
+    	sectorInfo.append(option);
+    	{% if amsDataJSON %}
+    	 selectionValue= {{amsDataJSON[0].sector_id}};
+		{% endif %}
+    	
+    	for (var i = 0; i < data.length; i++) {	
+    		if(selectionValue == data[i].SECTOR_ID || sector_id ==data[i].SECTOR_ID)
+    			option = $("<option selected/>");
+    		else
+    			option = $("<option/>");
+
+    		option.attr("value", data[i].SECTOR_ID).text(data[i].SECTOR_NAME);
+    		sectorInfo.append(option);
+    	}
+    }
+	});
+}
+
+function populateIndustryInfo() {
+	var industryInfo = $('#INDUS_ID');
+	industryInfo.empty();
+	var selectionValue;
+	$.ajax({url: "/getAmsIndustryInfo", success: function(data) {
+    	var option = $("<option/>");
+    	option.attr("value", "0").text("-Select Industry-");
+    	industryInfo.append(option);
+    	{% if amsDataJSON %}
+    	 selectionValue= {{amsDataJSON[0].indus_id}};
+		{% endif %}
+    	console.log("industry_id "+industry_id );
+    	for (var i = 0; i < data.length; i++) {	
+    		if(selectionValue == data[i].INDUS_ID || industry_id==data[i].INDUS_ID)
+    			option = $("<option selected/>");
+    		else
+    			option = $("<option/>");
+
+    		option.attr("value", data[i].INDUS_ID).text(data[i].INDUSTRY_NAME);
+    		industryInfo.append(option);
+    	}
+    }
+	});
+}
+
+function setAmsFormData() {
+	
+	//Flow from edit solution Button
+	{% if amsDataJSON %}
+		document.getElementById("OPPORTUNITY_ID").defaultValue = "{{amsDataJSON[0].opportunity_id}}";
+		
+		 $('#OPPORTUNITY_ID').addClass("ds-disabled");
+		 $('#OPPORTUNITY_ID').attr('disabled', true); 
+		 console.log("inside amsDataJson setting ");
+		 document.getElementById("CUSTOMER_NAME").defaultValue = "{{amsDataJSON[0].Customer_Name}}";
+		 document.getElementById("TICKET_VOLUME").defaultValue = "{{amsDataJSON[0].TICKET_VOLUME}}";
+		 document.getElementById("CLIENT_MNGD_TKTS").defaultValue = parseInt("{{(amsDataJSON[0].CLIENT_MNGD_TKTS/amsDataJSON[0].TICKET_VOLUME)*100}}");
+		 document.getElementById("MINOR_ENHANCEMENT_HRS").defaultValue = "{{amsDataJSON[0].MINOR_ENHANCEMENT_HRS}}";
+		 document.getElementById("PRODGAIN").defaultValue ="{{amsDataJSON[0].PROD_GAIN}}";
+		 document.getElementById("L1_5_TKTS").defaultValue = "{{amsDataJSON[0].L1_5_TKTS}}";
+		 document.getElementById("L2_TKTS").defaultValue = "{{amsDataJSON[0].L2_TKTS}}";
+		 document.getElementById("L3_TKTS").defaultValue = "{{amsDataJSON[0].L3_TKTS}}"; 
+		 
+		 document.getElementById("SOL_ID").defaultValue = "{{amsDataJSON[0].sol_id}}";
+		 document.getElementById("OPPORTUNITY_NAME").defaultValue = "{{amsDataJSON[0].opportunity_id}}";
+		
+		 $('#AMS_YRS').find('option').each( function() {
+		      var $this = $(this);
+		      if ($this.text() == "{{amsDataJSON[0].AMS_YRS}}") {
+		         $this.attr('selected','selected');
+		         return false;
+		      }
+		 });
+	 
+	{% endif %}
+	//Flow from dashboard 
+	{% if solId%}
+		 var solId={{ solId }};
+		$.ajax({url: "/getAmsDetailInfo",data:{solId:solId}, success: function(data, status) {
+		console.log("5 "+JSON.stringify(data));
+		document.getElementById("OPPORTUNITY_ID").defaultValue = data[0].opportunity_id;
+	    $('#OPPORTUNITY_ID').addClass("ds-disabled");
+	 	$('#OPPORTUNITY_ID').attr('disabled', true); 
+	 
+	 	document.getElementById("CUSTOMER_NAME").defaultValue = data[0].Customer_Name;
+	 	document.getElementById("TICKET_VOLUME").defaultValue = data[0].TICKET_VOLUME;
+	 	document.getElementById("CLIENT_MNGD_TKTS").defaultValue = parseInt((data[0].CLIENT_MNGD_TKTS/data[0].TICKET_VOLUME)*100);
+	 	document.getElementById("MINOR_ENHANCEMENT_HRS").defaultValue = data[0].MINOR_ENHANCEMENT_HRS;
+	 	document.getElementById("PRODGAIN").defaultValue = data[0].PROD_GAIN;
+	 	document.getElementById("L1_5_TKTS").defaultValue = data[0].L1_5_TKTS;
+		document.getElementById("L2_TKTS").defaultValue = data[0].L2_TKTS;
+		document.getElementById("L3_TKTS").defaultValue = data[0].L3_TKTS;
+		
+		document.getElementById("SOL_ID").defaultValue = solId;
+		 document.getElementById("OPPORTUNITY_NAME").defaultValue = data[0].opportunity_id;
+		 
+	 	 $('#AMS_YRS').find('option').each( function() {
+	      var $this = $(this);
+	      if ($this.text() == data[0].AMS_YRS) {
+	         $this.attr('selected','selected');
+	         return false;
+	      }
+		 });
+	 	 
+	 	 leadCountry_name=data[0].COUNTRY_NAME;
+	 	 sector_id=data[0].sector_id;
+	 	 industry_id=data[0].indus_id;
+	 	 console.log("leadCountry_name "+leadCountry_name+" sector_id "+sector_id+" industry_id "+industry_id);
+	 	 
+	
+	 }
+	}); 
+	{% endif %}
+	
+	
+}
+
+function setTestData(){
+	 document.getElementById("OPPORTUNITY_ID").defaultValue = "TEST_AMS_OPP33";
+	 document.getElementById("CUSTOMER_NAME").defaultValue = "TESTAMSCLIENT";
+	 document.getElementById("TICKET_VOLUME").defaultValue = "20";
+	 document.getElementById("CLIENT_MNGD_TKTS").defaultValue = "10";
+	 document.getElementById("MINOR_ENHANCEMENT_HRS").defaultValue = "10";
+	 document.getElementById("PRODGAIN").defaultValue = "10";
+	 document.getElementById("L1_5_TKTS").defaultValue = "10";
+	 document.getElementById("L2_TKTS").defaultValue = "30";
+	 document.getElementById("L3_TKTS").defaultValue = "60"; 
+}
+
+function goBack() {
+   //window.history.back();
+    var addr= (window.location.href).split('/');	        		 
+	 window.location.href = addr[0]+"//"+addr[2]+"/dashboard";
+    
+}
+	
+  $(document).ready(function() {
+	 console.log("entered");
+	 setAmsFormData();
+	 populateLeadCountry(); 
+	 populateSectorInfo();
+	 populateIndustryInfo();
+	 
+	
+	 //setTestData();
+	 
+	 $.validator.addMethod("valueNotEquals", function(value, element, arg){
+		return arg !== value;
+   	 }, "Value must not equal arg.");
+	 
+	 $.validator.addMethod("lettersonly", function(value, element){
+		return this.optional(element) || /^[a-z ]+$/i.test(value);
+	 }, "Letters and spaces only please");
+	
+	 $("#amsForm").validate({
+		    	errorClass:"ds-error",
+		    	validClass:"ds-success",
+		    	 /* onsubmit: true,
+		    	 onclick: true,  */
+		        rules: {
+		        	OPPORTUNITY_ID: {
+		        		 required: true,
+		        		    remote: {
+		        			  type:'get',
+		        			  url: '/checkOptyNameNotExists',
+		                      data: {
+		                    	 'OPPORTUNITY_ID': function () {
+		                             return $('#OPPORTUNITY_ID').val();
+		                        		 }
+		                  	 	   },
+		                 }   
+		        	},
+		        	CUSTOMER_NAME: {
+		                required: true,
+		                lettersonly: true
+		             },
+		            COUNTRY_ID:{
+		            	required: true
+		            	//valueNotEquals: "0"
+		            },
+		            SECTOR_ID:{
+		            	required: true
+		            	//valueNotEquals: "0"
+		            },
+		            INDUS_ID:{
+		            	required: true
+		            	//valueNotEquals: "0"
+		            },
+		            AMS_YRS:{
+		            	required: true
+		            	//valueNotEquals: "0"
+		            },
+		            TICKET_VOLUME:{
+		            	required: true,
+		            	digits: true
+		            },
+		            
+		            CLIENT_MNGD_TKTS: {
+		                required: true,
+		                digits: true
+		           },
+		            MINOR_ENHANCEMENT_HRS: {
+		                required: true,
+		                number: true
+		            },
+		            PRODGAIN:{
+		            	required: true,
+		                digits: true
+		            },
+		            L1_5_TKTS: {
+		                required: true,
+		                digits: true
+		            },
+		            L2_TKTS: {
+		                required: true,
+		                digits: true
+		            },
+		            L3_TKTS: {
+		                required: true,
+		                digits: true
+		                
+		            },
+		            
+		        },
+		        messages: {
+		        	OPPORTUNITY_ID: {
+		        		 required:"Please enter Opportunity Name or Id",
+		        		 remote:" Select a different Name as this opportunity name already Exist"
+		        	},
+		        	CUSTOMER_NAME:{
+		        		 required: "Please enter a Client's Name",
+			             lettersonly: "Please enter characters only",
+		        	},
+		        	COUNTRY_ID: "Please select a Lead Country ",
+		        	SECTOR_ID: "Please select a Sector",
+		        	INDUS_ID: "Please select an Industry",
+		        	AMS_YRS: "Please select an AMS year",
+		        	TICKET_VOLUME: {
+		        		required: "Please enter Expected Ticket Volume ",
+		            	digits: "Please enter non-decimal digits only",
+		        	},
+		        	CLIENT_MNGD_TKTS:{
+		        		required: "Please enter no of Client Managed Tickets",
+		        		digits: "Please enter non-decimal digits only",
+		            },
+		        	MINOR_ENHANCEMENT_HRS: {
+		        		required: "Please enter Enhancement Hours",
+		        		number: "Please enter digits only",
+		        	},
+		        	PRODGAIN:{
+		        		required: "Please enter Productivity Gain",
+		        		digits: "Please enter non-decimal digits only",
+		        	},
+		        	L1_5_TKTS:  {
+		        		required: "Please enter L1 Ticket Volume ",
+		            	digits: "Please enter non-decimal digits only",
+		        	},
+		        	L2_TKTS:  {
+		        		required: "Please enter L2 Ticket Volume ",
+		            	digits: "Please enter non-decimal digits only",
+		        	},
+		        	L3_TKTS:  {
+		        		required: "Please enter L3 Ticket Volume ",
+		            	digits: "Please enter non-decimal digits only",
+		        	}
+		            
+		        },
+		       
+		        highlight: function(element, errorClass, validClass) {
+		        	 if ( element.type === "select-one" ) 
+		            	$(element).parents('.ds-select').addClass(errorClass).removeClass(validClass);
+		            else
+		            	$(element).addClass(errorClass).removeClass(validClass);
+		           },
+		        unhighlight: function(element, errorClass, validClass) {
+		        	if ( element.type === "select-one" ) 
+		            	 $(element).parents('.ds-select').removeClass(errorClass).addClass(validClass);
+		            else
+		            	 $(element).removeClass(errorClass).addClass(validClass);
+		           },
+		          errorPlacement: function(error, element) {
+		        	  if (element.parent().hasClass("ds-select"))
+		        	    error.insertAfter(element.parent("div"));
+		        	  else
+		          		error.insertAfter(element);
+		   			 } ,
+		          submitHandler: function(form){
+			    		console.log(" l1 "+parseInt($("#L1_5_TKTS").val())+" l2 "+parseInt($("#L2_TKTS").val())+" l3 "+parseInt($("#L3_TKTS").val()));
+			    		 var total = parseInt($("#L1_5_TKTS").val())+parseInt($("#L2_TKTS").val())+parseInt($("#L3_TKTS").val());
+			    		 console.log(" total "+total);
+			    		if (total != 100)
+			    				$("#prodMsg").removeClass('ds-info').addClass('ds-error');
+			       		else{
+			       			$("#prodMsg").removeClass('ds-error').addClass('ds-info');
+			       			//$(".ds-overlay").show();
+			       			//form.submit();
+			       			if($('#OPPORTUNITY_ID').prop('disabled')){
+			       				console.log("resubmit");
+			       				document.getElementById("amsForm").action="/editAmsSolution";
+			       				alert("sending to editAmsSolution");
+			       				document.getElementById	("amsForm").submit();
+			       				//form.submit();
+			       			}
+			       			else{
+			       				console.log("normal submit");
+			       				document.getElementById("amsForm").action="/saveAMSInfo";
+			       				document.getElementById("amsForm").submit();
+			       				//form.submit();
+			       			}
+			       			//
+			       			
+			       		} 
+			    			
+		         	 } ,
+		   			 invalidHandler: function(form, validator) {
+		                $(".submit").hide();
+		             }
+		   		 });
+		    
+		    
+		    
+	 
+	});
+	
+	
+ 
+</script>
+</head>
+
+<body>
+<!--overlay OPEN  -->
+<!-- <div class="ds-overlay-container">
+    <div class="ds-overlay" id="overlay-default-demo" aria-hidden="false" role="dialog">
+        <div class="ds-shadow-floating ds-overlay-box ds-col-xs-10 ds-offset-xs-1 ds-col-md-8 ds-offset-md-2 ds-col-lg-6 ds-offset-lg-3 ds-align-text-left" role="document">
+            <div class="ds-row ds-overlay-content ds-align-text-center" style="margin-bottom: 0;">
+                <div class="ds-col-xs-10">
+                    <h2 class="ds-heading-2">Standard overlay</h2>
+                    <p>Overlay extends below the fold as needed to display content. Users can click outside the window to close it.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim.</p>
+                </div>
+                <div class="ds-col-xs-12 ds-padding-top-2 ds-align-text-center">
+                    <img src="/w3/w3ds/static/image-demo.png" alt="" class="ds-img-responsive" style="width: 300px;">
+                </div>
+            </div>
+        </div>
+        </div>
+   
+</div>
+ 	<button class="ds-button ds-primary"  id="overlay-default-snippet-demo-open" onclick="overlay()">Open default overlay</button>
+	<button class="ds-close ds-button ds-flat ds-close-button-right ds-margin-1 ds-padding-1" aria-label="close"><span class="ds-icon-close"></span></button >
+   
+ -->
+<!--overlay close  -->
+
+<div class=" ds-padding-top-4">
+	</div>
+
+<div class="divWidth">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+			<div class="NavDiv">
+				<div class="nav">
+					<ul>
+						<li class="home"><a href="dashboard">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+					</ul>
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop">
+							<img src="/static/images/search.jpg">
+							<div id="two" class="popupBox">
+							<form method="post" action="/searchOpportunity" id="search">
+								<input type="text" value="" name="searchOpportunity" id="searchOpportunity" required class="popInput placeholder-fix" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Opportunity Name">
+								<input type="submit" value="Search" class="popButton">
+							</form>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- <div class="InnDiv"></div> -->
+<div class="ds-bg-neutral-5 ds-shadow-floating ds-margin-top-3 ds-padding-top-2 ds-shadow-floating ds-padding-bottom-1 ds-margin-bottom-2">
+		<!-- <div class="ds-bg-contextual-blue-4 ds-marging-bottom-1 ds-shadow-floating "> -->
+			  <div class="ds-flex-fill-auto ds-flex-align-items-center ds-fade-in ds-delay-3 ds-bg-dark ds-no-gutter ds-padding-top-1 ds-padding-bottom-1">
+			    <div class="ds-col-12 ds-offset-1 ">
+			      <h2 class="ds-heading-2 ds-margin-bottom-0 ds-shadow-text">TICKET BASED AMS CALCULATOR</h2>
+			    </div>
+			  </div>
+			<!-- </div> -->
+	</div>
+	
+	<!-- <div class="ds-loader-container">
+	    <div class="ds-loader-header">Please wait ! your Request is getting submitted</div>
+	    <div class="ds-loader"></div>
+	</div> -->
+	
+	<!-- <div class="ds-col-xs-12 ds-alert ds-success">
+	    <p>test </p>
+	</div> -->
+
+
+	 <div class="ds-col-xs-10 ds-offset-xs-1 ds-col-md-6 ds-offset-md-1 ds-col-lg-10 ds-offset-lg-1 ds-col-xl-10 ds-offset-xl-1 ds-align-text-left"> 
+		<form id="amsForm" method="post" action="/captureRequirements"  >
+		
+		<div class=" ds-panel ds-panel-raised ds-panel-nester ds-shadow-floating ds-margin-top-4 ds-align-text-center ">	  
+		  <!-- DataFrame -->
+		  <div class="ds-row ds-margin-top-3 ds-margin-bottom-1_5 ">
+		  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+		   		 	<label for="opportunityName" class="ds-input-label ds-padding-left-2 ds-align-text-left">Opportunity Name/Id</label>
+		   		 </div>
+		   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+		        	<input type="text" class="ds-input" name="OPPORTUNITY_ID" id="OPPORTUNITY_ID"  placeholder="Enter Opportunity name or Sales Connect Id">
+		        	<!-- <p class="ds-input-msg ds-error ds-text-small" id="form-opportunity-validation">Enter a valid Name</p> -->
+				 </div>
+		   	</div>
+		  	<div class="ds-row ds-margin-bottom-1_5">
+		  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+		   		 	<label for="customerName" class="ds-input-label ds-padding-left-2 ds-align-text-left">Customer Name</label>
+		   		 </div>
+		   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+		        	<input type="text" class="ds-input" name="CUSTOMER_NAME" id="CUSTOMER_NAME" placeholder="Enter Client's name...(max 255 chars)">
+				 </div>
+		   	</div>
+		   	
+		   	
+		  	<div class="ds-row ds-margin-bottom-2">
+		  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+		   		 	<label for="leadCountry" class="ds-input-label ds-padding-left-2 ds-align-text-left">Lead Country</label>
+		   		 </div>
+		   		  <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ds-margin-bottom-xs-2 ds-margin-bottom-md-0  ds-padding-right-0">
+		       	<div class="ds-select">
+								<select name="COUNTRY_ID" id="COUNTRY_ID" required>
+									<!-- <option value="0" selected>-Lead Country-</option> -->
+									<option value="select" selected>-Lead Country-</option>
+								</select>
+					</div> 
+				</div>
+		  	</div>
+		 
+		 	
+		   		
+		  <div class="ds-row ds-margin-bottom-1_5">
+		  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+		   		 	<label for="customerName" class="ds-input-label ds-padding-left-2 ds-align-text-left">Sector</label>
+		   		 </div>
+		   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+		        		<div class="ds-select">
+							<select name="SECTOR_ID" id="SECTOR_ID" required>
+								<option value="0">--Select--</option>
+							<!-- 	<option value="214">Communications</option>
+								<option value="213">Distribution</option>
+								<option value="29">Financial Services</option>
+								<option value="131">Public</option> -->
+							</select>
+						</div>
+				</div>
+			</div>
+			
+			 <div class="ds-row ds-margin-bottom-1_5">	
+				<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+		   		 	<label for="customerName" class="ds-input-label ds-padding-left-2 ds-align-text-left">Industry</label>
+		   		 </div>
+		   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ds-margin-bottom-xs-2 ds-margin-bottom-md-0  ds-padding-right-0">
+		        		<div class="ds-select">
+							<select name="INDUS_ID" id="INDUS_ID" required>
+								<option value="0">--Select--</option>
+								<!-- <option value="1">Aerospace & Defence</option>
+								<option value="2">Banking</option>
+								<option value="3">etc.</option>
+								<option value="4">etc.</option> -->
+							</select>
+						</div>
+				</div>
+				
+		   	</div>	
+		 
+		  	<div class="ds-row ds-margin-bottom-1_5">
+		  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+		   		 	<label for="leadCountry" class="ds-input-label ds-padding-left-2 ds-align-text-left">Number of AMS Years</label>
+		   		 	</div>
+		   		  <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ds-margin-bottom-xs-2 ds-margin-bottom-md-0  ds-padding-right-0">
+		        	<div class="ds-select">
+								<select name="AMS_YRS" id="AMS_YRS" required>
+									<option value="0">-Select AMS Year-</option>
+									<option value="1">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+									<option value="4">4</option>
+									<option value="5">5</option>
+								</select>
+					</div>
+				</div> 
+		  </div>
+		  
+		  <div class="ds-row ds-margin-bottom-1_5">
+		  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+		   		 	<label for="customerName" class="ds-input-label ds-padding-left-2 ds-align-text-left">Expected Tickets Volume</label>
+		   		 </div>
+		   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+		        			<input type="text" class="ds-input" name="TICKET_VOLUME" id="TICKET_VOLUME" placeholder="Number of Tickets/year">
+				</div>
+		   	</div>	
+		   	
+		   	<div class="ds-row ds-margin-bottom-1_5">
+		  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+		   		 	<label for="customerName" class="ds-input-label ds-padding-left-2 ds-align-text-left">Tickets Managed by Client(Percentage)</label>
+		   		 </div>
+		   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+		        	
+		        	<input type="number" min="1" max="100" class="ds-input" name="CLIENT_MNGD_TKTS" id="CLIENT_MNGD_TKTS" placeholder="Percentage of Tickets Managed by Client">
+					
+				</div>
+				<!-- <span>&#37;</span> -->
+		   	</div>	
+		   	
+		   	<div class="ds-row ds-margin-bottom-1_5">
+		  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+		   		 	<label for="customerName" class="ds-input-label ds-padding-left-2 ds-align-text-left">Minor Enhancements(hours)</label>
+		   		 </div>
+		   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+						<input type="text" class="ds-input" name="MINOR_ENHANCEMENT_HRS" id="MINOR_ENHANCEMENT_HRS" placeholder="Minor Enhancement Hours/year">
+				</div>
+		   	</div>	
+		   	
+		   	<div class="ds-row ds-margin-bottom-1_5">
+		  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+		   		 	<label for="customerName" class="ds-input-label ds-padding-left-2 ds-align-text-left">Productivity Gain/year(In Percentage)</label>
+		   		 </div>
+		   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+					<input type="number" min="1" max="100" class="ds-input" name="PRODGAIN" id="PRODGAIN" placeholder="Productivity Gain %">
+				</div>
+		   	</div>	
+		   	
+		<!--  <div class=" ds-panel ds-panel-raised ds-panel-nester ds-shadow-floating ds-margin-top-4 "> -->
+		<div class="ds-col-9">	 
+		  <div class="ds-panel-rounded ds-panel-raised ds-panel ds-margin-top-3" style="height: 400px">
+				   	<!-- <div class="ds-row  ds-margin-top-2 ds-margin-bottom-1_5">
+				  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-6 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+				   		 	<label for="customerName" id="PRODGAIN"class="ds-input-label ds-padding-top-3 ds-padding-left-4 ds-align-text-left">Productivity Gain/year(In Percentage)</label>
+				   		 </div>
+				   		<div class="ds-hr"></div>
+				   	</div>	 -->
+			  	 	<div id="prodMsg" class="ds-col-xs-12 ds-alert ds-info">
+	    				<p>Sum of L1 , L2, L3 tickets should be equal to 100%</p>
+					</div>
+				   	<div class="ds-row ds-margin-top-4 ds-margin-bottom-2">
+				  		<div class="ds-col-xs-3 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+				   		 	<label for="customerName" class="ds-input-label ds-padding-left-6 ds-align-text-left">L1 Tickets(%)</label>
+				   		 </div>
+				   		 <div class="ds-col-xs-4 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-margin-left-8">
+								<input type="text" class="ds-input" name="L1_5_TKTS" id="L1_5_TKTS" placeholder="L 1 Tickets">
+						</div>
+				   	</div>	
+				   	
+				   	<div class="ds-row ds-margin-bottom-2">
+				  		<div class="ds-col-xs-3 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+				   		 	<label for="customerName" class="ds-input-label ds-padding-left-6 ds-align-text-left">L2 Tickets(%)</label>
+				   		 </div>
+				   		 <div class="ds-col-xs-4 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-margin-left-8">
+								<input type="text" class="ds-input" name="L2_TKTS" id="L2_TKTS" placeholder="L 2 Tickets">
+						</div>
+				   	</div>	
+				   	
+				   	<div class="ds-row ds-margin-bottom-2">
+				  		<div class="ds-col-xs-3 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+				   		 	<label for="customerName" class="ds-input-label ds-padding-left-6 ds-align-text-left">L3 Tickets(%)</label>
+				   		 </div>
+				   		 <div class="ds-col-xs-4 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-margin-left-8">
+								<input type="text" class="ds-input" name="L3_TKTS" id="L3_TKTS" placeholder="L 3 Tickets">
+						</div>
+				   	</div>	
+		   	
+		   		</div>
+		   	</div>
+		 <tbody class="dataframe ds-table-container" style="cursor: pointer;"></tbody>
+		   
+		<div class="ds-row ds-margin-bottom-1_5 ds-padding-top-3 ">
+		  <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-left-10 ">
+		  		<button type="button" class="ds-button ds-width-auto" onclick="goBack()">Back</button>
+		  </div>
+		  <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-0">
+		  		<button class="ds-button ds-width-auto" >Submit</button>
+		  </div>
+		 </div>
+			<div class="details-view ds-hide"></div>
+		  </div>
+		  
+		  	<input type=hidden id="SOL_ID" name="SOL_ID" value="{{solId}}"> 
+		  	<input type=hidden id="OPPORTUNITY_NAME" name="OPPORTUNITY_NAME" value=" "> 
+		  	<input type=hidden id="amsDataJSON" name="amsDataJSON" value="{{amsDataJSON}}"> 
+		</form>
+	
+	<div class="details-view ds-hide"></div>
+	
+	
+	</div>
+
+</body>
+</html>
+
+
+
+

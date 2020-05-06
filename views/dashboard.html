@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Solution Advisor</title>
+	<!-- Dashboard -->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="description" content="An interactive getting started guide for Edge Code CC.">
+		<link rel="stylesheet" href="static/css/style.css">
+		<link rel="stylesheet" href="static/css/jquery.modal.css">
+	<script	src="static/js/main.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.min.js"></script>
+	<script	src="static/js/jquery.modal.js"></script>	
+	<script	src="static/js/close.js"></script>
+<style>
+body {font-family: Arial;}
+
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: -6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+</style>
+<script language="javascript">
+
+$(document).ready(function() {
+	$("#MyOptyTab").addClass("active");
+	 document.getElementById("MyOptyTab").style.display = "block";
+});
+
+
+/* function loadSharedByMeData() {
+	var ownerId="{{user.attributes.emailaddress}}";
+	$.ajax({url: "/getSharedbyMeOpty", success: function(data) {
+	    	//console.log(" after getting list "+JSON.stringify(data));
+	    	optyShareByMeList=data;
+		 }
+	});
+} */
+
+
+
+function setOpportunity(solutionId) {
+	
+	document.getElementById("solutionId").value=solutionId;
+	document.getElementById("captureRequirementsForm").submit();
+	return true;
+}
+function setAmsOpportunity(solutionId) {
+	
+	document.getElementById("solutionId").value=solutionId;
+	document.getElementById("captureRequirementsForm").action="/amspage";
+	document.getElementById("captureRequirementsForm").submit();
+	return true;
+}
+
+function newOpportunity() {
+	document.getElementById("solutionId").value=-1;
+	document.getElementById("captureRequirementsForm").action="/captureRequirements";
+	document.getElementById("captureRequirementsForm").submit();
+	return true;
+}
+
+function newAMSOpportunity() {
+	document.getElementById("solutionId").value=-1;
+	document.getElementById("captureRequirementsForm").action="/amspage";
+	document.getElementById("captureRequirementsForm").submit();
+	return true;
+}
+
+function f(){
+	 var params= (window.location.href).split('?');
+	 if(params[1]){
+		 $("#btnLogout").click();
+	 }
+
+	/* var time = {{jsonObj["sqlQueryTimeSaveCurrYearResult"]}};
+	 time = Math.round((time/24));
+	 document.getElementById("timeSaveYear").innerHTML = time ; */
+
+	 var d ="{{jsonObj["sqlQueryLastLoginResult"]}}" ;
+	// var timeConv = new Date(d).toUTCString();
+	var timeConv = d + " CDT";
+	document.getElementById('timeID').innerHTML = timeConv ;
+} 
+
+function getToken(){
+return Guid.NewGuid().ToString();
+}
+
+function openDashboardTab(evt, tabName) {
+	  var i, tabcontent, tablinks;
+	  tabcontent = document.getElementsByClassName("tabcontent");
+	  for (i = 0; i < tabcontent.length; i++) {
+	    tabcontent[i].style.display = "none";
+	  }
+	  tablinks = document.getElementsByClassName("tablinks");
+	  for (i = 0; i < tablinks.length; i++) {
+	    tablinks[i].className = tablinks[i].className.replace(" active", "");
+	  }
+	  document.getElementById(tabName).style.display = "block";
+	  evt.currentTarget.className += " active";
+}
+</script>
+<style>
+.opportunity_wrapper {width:1000px;height:350px;;margin:0 auto;background-color:rgb(255,221,222);;overflow:hidden;}
+.opportunity_tile {width:205px;height:280px;background-color:rgb(0,90,1);float:left;margin:22px 23px;border:1px solid black;box-shadow:6px 6px 10px black;position:relative;}
+.opportunity_tile_header_history {height:140px;color:white;font: 18px arial,sans-serif;}
+.opportunity_tile_header_text {color:white;font: 18px arial,sans-serif; padding:15px;}
+.opportunity_tile_content_text {color:gray;font: 16px arial,sans-serif; padding:10px 15px 5px 15px;}
+.opportunity_tile_content_text_history {color:black;font: 15px arial,sans-serif;}
+.dropdown_image {position:absolute;left:10px;bottom:10px;}
+.opportunity_header {width:100%;}
+.opportunity_tile_header {background-color:rgb(0,90,1);width:100%; height:140px;}
+.opportunity_tile_header_ams {background-color:rgb(90,90,1);width:100%; height:140px;}
+.opportunity_tile_content {width:100%;background-color:rgb(255,255,255);height:140px;}
+.opportunity_tile_edit_link {display:inline-block;position:absolute;top:105px;left:6px;cursor: pointer;}
+.opportunity_tile_edit_link_ams {background-color:rgb(90,90,1);display:inline-block;position:absolute;top:105px;left:6px;cursor: pointer;}
+.opportunity_tile_view_link {display:inline-block;position:absolute;right:10px;top:100px;cursor: pointer;}
+.opportunity_tile_view_link_ams {display:inline-block;position:absolute;right:10px;top:230px;cursor: pointer;}
+.arrow_div {display:inline-block;width:25px;border-radius:50%;height:25px;border:2px solid white;color:white;text-align:center;line-height:25px;font-weight:bold;font-size:20px;}
+.opportunity_id {width:100%;height:45px;word-break:break-all;overflow:hidden;}
+.opportunity_name {width:100%;height:45px;word-break:break-all;overflow:hidden;}
+.opportunity_history_select_wrapper {width:100%;text-align:center;height:40px;position:absolute;display:inline-block;left:0;bottom:0;};
+.opportunity_tile_content_text_history div {color:black;font: 14px arial,sans-serif;padding-top:5px;}
+.opportunity_history_select_wrapper select {width:95%;height:30px;font-weight:bold;font-size:12px;padding:2px;border:2px solid black;}
+</style>
+</head>
+<!-- <body class="mainInner" onload="f();">  -->
+<body class="mainInner" >
+	<div class="divWidth">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+			<div class="NavDiv">
+				<div class="nav">
+					<ul>
+						<li class="home"><a href="dashboard">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+					</ul>
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop">
+							<img src="/static/images/search.jpg">
+							<div id="two" class="popupBox">
+							<form method="post" action="/searchOpportunity" id="search">
+								<input type="text" value="" name="searchOpportunity" id="searchOpportunity" required class="popInput placeholder-fix" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Opportunity Name">
+								<input type="submit" value="Search" class="popButton">
+							</form>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+<div class="InnDiv" ></div>
+<div class="divWidth"><!-- divWidth start-->
+		<!--<div class="loginInfo ">Hello {{ user.attributes.firstName }} {{user.attributes.lastName}}</div> -->
+		<div class="loginInfo ">Hello {{ user.attributes.firstName }}
+			{{user.attributes.lastName}}</div>
+
+		<p>Solution Dashboard</p>
+
+		</br>
+
+		<div class="divWidth"></div>
+
+		<!--Adding new Tabs  -->
+		<div class="tab">
+			<button class="tablinks" onclick="openDashboardTab(event, 'MyOptyTab')">My Opportunities( {{solDashboardResult.length}} )</button>
+			<button class="tablinks" onclick="openDashboardTab(event, 'SharedByMeOptyTab')">Shared By Me( {{optyShareByMeList.length}} )</button>
+			<button class="tablinks" onclick="openDashboardTab(event, 'SharedWithMeOptyTab')">Shared With Me( {{optyShareWithMeList.length}} )</button>
+		</div>
+		
+<!--	<input type="hidden" id="solutionId" name="solutionId" value={{ solutionId }}> 
+	<input type="hidden" id="correlationId" name="correlationId" value={{ correlationId }}>	
+
+-->
+		<!--End of Adding new Tabs  -->
+		</br>
+
+		<form method="post" style="margin-top: 30px"
+			action="/captureRequirements" id="captureRequirementsForm">
+			<input type="hidden" name="solutionId" id="solutionId">
+		<!--TAB 1  -->
+		<div id="MyOptyTab" class="tabcontent">
+			<div class="opportunity_tile opportunity_tile_create">
+				<div class="opportunity_tile_header opportunity_tile_header_create">
+					<div class="opportunity_tile_header_text">Create Opportunity
+					</div>
+					<a class="opportunity_tile_view_link"><div class="arrow_div"
+							onclick="javascript:return newOpportunity();">&rarr;</div></a>
+				</div>
+				{% if displayAms == true %}
+				<div
+					class="opportunity_tile_header_ams opportunity_tile_header_create">
+					<div class="opportunity_tile_header_text">Create New AMS
+						Opportunity</div>
+					<a class="opportunity_tile_view_link_ams"><div
+							class="arrow_div"
+							onclick="javascript:return newAMSOpportunity();">&rarr;</div></a>
+				</div>
+				{% else %}
+				<div
+					class="opportunity_tile_content opportunity_tile_content_create">
+					<div class="opportunity_tile_content_text">Create a solution
+						for a new opportunity as per your industry and services areas</div>
+				</div>
+
+				{% endif %}
+
+			</div>
+
+			{% for sol in solDashboardResult %} 
+			{% if loop.index < 4 %}
+			<div class="opportunity_tile opportunity_tile_history">
+				<div class="opportunity_tile_header opportunity_tile_header_history">
+					<div class="opportunity_tile_header_text">
+						<div class="opportunity_id">{{ sol.customer_name }}</div>
+						<div class="opportunity_name">{{ sol.opportunity_name }}</div>
+						<a class="opportunity_tile_edit_link"><img
+							src="/static/images/edit_btn.png"
+							onclick="javascript:return setOpportunity({{ sol.sol_id }});" /></a>
+						<a class="opportunity_tile_view_link"
+							href="getSolutionInfo?searchSolId={{ sol.sol_id }}"><div
+								class="arrow_div">&rarr;</div></a>
+					</div>
+				</div>
+				<div
+					class="opportunity_tile_content opportunity_tile_content_history">
+					<div
+						class="opportunity_tile_content_text opportunity_tile_content_text_history">
+						<div>
+							<strong>Created: </strong><span class="opportunity_create_date">{{
+								sol.creation_date }}</span>
+						</div>
+						<div>
+							<strong>Edited: </strong><span class="opportunity_edit_date">{{sol.last_edit_date}}</span>
+						</div>
+						<div>
+							<strong>Total Effort: </strong><span class="opportunity_effort">{{
+								sol.total_efforts }}</span> Hrs
+						</div>
+						<div>
+							<strong>Completed: </strong> <span
+								class="opportunity_complete_status"> {% if sol.sol_status
+								> 0 %} YES {% else%} NO {% endif %} </span>
+						</div>
+					</div>
+					<div class="opportunity_history_select_wrapper">
+						<select>
+							<option selected disabled>Solution Areas</option> {% for solArea
+							in sol.solAreaList %}
+							<option value="{{ solArea.sol_area_name }}" disabled>{{
+								solArea.sol_area_name }}</option> {% endfor %}
+						</select>
+					</div>
+				</div>
+			</div>
+			{% endif %} {% endfor %}
+
+
+			<table width="100%" cellpadding="1" cellspacing="0" border="0"
+				style="border: 1px dotted #FFFFFF;">
+				<tr>
+					<td colspan="3" class="tdmarg">Previous Solution Details by
+						Opportunity</td>
+
+					<td colspan="1" class="tdmarg" align=right>&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="tdTableHeaderLabel" align=left width=10%><strong>Opportunities</strong></td>
+					<td class="tdTableHeaderLabel" align=center width=35%><strong></strong></td>
+					<td class="tdTableHeaderLabel" align=left width=25%><strong>Created
+							On</strong></td>
+					<td class="tdTableHeaderLabel" align=center width=30%>&nbsp;</td>
+				</tr>
+				{% if errorMessage %}
+				<tr>
+					<td colspan="4" class="tdErrorMsg">{{errorMessage}}</td>
+				</tr>
+				{% endif %} {% for ob in solDashboardResult %} {% if loop.index > 3
+				%} {% if (ob.sol_id % 2) == 0 %}
+				<tr bgcolor='#cccccc'>{% endif %} {% if (ob.sol_id % 2) == 1 %}
+				
+				<tr bgcolor='#e1e0e0'>
+					{% endif %}
+					<td class="tdTableLabel"><a
+						href="getSolutionInfo?searchSolId={{ ob.sol_id }}" name="aSolId"
+						id="aSolId">{{ ob.opportunity_name }} ({{ob.customer_name}})</td>
+					<td class="tdTableLabel"></td>
+					<td class="tdTableLabel"></td>
+
+					<td colspan="1" align=right><input type="button"
+						class="smallgreenbutton" value="Edit Opportunity"
+						onclick="javascript:return setOpportunity({{ ob.sol_id }});"></td>
+
+					{% for sol in ob.solAreaList %}
+				<tr>
+					<td class="tdTableLabel" align=center></td>
+					<td class="tdTableLabel">{{ sol.sol_area_name }}</td>
+
+					<td class="tdTableLabel">{{ sol.creation_date }}</td>
+					<td class="tdTableLabel"></td>
+				</tr>
+				{% endfor %}
+
+				</tr>
+				{% endif %} {% endfor %}
+				
+			</table>
+			</div><!--TAB 1  end -->
+			
+			<!--Tab2   -->
+			<div id="SharedByMeOptyTab" class="tabcontent">
+			
+			{% for sol in optyShareByMeList %} 
+			{% if loop.index < 4 %}
+			<div class="opportunity_tile opportunity_tile_history">
+				<div class="opportunity_tile_header opportunity_tile_header_history">
+					<div class="opportunity_tile_header_text">
+						<div class="opportunity_id">{{ sol.customer_name }}</div>
+						<div class="opportunity_name">{{ sol.opportunity_name }}</div>
+						<a class="opportunity_tile_edit_link"><img
+							src="/static/images/edit_btn.png"
+							onclick="javascript:return setOpportunity({{ sol.sol_id }});" /></a>
+						<a class="opportunity_tile_view_link"
+							href="getSolutionInfo?searchSolId={{ sol.sol_id }}"><div
+								class="arrow_div">&rarr;</div></a>
+					</div>
+				</div>
+				<div
+					class="opportunity_tile_content opportunity_tile_content_history">
+					<div
+						class="opportunity_tile_content_text opportunity_tile_content_text_history">
+						<div>
+							<strong>Created: </strong><span class="opportunity_create_date">{{
+								sol.creation_date }}</span>
+						</div>
+						<div>
+							<strong>Edited: </strong><span class="opportunity_edit_date">{{sol.last_edit_date}}</span>
+						</div>
+						<div>
+							<strong>Total Effort: </strong><span class="opportunity_effort">{{
+								sol.total_efforts }}</span> Hrs
+						</div>
+						<div>
+							<strong>Completed: </strong> <span
+								class="opportunity_complete_status"> {% if sol.sol_status
+								> 0 %} YES {% else%} NO {% endif %} </span>
+						</div>
+					</div>
+					<div class="opportunity_history_select_wrapper">
+						<select>
+							<option selected disabled>Solution Areas</option> {% for solArea
+							in sol.solAreaList %}
+							<option value="{{ solArea.sol_area_name }}" disabled>{{
+								solArea.sol_area_name }}</option> {% endfor %}
+						</select>
+					</div>
+				</div>
+			</div>
+			{% endif %} {% endfor %}
+
+
+			<table width="100%" cellpadding="1" cellspacing="0" border="0"
+				style="border: 1px dotted #FFFFFF;">
+				<tr>
+					<td colspan="3" class="tdmarg">Previous Solution Details by
+						Opportunity</td>
+
+					<td colspan="1" class="tdmarg" align=right>&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="tdTableHeaderLabel" align=left width=10%><strong>Opportunities</strong></td>
+					<td class="tdTableHeaderLabel" align=center width=35%><strong></strong></td>
+					<td class="tdTableHeaderLabel" align=left width=25%><strong>Created
+							On</strong></td>
+					<td class="tdTableHeaderLabel" align=center width=30%>&nbsp;</td>
+				</tr>
+				{% if errorMessage %}
+				<tr>
+					<td colspan="4" class="tdErrorMsg">{{errorMessage}}</td>
+				</tr>
+				{% endif %} 
+				{% for ob in optyShareByMeList %} 
+					{% if loop.index > 3%}
+				 		{% if (ob.sol_id % 2) == 0 %}
+							<tr bgcolor='#cccccc'>
+						{% endif %}
+						{% if (ob.sol_id % 2) == 1 %}
+							<tr bgcolor='#e1e0e0'>
+						{% endif %}
+						<td class="tdTableLabel"><a
+							href="getSolutionInfo?searchSolId={{ ob.sol_id }}" name="aSolId"
+							id="aSolId">{{ ob.opportunity_name }} ({{ob.customer_name}})</td>
+						<td class="tdTableLabel"></td>
+						<td class="tdTableLabel"></td>
+	
+						<td colspan="1" align=right><input type="button"
+							class="smallgreenbutton" value="Edit Opportunity"
+							onclick="javascript:return setOpportunity({{ ob.sol_id }});"></td>
+
+					{% for sol in ob.solAreaList %}
+						<tr>
+							<td class="tdTableLabel" align=center></td>
+							<td class="tdTableLabel">{{ sol.sol_area_name }}</td>
+		
+							<td class="tdTableLabel">{{ sol.creation_date }}</td>
+							<td class="tdTableLabel"></td>
+						</tr>
+					{% endfor %}
+
+				</tr>
+				{% endif %} 
+				{% endfor %}
+				
+			</table>
+			</div><!--Tab2 end  -->
+			<!--Tab3   -->
+			<div id="SharedWithMeOptyTab" class="tabcontent">
+				
+			{% for sol in optyShareWithMeList %} 
+			{% if loop.index < 4 %}
+			<div class="opportunity_tile opportunity_tile_history">
+				<div class="opportunity_tile_header opportunity_tile_header_history">
+					<div class="opportunity_tile_header_text">
+						<div class="opportunity_id">{{ sol.customer_name }}</div>
+						<div class="opportunity_name">{{ sol.opportunity_name }}</div>
+						<a class="opportunity_tile_edit_link"><img
+							src="/static/images/edit_btn.png"
+							onclick="javascript:return setOpportunity({{ sol.sol_id }});" /></a>
+						<a class="opportunity_tile_view_link"
+							href="getSolutionInfo?searchSolId={{ sol.sol_id }}"><div
+								class="arrow_div">&rarr;</div></a>
+					</div>
+				</div>
+				<div
+					class="opportunity_tile_content opportunity_tile_content_history">
+					<div
+						class="opportunity_tile_content_text opportunity_tile_content_text_history">
+						<div>
+							<strong>Created: </strong><span class="opportunity_create_date">{{
+								sol.creation_date }}</span>
+						</div>
+						<div>
+							<strong>Edited: </strong><span class="opportunity_edit_date">{{sol.last_edit_date}}</span>
+						</div>
+						<div>
+							<strong>Total Effort: </strong><span class="opportunity_effort">{{
+								sol.total_efforts }}</span> Hrs
+						</div>
+						<div>
+							<strong>Completed: </strong> <span
+								class="opportunity_complete_status"> {% if sol.sol_status
+								> 0 %} YES {% else%} NO {% endif %} </span>
+						</div>
+					</div>
+					<div class="opportunity_history_select_wrapper">
+						<select>
+							<option selected disabled>Solution Areas</option> {% for solArea
+							in sol.solAreaList %}
+							<option value="{{ solArea.sol_area_name }}" disabled>{{
+								solArea.sol_area_name }}</option> {% endfor %}
+						</select>
+					</div>
+				</div>
+			</div>
+			{% endif %} {% endfor %}
+
+
+			<table width="100%" cellpadding="1" cellspacing="0" border="0"
+				style="border: 1px dotted #FFFFFF;">
+				<tr>
+					<td colspan="3" class="tdmarg">Previous Solution Details by
+						Opportunity</td>
+
+					<td colspan="1" class="tdmarg" align=right>&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="tdTableHeaderLabel" align=left width=10%><strong>Opportunities</strong></td>
+					<td class="tdTableHeaderLabel" align=center width=35%><strong></strong></td>
+					<td class="tdTableHeaderLabel" align=left width=25%><strong>Created
+							On</strong></td>
+					<td class="tdTableHeaderLabel" align=center width=30%>&nbsp;</td>
+				</tr>
+				{% if errorMessage %}
+				<tr>
+					<td colspan="4" class="tdErrorMsg">{{errorMessage}}</td>
+				</tr>
+				{% endif %} 
+				{% for ob in optyShareWithMeList %} 
+					{% if loop.index > 3%}
+				 		{% if (ob.sol_id % 2) == 0 %}
+							<tr bgcolor='#cccccc'>
+						{% endif %}
+						{% if (ob.sol_id % 2) == 1 %}
+							<tr bgcolor='#e1e0e0'>
+						{% endif %}
+						<td class="tdTableLabel"><a
+							href="getSolutionInfo?searchSolId={{ ob.sol_id }}" name="aSolId"
+							id="aSolId">{{ ob.opportunity_name }} ({{ob.customer_name}})</td>
+						<td class="tdTableLabel"></td>
+						<td class="tdTableLabel"></td>
+	
+						<td colspan="1" align=right><input type="button"
+							class="smallgreenbutton" value="Edit Opportunity"
+							onclick="javascript:return setOpportunity({{ ob.sol_id }});"></td>
+
+					{% for sol in ob.solAreaList %}
+						<tr>
+							<td class="tdTableLabel" align=center></td>
+							<td class="tdTableLabel">{{ sol.sol_area_name }}</td>
+		
+							<td class="tdTableLabel">{{ sol.creation_date }}</td>
+							<td class="tdTableLabel"></td>
+						</tr>
+					{% endfor %}
+
+				</tr>
+				{% endif %} 
+				{% endfor %}
+				
+			</table>
+			</div><!--Tab3 end  -->
+		</form>
+	</div><!-- divWidth end-->
+</body>
+</html>

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Solution Advisor</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="description" content="An interactive getting started guide for Edge Code CC.">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/style.css">
+    <script	src="static/js/main.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>	
+	<link rel="stylesheet" href="static/css/jquery.modal.css">
+    <script	src="static/js/jquery.modal.js"></script>	
+    <script	src="static/js/close.js"></script>
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/css/bootstrapValidator.min.css"/>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/js/bootstrapValidator.min.js"> </script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        .glyphicon.spinning {
+            animation: spin 1s infinite linear !important;
+            -webkit-animation: spin2 1s infinite linear !important;
+        }
+        
+        @keyframes spin {
+            from { transform: scale(1) rotate(0deg) !important;}
+            to { transform: scale(1) rotate(360deg) !important;}
+        }
+        
+        @-webkit-keyframes spin2 {
+            from { -webkit-transform: rotate(0deg) !important;}
+            to { -webkit-transform: rotate(360deg) !important;}
+        }
+        
+        .glyphicon-left {
+            margin-right: 7px !important;
+        }
+        
+        /* Tooltip */
+  .form-control + .tooltip > .tooltip-inner {
+      background-color: #CDEEF6; 
+      color: #01080c; 
+      border: 1px solid green; 
+      font-size: 14px;
+  }
+  /* Tooltip on right */
+  .form-control + .tooltip.right > .tooltip-arrow {
+      border-right: 5px solid black;
+  }
+        
+    </style>
+    <script>
+    
+    function disableRollout() {
+    	//**Rollout Inputs** to be disabled
+		
+		//Horizontal fields
+		$("#field_7_1").prop('disabled', true);
+		$("#field_7_2").prop('disabled', true);
+		$("#field_7_3").prop('disabled', true);
+		//vertical fields
+		$("#field_8").prop('disabled', true);
+		$("#field_9").prop('disabled', true);
+		$("#field_10").prop('disabled', true);
+    }
+    
+    function enableRollout() {
+    	//**Rollout Inputs** to be enabled
+		
+		//Horizontal fields
+		$("#field_7_1").prop('disabled', false);
+		$("#field_7_2").prop('disabled', false);
+		$("#field_7_3").prop('disabled', false);
+		//vertical fields
+		$("#field_8").prop('disabled', false);
+		$("#field_9").prop('disabled', false);
+		$("#field_10").prop('disabled', false);
+		
+    }
+    
+    function enableEmptorisModules() {
+    	//**Emptoris Modules** to be disabled
+		$("#field_11").prop('disabled', false);
+		$("#field_12").prop('disabled', false);
+		$("#field_13").prop('disabled', false);
+		$("#field_14").prop('disabled', false);
+		$("#field_15").prop('disabled', false);
+		
+		
+    }
+    
+    
+    function disableEmptorisModules() {
+    	//**Emptoris Modules** to be enabled
+		$("#field_11").prop('disabled', true);
+		$("#field_12").prop('disabled', true);
+		$("#field_13").prop('disabled', true);
+		$("#field_14").prop('disabled', true);
+		$("#field_15").prop('disabled', true);
+		
+    }
+    
+    
+function myFunction() {
+      // alert('testing data');
+        $('select[name="field_16"]').on('change',function(){
+       		var  input = $(this).val();
+       		if(input=="Ariba Implementation Project"){
+       			//$('[name="Rollout Inputs"]').hide();	
+				disableRollout();
+       		} else if(input=="Ariba Template & Rollout Project"){
+       			//$('[name="Rollout Inputs"]').show();	
+       			enableRollout();
+       		} else {
+       			
+       		}
+        }); 
+       
+}
+
+        
+function checkSelect (checkBox) {
+	
+	var id = checkBox.id;
+	
+	if($('#field_241').is(":checked")) {
+		//$('[name="Emptoris Modules"]').show();
+		enableEmptorisModules();
+		$(checkBox).val('true');
+	} else {
+		//$('[name="Emptoris Modules"]').hide();
+		disableEmptorisModules();
+		$(checkBox).val('false');
+	}
+	
+}
+    
+    
+ $(document).ready(function(){
+    
+    		//$('[name="Rollout Inputs"]').hide();
+    		//Setting uo initial state
+    		//$("#field_16 option").removeAttr("Ariba Implementation Project");
+    		//$("#field_16 option").removeAttr('selected');
+    		//$('#field_241').prop('checked', false);
+    		
+    		
+    		var optionSelectedVal = $('#field_16 option:selected').val();
+    		
+    		if (optionSelectedVal == "Ariba Implementation Project") {
+           			//$('[name="Rollout Inputs"]').hide();	
+           			
+    				//**Rollout Inputs** to be disabled
+            		
+    				disableRollout();
+    				
+           		} else if(optionSelectedVal=="Ariba Template & Rollout Project"){
+           			//$('[name="Rollout Inputs"]').show();	
+            		
+            		//**Rollout Inputs** to be enabled
+            		
+           			enableRollout();
+           		}
+    			
+    		
+    		    		
+    		//**Emptoris Modules** to be enabled
+    	var chk=$('#field_241').val();
+		if(chk=='true') {
+			enableEmptorisModules();
+		} else {
+			disableEmptorisModules();
+		}		
+		
+    		
+    		
+    		
+    		//$('[name="Emptoris Modules"]').hide();
+       		
+        $('[data-toggle="tooltip"]').tooltip();   
+        
+        
+    });
+    		
+					var timeCount = 10000;
+					function waitModal() {
+						window.scrollTo(0, 0);
+						$(".showmodal").show();
+						checkSaveStatus(0);
+						return true;
+					}
+
+					
+					
+					function checkSaveStatus(count){
+				        //alert($('#serviceURL').val()+'/download/query?solId='+$('#solId').val()+'&solAreaId='+$('#solAreaId').val());
+
+				            setTimeout(function() {
+				                $.ajaxSetup({async: false});
+				                $.post("/checkSaveStatus",{solId:$('#solId').val(),solAreaId:$('#SOL_AREA_ID').val(), testSolId:$("#testSolId").val()}, function(data, status){
+				                    console.log("Data: " + data + "\nStatus: " + status);
+				                    if(data!="Error: connect ECONNREFUSED"){
+				                        if(data=="No"){
+				                            if(count > 0){
+				                                var addr= (window.location.href).split('/');	        		 
+				                                window.location.href = addr[0]+"//"+addr[2]+"/dashboard";
+				                            }
+				                            else{
+				                                $("#waitImg").hide();
+				                                $(".center").css("width","350px");
+				                                $("#waiText").show();
+				                                count++;
+				                                setTimeout(function() {
+				                                    checkSaveStatus(1);
+				                                },timeCount);
+				                            }
+				                        }
+				                        else{
+											setTimeout(function() {
+												document.getElementById("addlParamForm").action = "/gotoSolutionDetails";
+												// document.getElementById("enbTestBtn").value = values.length;
+												document.getElementById("addlParamForm").submit();
+											}, 10000);				                            
+				                        }
+				                    }else{
+				                        // Long waiting operation here
+				                        $("#waitImg").hide();
+				                        $(".center").css("width","350px");
+				                        $("#waiText").hide();
+				                        $("#downText").show();
+				                        setTimeout(function() {
+				                            $("#downText").hide();
+				                            $(".showmodal").hide();
+				                        },3000);
+				                    }
+				                });
+				                $.ajaxSetup({async: true});
+				            },timeCount);
+
+				        }
+				</script>
+</head>
+
+<body class="mainInner" onload = "myFunction()">
+	<div class="divWidth" style="width: 1040px !important;">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px !important;"></div>
+			<div class="NavDiv">
+				<div class="nav" style="padding-right: 34px;">
+					<ul style="line-height: 80px !important;font-size: 16px !important;">
+						<li class="home" style=""><a href="dashboard" id="btnHome">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request' style="padding-left: 2px !important;">Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open" style="padding-left: 3px !important;">Logout</a></li>
+					</ul>
+					<!-- <div class="SeaDiv"><img src="/static/images/search.jpg"></div> -->
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop" style="border: transparent !important;">
+							<img src="/static/images/search.jpg" style="padding-left: 16px !important;">
+							<div id="two" class="popupBox">
+							<form method="post" action="/searchOpportunity" id="search">
+								<input type="text" value="" name="searchOpportunity" id="searchOpportunity" required class="popInput placeholder-fix" style="width: 80%;margin-top: 5px !important;margin-left: 5px !important;" placeholder="Opportunity Name">
+								<input type="submit" value="Search" class="popButton">
+							</form>
+							</div>
+						</div>
+					</div> 
+				</div>
+			</div>
+		</div>
+	</div>
+    <div class="InnDiv" ></div>
+    <div class="divWidth">
+        <form class="form-horizontal" id="addlParamForm" method="post" action="/saveAddlParamInfo" onsubmit="return waitModal()">
+            <input type=hidden id="solId" name="solId" value="{{solId}}">
+            <input type=hidden id="SOL_AREA_ID" name="SOL_AREA_ID" value="{{solAreaId}}">
+            <input type=hidden id="testSolId" name="testSolId" value="{{testSolId}}" />
+			<input type=hidden id="INDUS_ID" name="INDUS_ID" value="{{indus_id}}" />
+            <div class="loginInfo" style="padding-top: 15px;">Hello {{ user.attributes.firstName }} {{user.attributes.lastName}}</div>
+            <p style="padding-top: 15px;font-size: 16px;">Capture Additional Parameter</p>
+
+            <div>
+                {% set loopFirst = true %}
+                {% for groupList in JSON.parse(addlParamJson) %} 
+                    <!-- <h2><span class="label label-info" style="display: inline-block !important; min-width: 1022px !important; text-align: left !important;"> {{ loop.key }}</span></h2>-->
+                 
+                 <div name="{{ loop.key }}" > 
+                    <h3><span class="text-primary">{{ loop.key }}</span></h3>
+                    <hr style="height: 5px !important; border: 0 !important;	box-shadow: 0 5px 5px -5px #8c8b8b inset !important;"></hr>
+                    {% for data in groupList %}   
+                        {% if data.addlParamCellNo %}                             
+                            <div class="form-group">                            
+                                <label class="col-xs-6 control-label">{{ data.addlParamLabel }}
+                                    {% if data.addlParamIsMandatory == 1 %}
+                                        <span class="asteriskField"><font color="RED">*</font></span>                    
+                                    {% endif %}
+                                </label>
+                                <div class="col-md-6 form-inline">
+                                {% if data.addlParamUIId == 1 %}
+                                    <input class="form-control" id="field_{{ data.addlParamId }}"  data-toggle="tooltip" title="{{ data.message }}"  data-placement="right" name="field_{{ data.addlParamId }}" type="number" step="{{ data.addlDecimalPlace }}" min="{{data.addlParamLowerLimit}}" max="{{data.addlParamUpperLimit}}" value="{{ data.addlParamDefaultVal }}" {% if data.addlParamIsMandatory == '1' %} required="required" {% endif %}/>&nbsp;{{ data.addlParamInputUnit }}
+                                {% elseif data.addlParamUIId == 4 %}
+                                    <input class="form-control checkclass" value="{{data.addlParamDefaultVal}}" id="field_{{ data.addlParamId }}"  data-toggle="tooltip" title="{{ data.message }}"  data-placement="right" name="field_{{ data.addlParamId }}" type="checkbox"  onClick="checkSelect(this)" {% if data.addlParamIsMandatory == '1' %} required="required" {% endif %} {% if data.addlParamDefaultVal == 'true' %} checked {% endif %} />&nbsp;{{ data.addlParamInputUnit }}
+                                {% elseif data.addlParamUIId == 2 %}
+                                    <input class="form-control" id="field_{{ data.addlParamId }}"  data-toggle="tooltip" title="{{ data.message }}" data-placement="right"  name="field_{{ data.addlParamId }}" type="text" value="{{ data.addlParamDefaultVal }}" {% if data.addlParamIsMandatory == '1' %} required="required" {% endif %}/>&nbsp;{{ data.addlParamInputUnit }}
+                                {% elseif data.addlParamUIId == 3 %}
+                                    <!--{% set optionArray1 = data.addlParamValue|replace(data.addlParamDefaultVal+"~", "", "g") %}
+                                    {% set optionArray2 = optionArray1|safe|replace("~"+data.addlParamDefaultVal, "", "g") %}
+                                    {% set optionsArray = "<option >"+data.addlParamDefaultVal+"</option><option>"+optionArray2|safe|replace('~','</option><option>','g')+"</option>" %}-->
+
+                                    {% set optionsArray = "<option>"+data.addlParamValue|replace('~','</option><option>','g')+"</option>" %}
+                                    {% set finalOptionArray = optionsArray|safe|replace("<option>"+data.addlParamDefaultVal, "<option selected='selected'>"+data.addlParamDefaultVal, "g") %}
+								    <select class="form-control" id="field_{{ data.addlParamId }}" data-toggle="tooltip" title="{{ data.message }}" data-placement="right" name="field_{{ data.addlParamId }}">
+  										{{ finalOptionArray|safe }}
+									</select>
+                                {% else %}
+                                    <input class="form-control" id="field_{{ data.addlParamId }}" data-toggle="tooltip" title="{{ data.message }}"  data-placement="right" name="field_{{ data.addlParamId }}" type="text" value="{{ data.addlParamDefaultVal }}" {% if data.addlParamIsMandatory == '1' %} required="required" {% endif %}/>&nbsp;{{ data.addlParamInputUnit }}
+                                {% endif %}
+                                </div>                   
+                            </div> 
+                        {% else %}
+                            <div class="form-group">
+                                <label class="control-label col-md-6">{{ data.addlParamLabel }}</label>                    
+                                {% if data.addlParamUIStyle == 'H' %}
+                                    {% for subData in data.subParamList %} 
+                                        <div class="col-md-2">
+                                            <label class="control-label col-md-3">{{ subData.addlSubParamLabel }}&nbsp;
+                                                {% if subData.addlParamIsMandatory == 1 %}
+                                                    <span class="asteriskField"><font color="RED">*</font></span>                    
+                                                {% endif %}   
+                                            </label>                    
+                                            
+                                            {% if subData.addlSubParamUIId == '1' %}
+                                                <input class="form-control" id="field_{{ data.addlParamId }}_{{ subData.addSubParamId }}" data-toggle="tooltip" title="{{ data.message }}" data-placement="right"  name="field_{{ data.addlParamId }}_{{ subData.addSubParamId }}" type="number" step="{{ subData.addlSubDecimalPlace }}" min="{{subData.addlSubParamLowerLimit}}" max="{{subData.addlSubParamUpperLimit}}" value="{{ subData.addlSubParamDefaultVal }}"  {% if subData.addlParamIsMandatory == '1' %} required="required" {% endif %}/>&nbsp;{{ subData.addlSubParamInputUnit }}
+                                            {% elseif data.addlParamUIId == 4 %}
+                                    			<input class="form-control checkclass" value="{{data.addlParamDefaultVal}}" id="field_{{ data.addlParamId }}"  data-toggle="tooltip" title="{{ data.message }}"  data-placement="right" name="field_{{ data.addlParamId }}" type="checkbox"  onClick="checkSelect(this)" {% if data.addlParamIsMandatory == '1' %} required="required" {% endif %}  {% if data.addlParamDefaultVal == 'true' %} checked {% endif %} />&nbsp;{{ data.addlParamInputUnit }}
+                                            {% elseif subData.addlSubParamUIId == 2 %}
+                                                <input class="form-control" id="field_{{ data.addlParamId }}_{{ subData.addSubParamId }}" data-toggle="tooltip" title="{{ data.message }}"  data-placement="right" name="field_{{ data.addlParamId }}_{{ subData.addSubParamId }}" type="text" value="{{ subData.addlSubParamDefaultVal }}" {% if subData.addlSubParamIsMandatory == '1' %} required="required" {% endif %}/>&nbsp;{{ subData.addlSubParamInputUnit }}
+                                            {% elseif subData.addlSubParamUIId == 3 %}
+                                            {% set optionsArray = "<option>"+subData.addlSubParamValue|replace('~','</option><option>','g')+"</option>" %}
+                                            {% set finalOptionArray = optionsArray|safe|replace("<option>"+subData.addlSubParamDefaultVal+"</option>", "<option selected='selected'>"+subData.addlSubParamDefaultVal+"</option>", "g") %}
+                                                <select class="form-control" id="field_{{ data.addlParamId }}_{{ subData.addSubParamId }}" data-toggle="tooltip" title="{{ data.message }}" data-placement="right" name="field_{{ data.addlParamId }}_{{ subData.addSubParamId }}">
+                                                      {{ finalOptionArray|safe }}
+                                                </select>
+                                            {% else %}
+                                                <input class="form-control" id="field_{{ data.addlParamId }}_{{ subData.addSubParamId }}" data-toggle="tooltip" title="{{ data.message }}"  data-placement="right" name="field_{{ data.addlParamId }}_{{ subData.addSubParamId }}" type="text" value="{{ subData.addlSubParamDefaultVal }}" {% if subData.addlSubParamIsMandatory == '1' %} required="required" {% endif %}/>&nbsp;{{ subData.addlSubParamInputUnit }}
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}                                
+                                {% endif %}
+                                
+                            </div> 
+                        {% endif %} 
+                    {% endfor %}    
+                    </div>     
+                {% endfor %} 
+                
+                <div class="form-group">
+                    <div class="col-md-6 col-md-offset-6">
+                        <button class="btn btn-primary btn-custom" type="submit">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div id="showmodalid" class="showmodal" style="display:none">	
+            <div class="center">
+                <span id="downText" style="font-weight: bolder;font-size: x-large;display: none;"><blink>The back-end service is down. Please try after sometime</blink></span>
+                <span id="waiText" style="font-weight: bolder;font-size: x-large;display: none;">We are saving your data...</span>
+                <img id="waitImg" alt="" src="/static/images/loader.gif" />              
+  
+            </div>
+        </div>
+            
+    </div>
+
+</body>
+</html>

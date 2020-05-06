@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Solution Advisor</title>
+	<!-- Productivity Calculator-->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="description" content="An interactive getting started guide for Edge Code CC.">
+	<link rel="stylesheet" href="static/css/style.css">
+	<link rel="stylesheet" href="static/css/jquery.modal.css">
+	<link rel="stylesheet" href="static/css/icon.css"> 
+ 	<link rel="stylesheet" href="static/css/3.3.7/bootstrap.min.css">
+	<script	src="static/js/main.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.min.js"></script>
+	<script	src="static/js/jquery.modal.js"></script>	
+ 	<script	src="static/js/close.js"></script>
+ 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+ 	<script src="static/js/3.3.7/bootstrap.min.js"></script>
+<style type="text/css">
+   .tableWidth {
+    width: 80%;
+ }
+ .tableHeader{
+	background-color:#fff ;//#d6d3d3;
+ }
+ </style>
+<script language="javascript">
+
+$(document).ready(function(){
+	getTotalFte();
+	
+	$('#alert_template .close').click(function(e) {
+	    $("#alert_template span").remove();
+	});
+
+	$('#fteTable1 #row1 td').change(function() {
+		var total= parseFloat($('#l1_5Fte').val())+ parseFloat($('#l2Fte').val())+ parseFloat($('#l3Fte').val())+ parseFloat($('#minorEnhancementFte').val())+ parseFloat($('#majorEnhancementFte').val());
+	  	$('#totalUserFte').val(total.toFixed(1));
+	   if(parseFloat($('#l1_5Fte').val())>0 && parseFloat($('#l2Fte').val())>0 && parseFloat($('#l3Fte').val())>0 && parseFloat($('#minorEnhancementFte').val())>0 && parseFloat($('#majorEnhancementFte').val())>0){
+		   if(total>  parseFloat($("#totalFte").text())){
+		   		alert(" Total distribution should add to "+$("#totalFte").text()+" :current "+total);
+		   		$("#submit-form").prop("disabled", true);
+		   		//showalert("Total distribution should add to 100 :current "+total,"warning");
+		   		//$("#alert_template button").after('<span>Total distribution should add to 100 :current '+total+'</span>');
+		   		//$('#alert_template').fadeIn('slow');
+		    } 
+		  	else
+		 		$("#submit-form").removeAttr('disabled')
+		} 
+	});
+	
+	/* $('#fteTable1 #row2 td').change(function() {
+	   if(parseInt($('#l1_5Dist').val())>0 && parseInt($('#l2Dist').val())>0 && parseInt($('#l3Dist').val())>0 && parseInt($('#minorEnhancementDist').val())>0 && parseInt($('#majorEnhancementDist').val())>0){
+		    var total= parseInt($('#l1_5Dist').val())+ parseInt($('#l2Dist').val())+ parseInt($('#l3Dist').val())+ parseInt($('#minorEnhancementDist').val())+ parseInt($('#majorEnhancementDist').val());
+		    //console.log("call "+total);
+		    $('#totalDist').val(total);
+		    console.log("call "+$("#totalFte").text());
+		   	if(total!== $("#totalFte").text()){
+		   		alert(" Total distribution should add to "+$("#totalFte").text()+" :current "+total);
+		   		//showalert("Total distribution should add to 100 :current "+total,"warning");
+		   		//$("#alert_template button").after('<span>Total distribution should add to 100 :current '+total+'</span>');
+		   		//$('#alert_template').fadeIn('slow');
+		    } 
+	    } 
+	}); */
+	
+	
+});//end of ready
+
+function getTotalFte(){}	  
+{
+	console.log("solId "+{{productivityObj.solId}});
+	$.ajax({
+		url : '/getAMSTotalFte',
+	    type : 'GET',
+	    dataType:'json',
+	    data : {
+	    	'solId':{{productivityObj.solId}}
+	    },
+	    success : function(data) {  
+	    	$("#totalFte").text(parseInt(data[0].FTE_TOTAL));	
+	    	//$("#totalFte").val(parseInt(data[0].FTE_TOTAL));	
+		    $('#calTotalFTE').val(data[0].FTE_TOTAL);
+	    	$("#solutionId").text(data[0].SOL_ID);	
+			
+	    	$("#TestFte").val(data[0].TEST_FTE);
+	    	$("#l1_5Fte").val(data[0].FTE_L1);	
+	    	$("#l2Fte").val(data[0].FTE_L2);	
+	    	$("#l3Fte").val(data[0].FTE_L3);	
+	    	$("#minorEnhancementFte").val(data[0].FTE_MINOR_ENH);	
+	    	$("#majorEnhancementFte").val(data[0].FTE_MAJOR_ENH);
+	    	var total=data[0].TEST_FTE + data[0].FTE_L1+data[0].FTE_L2+data[0].FTE_L3+data[0].FTE_MINOR_ENH+data[0].FTE_MAJOR_ENH;
+	    	$("#totalUserFte").val(total.toFixed(1));
+			
+			if(total==0){
+				//set values from estimation file for first time
+	    	$("#l1_5Fte").val(data[0].FTE_L1_EST);	
+	    	$("#l2Fte").val(data[0].FTE_L2_EST);	
+	    	$("#l3Fte").val(data[0].FTE_L3_EST);	
+	    	$("#minorEnhancementFte").val(data[0].FTE_MINOR_ENH_EST);	
+	    	$("#majorEnhancementFte").val(data[0].FTE_MAJOR_ENH_EST);
+	    	var total=data[0].TEST_FTE + data[0].FTE_L1_EST+data[0].FTE_L2_EST+data[0].FTE_L3_EST+data[0].FTE_MINOR_ENH_EST+data[0].FTE_MAJOR_ENH_EST;
+	    	$("#totalUserFte").val(total.toFixed(1));
+			}
+			
+			
+	    	//set values from estimation file for reference
+	    	$("#l1_5Dist_est").val(data[0].FTE_L1_EST);	
+	    	$("#l2Dist_est").val(data[0].FTE_L2_EST);	
+	    	$("#l3Dist_est").val(data[0].FTE_L3_EST);	
+	    	$("#minorEnhancementDist_est").val(data[0].FTE_MINOR_ENH_EST);	
+	    	$("#majorEnhancementDist_est").val(data[0].FTE_MAJOR_ENH_EST);
+	    	var total=data[0].FTE_L1_EST+data[0].FTE_L2_EST+data[0].FTE_L3_EST+data[0].FTE_MINOR_ENH_EST+data[0].FTE_MAJOR_ENH_EST;
+	    	$("#totalDist_est").val(total.toFixed(1));
+			
+	    	
+	    	$("#contractDuration").val(data[0].CONTRACT_DURATION);
+	    	$("#appForCast").val(data[0].CAST_APPS);
+	    	
+	    	//$('select[name^="salesrep"] option:selected').attr("selected",null);
+	    	$('select[name^="clientMaturity"] option[value="'+data[0].CLIENT_MATURITY+'"]').attr("selected","selected");
+	    	$('select[name^="daTool"] option[value="'+data[0].DA_TOOL+'"]').attr("selected","selected");
+	    	$('select[name^="deploymentModel"] option[value="'+data[0].BLUEPRISM_DEPLOY_MODEL+'"]').attr("selected","selected");
+	    	$('select[name^="isDri"] option[value="'+data[0].DRI_ON_PRIM+'"]').attr("selected","selected");
+	    	$('select[name^="aqlLoc"] option[value="'+data[0].AQL_LOCATION+'"]').attr("selected","selected");
+	    	$('select[name^="agileLoc"] option[value="'+data[0].AGILE_COACH_LOCATION+'"]').attr("selected","selected");
+	    	$('select[name^="isCtdOtfaCombo"] option[value="'+data[0].OTFA_COMBO+'"]').attr("selected","selected");
+	    	$('select[name^="useDevops"] option[value="'+data[0].AMS_DEVOPS+'"]').attr("selected","selected");
+	    	$('select[name^="useAD"] option[value="'+data[0].AD_DEVOPS+'"]').attr("selected","selected");
+	    	$('select[name^="useNextGenAdm"] option[value="'+data[0].NEXTGEN_ADM_DEVFACTORY+'"]').attr("selected","selected");
+	    
+	    	
+	    },
+	    
+	});
+}
+
+function validate() {
+	
+	var allGood = false;
+	allGood=true;
+	
+	if(allGood){
+		/* 
+		console.log("submit-form is clicked");
+		$(".showmodal").show();
+		$.ajax({
+			url : '/getAMSTotalFte',
+		    type : 'GET',
+		    dataType:'json',
+		    data : {
+		    	'solId':{{productivityObj.solId}}
+		    },
+		    success : function(data) {  
+		    	
+		    }
+		 }); */
+		return true;
+	} else{
+		alert("Please provide proper values ");
+		return false;
+	}		
+}
+
+</script>
+
+</head>
+<body class="mainInner">
+<div class="divWidth">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+			<div class="NavDiv">
+				<div class="nav">
+					<ul>
+					
+						<li class="home"><a href="dashboard">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+					</ul>
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop">
+							<img src="/static/images/search.jpg">
+							<div id="two" class="popupBox">
+							<form method="post" action="/searchOpportunity" id="search">
+								<input type="text" value="" name="searchOpportunity" id="searchOpportunity" required class="popInput placeholder-fix" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Opportunity Name">
+								<input type="submit" value="Search" class="popButton">
+							</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+</div>
+
+<div class="InnDiv" ></div>
+	
+<!-- TABLE start -->	
+
+<div class="divWidth"> <!--<div class="col-md-offset-2 col-md-10"> -->	
+<div class="container">
+<div class="text-left" style="padding-bottom:4px">
+   <h1>Productivity Calculator </h1>
+</div>
+<hr style="height: 5px !important; border: 0 !important;	box-shadow: 0 5px 5px -5px #8c8b8b inset !important; margin-top:0px;">
+<form method="post" id="savefirstProdCalculator" action="/savefirstProdCalculator" onsubmit="return validate()"> <!-- onsubmit="return validate()" -->
+ <input type=hidden id="solId" name="solId" value="{{productivityObj.solId}}">
+ <input type=hidden id="SOL_AREA_ID" name="SOL_AREA_ID" value="{{productivityObj.solAreaId}}">
+ <input type=hidden id="calTotalFTE" name="calTotalFTE" value="">
+  <input type=hidden id="optyName" name="optyName" value="{{productivityObj.optyName}}">
+ <div class="text-left" style="padding-bottom:4px">
+   <table class="table" style="width: 30%;">
+   <tbody>
+		<tr>
+			<td style="border-top: none;" class="text-left"><strong>Opportunity Name</strong> </td>
+			<td style="border-top: none;" class="text-left" name="optyName" > {{productivityObj.optyName}}</td>
+		</tr>
+		<tr>
+			<td style="border-top: none;" class="text-left"><strong>Solution ID</strong> </td>
+			<td style="border-top: none;" class="text-left" name="solutionId" > {{productivityObj.solId}}</td>
+		</tr>
+		<!--
+		<tr>
+			<td style="border-top: none;" class="text-left"><strong>FTE</strong> </td>
+			<td style="border-top: none;" class="text-left" id="totalFte" ></td>
+		</tr> -->
+   </tbody
+  </table>
+</div>
+
+<div id = "alert_placeholder"></div>
+
+<table id="fteTable1" class="table  table-bordered table-condensed  tableWidth" align="left" >
+		<!-- <caption style="text-align: center;">Enter FTE's</caption> -->
+		  <thead >
+			<tr><b>Provide Technical FTE Distribution (Estimated values are also provided for reference)</b></tr>
+		  	<tr class="tableHeader">
+				<th> &nbsp;</th>
+				<th> Test</th>
+				<th> L1.5</th>
+				<th> L2</th>
+				<th> L3</th>
+				<th> Minor enhancement</th>
+				<th> Major enhancement</th>
+				<th> Total FTE</th>
+			</tr>
+		 </thead>
+		 <tbody>
+		<tr id="row1">
+				<td class="tableHeader"><strong>FTE Distribution</strong></td>
+				<td class="active"><input type="text" class="form-control" id="TestFte" name="TestFte" placeholder="Test FTE" value="0"></td>
+				<td class="active"><input type="text" class="form-control" id="l1_5Fte" name="l1_5Fte" placeholder="L1.5 FTE" value="0"></td>
+				<td class="active"><input type="text" class="form-control" id="l2Fte" name="l2Fte" placeholder="L2 FTE" value="0"></td>
+				<td class="active"><input type="text" class="form-control" id="l3Fte" name="l3Fte" placeholder="L3 FTE" value="0"></td>
+				<td class="active"><input type="text" class="form-control" id="minorEnhancementFte" name="minorEnhancementFte" placeholder="Minor Enhancement" value="0"></td>
+				<td class="active"><input type="text" class="form-control" id="majorEnhancementFte" name="majorEnhancementFte" placeholder="Major Enhancement" value="0"></td>
+				<td ><input type="text" class="form-control" id="totalUserFte"name="totalUserFte" value="0" disabled></td>
+				<input type="hidden" class="form-control" id="totalUserFte"name="totalUserFte" value="0" >
+		</tr>
+		<tr id="row2">
+				<td class="tableHeader"><strong>Estimated Distribution </strong></td>
+				<td class="info"><input type="text" id="TestFte_est" name="TestFte_est" placeholder="Test FTE Est" value="0" disabled></td>
+				<td class="info"><input type="text" id="l1_5Dist_est" name="l1_5Dist_est" placeholder=" "  value="0" disabled></td>
+				<td class="info"><input type="text" id="l2Dist_est" name="l2Dist_est" placeholder=""  value="0" disabled></td>
+				<td class="info"><input type="text" id="l3Dist_est" name="l3Dist_est" placeholder=""  value="0" disabled></td>
+				<td class="info" ><input type="text" id="minorEnhancementDist_est" name="minorEnhancementDist_est" placeholder=""  value="0" disabled></td>
+				<td class="info"><input type="text" id="majorEnhancementDist_est" name="majorEnhancementDist_est" placeholder="" value="0" disabled> </td>
+				<td class="info"><input type="text" id="totalDist_est" name="totalDist_est" value="0" disabled></td>
+				<input type="hidden" id="totalDist_est"name="totalDist_est" value="0" >
+		</tr>
+		</tbody>
+</table>
+
+<table class="table  table-bordered table-condensed table-hover tableWidth"align="left" >
+<caption style="text-align: center;">Additional Parameters</caption>
+	 <thead>
+		  	<tr class="tableHeader">
+				<th > Parameters</th>
+				<th > Select Values </th>
+			</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td class="" >Select Client Maturity (Low/ Medium/ High)</td>
+			<td ><select name="clientMaturity" class="form-control">
+					  <option value="select">Select</option>
+					  <option value="Low">Low</option>
+					  <option value="Medium" selected >Medium</option>
+					  <option value="High">High</option>
+				</select>
+			</td>
+		<tr>	
+		<tr>
+			<td class="">Contract duration in months</td>
+			<td ><input type="text" class="form-control"  name="contractDuration" id="contractDuration" value="0" style="width:100%" readonly="readonly"></td>
+			 <!-- <input type="hidden" class="form-control" id="contractDuration" name="contractDuration" value="0" >  -->
+		<tr>	
+		<tr>
+			<td class="">DA Tool used. Select "Combo" for BP + WA</td>
+			
+			<td ><select name="daTool" class="form-control">
+					  <option value="select">Select</option>
+					  <option value="BP/AA">BP/AA</option>
+					  <option value="WinAuto" selected >WinAuto</option>
+					  <option value="Combo">Combo</option>
+				</select>
+			</td>
+		<tr>			
+		<tr>
+			<td class="">Select the Deployment Model for Blueprism</td>
+			
+			<td ><select name="deploymentModel" class="form-control">
+					  <option value="select">Select</option>
+					  <option value="Shared">Shared</option>
+					  <option value="Dedicated" selected >Dedicated</option>
+					 
+				</select>
+			</td>
+		<tr>	
+		<tr>
+			<td class="">Is DRI On Prem Needed</td>
+			<td ><select name="isDri" class="form-control">
+					  <option value="select">Select</option>
+					  <option value="1">Yes</option>
+					  <option value="0" selected >No</option>
+					 
+				</select>
+			</td>
+		<tr>	
+		<tr>
+			<td class="">AQL Location</td>
+			<td ><select name="aqlLoc" class="form-control">
+					  <option value="select">Select</option>
+					  <option value="Offshore">Offshore</option>
+					  <option value="Onshore" selected >Onshore</option>
+					 
+				</select>
+			</td>
+		<tr>
+		<tr>
+			<td class="">Agile Coach Location</td>
+				<td ><select name="agileLoc" class="form-control">
+					  <option value="select">Select</option>
+					  <option value="Offshore">Offshore</option>
+					  <option value="Onshore" selected >Onshore</option>
+					 
+				</select>
+			</td>
+		<tr>
+		<tr>
+			<td class="">Are U using CTD+SteF+OTFA Combo</td>
+			<td ><select name="isCtdOtfaCombo" class="form-control">
+					  <option value="select">Select</option>
+					  <option value="1">Yes</option>
+					  <option value="0" selected >No</option>
+					 
+				</select>
+			</td>
+		<tr>
+		<tr>
+			<td class="">Use DevOps - AMS</td>
+			<td ><select name="useDevops" class="form-control">
+					  <option value="select">Select</option>
+					   <option value="1">Yes</option>
+					  <option value="0" selected >No</option>
+					 
+				</select>
+			</td>
+		<tr>
+		<tr>
+			<td class="">Use DevOps - AD</td>
+			<td ><select name="useAD" class="form-control">
+					  <option value="select">Select</option>
+					  <option value="1">Yes</option>
+					  <option value="0" selected >No</option>
+					 
+				</select>
+			</td>
+		<tr>
+		<tr>
+			<td class="">Use NextGen ADM Development factory</td>
+			<td ><select name="useNextGenAdm" class="form-control">
+					  <option value="select">Select</option>
+					   <option value="1">Yes</option>
+					  <option value="0" selected >No</option>
+					 
+				</select>
+			</td>
+		<tr>
+		<tr>
+			<td class="">Apps for CAST ( If not Included in Transition)</td>
+			<td ><input type="text" class="form-control" name="appForCast" id="appForCast" style="width:100%" value="0" ></td>
+			
+		<tr>
+		
+	</tbody>
+</table>	
+		
+
+			
+
+<!-- 
+<table class="table  table-bordered table-condensed table-hover tableWidth" align="left">
+<caption style="text-align: center;">Enter Average Cost</caption>
+	 <thead>
+		  	<tr class="tableHeader">
+				<th > </th>
+				<th >Avg Cost</th>
+				<th >FTE</th>
+			</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td  class="tableHeader"><strong>Offshore</strong></td>
+			<td class="info" >18.00</td>
+			<td class="info">75%</td>
+		<tr>	
+		<tr>
+			<td  class="tableHeader"><strong>NearShore</strong></td>
+			<td class="info" >60.00</td>
+			<td class="info">0%</td>
+		<tr>	
+		<tr>
+			<td  class="tableHeader"><strong>Onshore</strong></td>
+			<td class="info" >80.00</td>
+			<td class="info">25%</td>
+		<tr>
+	</tbody>
+</table> -->			
+
+<table align="center" width="100%" cellpadding="1" cellspacing="0" border="0">
+		<tr>
+			<td class="tdspace">
+				&nbsp;&nbsp;
+				<button name="submit-form" id="submit-form" class="bluebutton" >Calculate Productivity</button>  
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="button" id="backButton" class="cancelbutton" value="Back" onclick="javascript:history.go(-1);">
+			</td>
+		</tr>
+</table> 
+<!-- TABLE END -->				
+</div>
+</div>	
+</form>	
+
+
+<div id="showmodalid" class="showmodal" style="display:none">
+	
+	    <div class="center">
+	    <span id="downText" style="font-weight: bolder;font-size: large;display: none;"><blink>The back-end service is down. Please try after sometime</blink></span>
+	    <span id="waiText" style="font-weight: bolder;font-size: large;display: none;">We are processing your request...</span>
+	    <img id="waitImg" alt="" src="/static/images/loader.gif" />
+		<span id="waiText2" style="font-weight: bolder;font-size: large;">This may take few seconds</span>
+	    </div>
+	    
+</div>
+	</body>
+</html>

@@ -1,0 +1,45 @@
+<script>
+function changeSelection(){
+	document.getElementById("timeSavedOthers").checked = true;
+        document.getElementById("closeBtn").disabled = false;
+}
+
+function checkSelection(elm){
+	if(elm.value == ''){
+		document.getElementById("timeSavedOthers").checked = false;
+		document.getElementById("closeBtn").disabled = true;
+	}
+}
+
+function enableFeedback(timesave){
+   if(timesave.checked==true){
+     document.getElementById("closeBtn").disabled = false;    
+   }else{
+     document.getElementById("closeBtn").disabled = true;
+   }
+}
+
+</script>
+<form action="/logout" method="post">
+	<!--<h3>Please Provide Your Feedback</h3>
+	<br/>
+	<div>
+		How much time do you think you saved using Solution Advisor?  <br /><br />
+		<input type="radio" id="timeSaved" name="timeSaved" value="8" onclick="enableFeedback(this)">1 day<br />
+		<input type="radio" id="timeSaved" name="timeSaved" value="16" onclick="enableFeedback(this)">2 days<br />
+		<input type="radio" id="timeSaved" name="timeSaved" value="32" onclick="enableFeedback(this)">4 days
+		
+	</div>
+	<div><input type="radio" id="timeSavedOthers" name="timeSaved">Others<input type="number" onclick="changeSelection()" onblur="checkSelection(this)" id="timeSavedIn" name="timeSavedIn"  value="" min=0 max=99 style="width:60px;display: inline;height: 20px;"/> days</div>
+	<br />
+	<div align="center">
+	<input class="greenbutton"  id="closeBtn" name="closeBtn" type="submit" value="Submit Feedback" disabled/>
+	-->
+	
+	<!--&emsp;<input class="greenbutton" id="closeBtn" name="closeBtn" type="submit" value="Close" /> -->
+	<h3>You will be Signed out From Tool</h3>
+	
+	<input class="greenbutton"  id="closeBtn" name="closeBtn" type="submit" value="Signout" />
+	</div>
+	
+</form>

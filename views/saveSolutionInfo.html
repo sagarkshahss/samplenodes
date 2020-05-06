@@ -1,0 +1,75 @@
+<html>
+	<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="description" content="">
+	<title>Solution Advisor</title>
+	<link rel="stylesheet" href="static/css/style.css">
+
+		<script	src="static/js/main.js"></script>
+		<script	src="static/js/lib/jquery-2.1.4.js"></script>
+		<script	src="static/js/lib/jquery-2.1.4.min.js"></script>
+		<link rel="stylesheet" href="static/css/jquery.modal.css">
+	<script	src="static/js/jquery.modal.js"></script>	
+	<script	src="static/js/close.js"></script>
+
+<script language="javascript">
+
+function submitform() {
+	document.myform.submit();
+	return false;
+}
+</script>
+
+</head>
+<body>
+
+	<div id="topdiv">
+		<div class="logodiv"><img src="static/images/logo.png"></div>
+		<div class="ixmdiv"><strong>Solution Advisor</strong></div>
+	</div>
+	<ul id="nav">
+							<li class="home"><a href="dashboard">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+		<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+		<div class="tsearch"> 
+			<form method="post" action="/getSolutionInfo" id="search">
+				<input type="text" pattern="[0-9]*" title="Only numeric values are allowed" size="40" name="searchSolId" id="searchSolId" required placeholder="Existing solution id" maxlength="11"/>
+			</form>
+		</div>	
+	</ul>
+	<div>
+		<div style="background-image: url(images/blue.png); height:1px"></div>
+		<div class="tab-pane fade active in" id="smart-green-demo" >
+			<form method="post" class="smart-green" name="myform" action="getSolRequirements">
+			<input type=hidden name="SOL_ID" value="{{SOL_ID}}">
+			<input type=hidden name="INDUS_ID" value="{{INDUS_ID}}">
+			<input type=hidden name="SOL_AREA_ID" value="{{SOL_AREA_ID}}">
+			<p>
+				<h1>Solution Artifacts for your solution</h1>
+				<hr class="hrc">
+				<div class="form_head">Solution Details</div>
+				<div class="form_label">
+					Here are some of the essential outputs that you would need to complete solutioning.Select the ones you need and click create to generate them right away.<BR><br>
+					Please note the solution id - <font color="#ff0000">(<strong>{{SOL_ID}}</strong>)</font> for your future reference to retrieve the solution details.<BR><BR><BR>&nbsp;
+				</div>
+				
+				<table class="table_label">
+					<tr>
+						<td class="td_icons"><a href="http://ixm-service.stage1.mybluemix.net/download/request?solId={{SOL_ID}}&solAreaId={{SOL_AREA_ID}}" target="_blank"><img src="static/icon/estimate.png"><br>Estimation Sheet</a></td>
+						<td class="td_icons"><a href="http://ixm-service.stage1.mybluemix.net/download/request?solId={{SOL_ID}}&solAreaId={{SOL_AREA_ID}}" target="_blank"><img src="static/icon/staff.png">	<br>Staffing Plan</a></td>
+					</tr>
+					<tr>
+						<td class="td_icons" width=50%><a href="javascript:void(0);" onclick="return submitform()"><img src="static/icon/matrix.png"><br>Requirement Matrix</a></td>
+						<td class="td_icons" width=50%><img src="static/icon/tech.png"><br>Technical Assumptions</td>
+					</tr>
+				
+				</table><BR>
+				&nbsp;
+			</p>
+			</form>
+		</div>
+		<div id="bottomdiv">Copyright IBM Corp. 1985, 2015.  All Rights Reserved.&nbsp;&nbsp;&nbsp;</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+		<title>Solution Advisor</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta "description" content="An interactive getting started guide for Edge Code CC.">
+	<link rel="stylesheet" href="static/css/style.css">
+	<link rel="stylesheet" href="static/css/jquery.modal.css">
+	<link rel="stylesheet" href="static/css/icon.css"> 
+ 	<link rel="stylesheet" href="static/css/3.3.7/bootstrap.min.css">
+	<script	src="static/js/main.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.min.js"></script>
+	<script	src="static/js/jquery.modal.js"></script>	
+ 	<script	src="static/js/close.js"></script>
+ 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+ 	<script src="static/js/3.3.7/bootstrap.min.js"></script>
+
+<style type="text/css">
+   .select-editable1 {
+     position:relative;
+     background-color:white;
+    /*  border:solid grey 1px; */
+     border:none;
+     width:120px;
+     height:18px;
+ }
+ .select-editable2 {
+     position:relative;
+     background-color:white;
+    /*  border:solid grey 1px; */
+     border:none;
+     width:120px;
+     height:18px;
+ }
+ .select-editable3 {
+     position:relative;
+     background-color:white;
+    /*  border:solid grey 1px; */
+     border:none;
+     width:120px;
+     height:18px;
+ }
+ .select-editable1 select {
+     position:absolute;
+     top:0px;
+     left:0px;
+     border-style: solid;
+     width:240px;
+     margin:0;
+ }
+  .select-editable2 select {
+     position:absolute;
+     top:0px;
+     left:0px;
+     border-style: solid;
+     width:198px;
+     margin:0;
+ }
+  .select-editable3 select {
+     position:absolute;
+     top:0px;
+     left:0px;
+     border-style: solid;
+     width:169px;
+     margin:0;
+ }
+ .select-editable1 input {
+     position:absolute;
+     top:1px;
+     left:3px;
+     width:217px;
+     padding:1px;
+     font-size:12px;
+     /* border-style: solid; */
+     border:none;
+ }
+ .select-editable2 input {
+     position:absolute;
+     top:1px;
+     left:3px;
+     width:173px;
+     padding:1px;
+     font-size:12px;
+     /* border-style: solid; */
+     border:none;
+ }
+ .select-editable3 input {
+     position:absolute;
+     top:1px;
+     left:3px;
+     width:146px;
+     padding:1px;
+     font-size:12px;
+     /* border-style: solid; */
+     border:none;
+ }
+ 
+ .select-editable select:focus, .select-editable input:focus {
+     outline:none;
+ }
+    .table-title {
+        padding-bottom: 10px;
+        margin: 0 0 10px;
+    }
+    .table-title h2 {
+        margin: 6px 0 0;
+        font-size: 22px;
+    }
+    .table-title .add-new {
+        float: right;
+		height: 30px;
+		font-weight: bold;
+		font-size: 12px;
+		text-shadow: none;
+		min-width: 100px;
+		border-radius: 50px;
+		line-height: 13px;
+    }
+    
+	.table-title .add-new i {
+		margin-right: 7px;
+	}
+    table.table {
+        table-layout: fixed;
+    }
+    table.table tr th, table.table tr td {
+        border-color: #B2B2B2;
+    } 
+    table.table th i {
+        font-size: 13px;
+        margin: 0 5px;
+        cursor: pointer;
+    }
+    table.table th:last-child {
+        width: 100px;
+    }
+    table.table td a {
+		cursor: pointer;
+        display: inline-block;
+        margin: 0 1px;
+		min-width: 24px;
+    }    
+	table.table td a.add {
+        color: #27C46B;
+    }
+    table.table td a.edit {
+        color: #FFC107;
+    }
+    table.table td a.delete {
+        color: #E34724;
+    }
+    table.table td i {
+        font-size: 19px;
+    }
+	table.table td a.add i {
+        font-size: 24px;
+    	margin-right: -1px;
+        position: relative;
+        top: 3px;
+    }    
+    table.table .form-control {
+        height: 32px;
+        line-height: 32px;
+        box-shadow: none;
+        border-radius: 2px;
+        padding: 6px 8px;
+        font-family: sans-serif;
+        font-style: italic;
+        font-size: 12px;
+        color: #6a858c;
+    }
+	table.table .form-control.error {
+		border-color: #f50000;
+	}
+	table.table td .add {
+		display: none;
+	}
+	
+	.btn-color{
+		color:#fff;
+		background-color:#005eb5;
+		border-color:#2e6da4;
+		padding: 6px 20px;
+		font-size: 15px;
+	}
+	th {
+	    background-color: #C5C3C3;
+	 } 
+	
+	
+</style>
+	 
+<script type="text/javascript">
+var timeCount = 10000;
+
+var jsonArr = { entries: []};
+function validate() {
+	
+	
+	var allGood = false;
+	
+	if ($('#amsyears').val()==0){
+		alert("Please select AMS years.");
+		return false;
+	}
+	
+	if ($('#activeUsers').val()==0){
+		alert("Please provide number of active users .");
+		return false;
+	}
+	
+	if ($('#usrRaiseTkt').val()==0){
+		alert("Please provide number of users that will raise tickets .");
+		return false;
+	}
+	if ($('#yoyActiveUsers').val()==0){
+		alert("Please provide number of Yoy active users  .");
+		return false;
+	}
+	if ($('#perUsrRaiseSr').val()==0){
+		alert("Please provide % of users that will raise SR .");
+		return false;
+	}
+	if ($('#avgHrsOnSr').val()==0){
+		alert("Please provide average hrs on SR .");
+		return false;
+	}
+	if ($('#perMinorEnhancement').val()==0){
+		alert("Please provide % of users that will raise Minor Enhancement .");
+		return false;
+	}
+	if ($('#avgHrsOnMinorEnhancement').val()==0){
+		alert("Please provide average hours on Minor Enhancement .");
+		return false;
+	}
+	/* if ($('#productivity').val()==0){
+		alert("Please provide value for Productivity .");
+		return false;
+	} */
+	 //if(parseInt($('#l15Support').val())==0 || parseInt($('#l2Support').val())==0 || parseInt($('#l3Support').val())==0){
+	 if(parseInt($('#l2Support').val())==0 || parseInt($('#l3Support').val())==0){
+		alert("Please provide values for L2,L3 support ");
+		return false;
+	} 
+	else if(parseInt($('#l2Support').val())>0 || parseInt($('#l3Support').val())>0){
+		var total=parseInt($('#l2Support').val())+ parseInt($('#l3Support').val());
+		if(total!==100){
+	    	alert(" Support Level distribution should add to 100 :current "+total);
+	    	return false;
+	    }
+	}
+	
+	allGood=true;
+	
+	if(allGood){
+		document.getElementById("amsValJson").value = JSON.stringify(jsonArr);
+		window.scrollTo(0, 0);
+		$(".showmodal").show();
+		checkSaveStatus(0);
+		return true;		
+	} else{
+		alert("Please provide proper value. ");
+		return false;
+	}		
+}
+
+function setLoad(){
+	//consol.log(window.pageYOffset +" "+window.pageXOffset);
+	if($(".showmodal").css("display") != 'none'){
+		$(".showmodal").css("top",window.pageYOffset);
+	}
+}
+
+function checkSaveStatus(count){
+	//alert($('#serviceURL').val()+'/download/query?solId='+$('#solId').val()+'&solAreaId='+$('#solAreaId').val());
+	var values = new Array();
+	
+	
+	setTimeout(function() {
+		$.ajaxSetup({async: false});
+		$.post("/checkSaveStatus",
+				{
+					solId:$('#solId').val(),
+					solAreaId:$('#currentSolAreaId').val(), 
+					testSolId:$("#testSolId").val(),
+					enbTestBtn:values.length
+				}, 
+				function(data, status){
+					//alert("Data: " + data + "\nStatus: " + status);
+					if(data!="Error: connect ECONNREFUSED"){
+						
+						if(data=="No"){
+							 if(count > 0){
+								 //$('a#advisorHome').click();
+								  console.log("data is NO and now dashboard");
+								 var addr= (window.location.href).split('/');	        		 
+								 window.location.href = addr[0]+"//"+addr[2]+"/dashboard";
+							 }else{
+								 console.log("data is NO and count <0");
+								$("#waitImg").hide();
+								$(".center").css("width","350px");
+								$("#waiText").show();
+								count++;
+								setTimeout(function() {
+									checkSaveStatus(1);
+								},timeCount);
+							}
+						}else{
+							//$("#waiText").hide();
+							//$(".showmodal").hide();
+							console.log("data is YES and now gotoSolutionsDetails");
+							document.getElementById("saveSolution").action = "/gotoSolutionDetails";
+							if(document.getElementById("testSolId").value == 'Y'){
+								document.getElementById("enbTestBtn").value = 1;
+							} else{
+								document.getElementById("enbTestBtn").value = 0;
+							}
+							document.getElementById("saveSolution").submit();
+							/* $.post("/gotoSolutionDetails",{solId:$('#solId').val(),enbTestBtn:values.length}, function(data, status){
+								
+							}); */
+						}
+					}else{
+						console.log("data can be Error: connect ECONNREFUSED");
+						$("#waitImg").hide();
+						$(".center").css("width","350px");
+						$("#waiText").hide();
+						$("#downText").show();
+						setTimeout(function() {
+							$("#downText").hide();
+							$(".showmodal").hide();
+						},3000);
+					}
+				}
+		);
+		$.ajaxSetup({async: true});
+	},timeCount);
+	
+}
+
+function setFormData() {
+	// var complexity = parseInt($("#complexity option:selected").val());
+	//Flow from 
+	{% if defaultValues != null %}
+		 document.getElementById("use_case_count").defaultValue = "{{defaultValues[0].Use_Case_Count}}";
+		
+	{% endif %}
+	
+}
+function loadProductivityPercentTable(){
+	var amsyears=0;
+	{% if defaultValues!=null %}
+		amsyears= Number({{defaultValues[0].num_ams_years}});
+		if(amsyears>0){
+			for(var i=amsyears+1;i<=5;i++){
+				$( "input[id^='productivityPercent"+i+"']").attr('disabled','disabled');
+			}
+		}
+		else{
+			for(var i=1;i<=5;i++){
+				$( "input[id^='productivityPercent"+i+"']").attr('disabled','disabled');
+			}
+		}
+			
+	{% endif %}
+	
+}
+
+
+$(document).ready(function(){
+	/* 
+	populateComplexity();
+	setFormData();
+	 {% if defaultValues==null %}
+			for(var i=1;i<=5;i++){
+				$( "input[id^='productivityPercent"+i+"']").attr('disabled','disabled');
+			}
+	{% endif %}
+	
+	//commenting the logic to enable/disable input based on no of ams years due to introduction of AMS Prod Calculator
+	//setting productivityPercent
+	loadProductivityPercentTable();
+	
+	$("#amsyears").change(function(){
+		var newAmsYear=Number($('#amsyears :selected').text());
+		if(newAmsYear >0){
+			for(var i=1;i<=newAmsYear;i++){
+				$( "input[id^='productivityPercent"+i+"']").removeAttr('disabled');
+			}
+			for(var i=newAmsYear+1;i<=5;i++){
+				$( "input[id^='productivityPercent"+i+"']").attr('disabled','disabled');
+			}
+		}
+		else{
+			for(var i=1;i<=5;i++){
+				$( "input[id^='productivityPercent"+i+"']").attr('disabled','disabled');
+			}
+		}
+		
+	
+	});	
+	getStartWeek();
+	disableProductivityPercentTable();
+
+	$('#supportTable tr td').change(function() {
+	    console.log("call");
+	    //if(parseInt($('#l15Support').val())>0 && parseInt($('#l2Support').val())>0 && parseInt($('#l3Support').val())>0){
+	    if(parseInt($('#l2Support').val())>0 && parseInt($('#l3Support').val())>0){
+		   //var total= parseInt($('#l15Support').val())+ parseInt($('#l2Support').val())+ parseInt($('#l3Support').val());
+		    var total= parseInt($('#l2Support').val())+ parseInt($('#l3Support').val());
+		    console.log("call "+total);
+		    if(total!==100){
+		    	alert(" Support Level distribution should add to 100 :current "+total);
+		    	
+		    }
+	    } 
+	});
+	 */
+});//end of ready
+
+/*
+function disableProductivityPercentTable(){
+	var amsyears=5;
+	
+	for(var i=1;i<=5;i++){
+	 $('#productivityPercent'+i).attr('disabled','disabled');
+	}
+}
+
+function populateComplexity(){
+	var numbers = [1, 2, 3];
+	var option = $("<option/>");
+	var amsyears = $('#complexity');
+	var selectionValue;
+	amsyears.empty();
+	option.attr("value", "0").text("-Select complexity-");
+	amsyears.append(option);
+	
+	{% if defaultValues %}
+		 selectionValue= {{defaultValues[0].complexity_id}};
+	{% endif %}
+	
+	for (var i=0;i<numbers.length;i++){
+		if(selectionValue == numbers[i] )
+			option = $("<option selected/>");
+		else
+			option = $("<option/>");
+
+		option.attr("value", numbers[i]).text(numbers[i]);
+		amsyears.append(option);
+	   //option += '<option value="'+ numbers[i] + '">' + numbers[i] + '</option>';
+	}
+	
+}
+
+function getStartWeek(){
+	$.ajax({
+			url : '/getStartWeek',
+		    type : 'GET',
+		    data : {
+		    	'solId':$('#solId').val(),
+		    	'solAreaId':$('#SOL_AREA_ID').val()
+		    },
+		    dataType:'json',
+		    success : function(data) {              
+		        console.log('DataS: '+data[0].startWeek);
+		        $("#startWeek").val(data[0].startWeek);
+		        $("#range_weight_disp").text(data[0].startWeek);
+		    },
+		    error : function(request,error)
+		    {
+		    	console.log('DataE: '+JSON.stringify(data));
+		    }
+		});
+	  
+} 
+
+*/
+
+var entryList = {}; 
+</script>
+  </head>
+  <body class="mainInner" onscroll="setLoad()">
+	<div class="divWidth">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+			<div class="NavDiv">
+				<div class="nav">
+					<ul>
+						<li class="home"><a href="dashboard" id="advisorHome">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+					</ul>
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop">
+							<img src="/static/images/search.jpg">
+							<div id="two" class="popupBox">
+							<form method="post" action="/searchOpportunity" id="search">
+								<input type="text" value="" "searchOpportunity" id="searchOpportunity" required class="popInput placeholder-fix" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Opportunity Name">
+								<input type="submit" value="Search" class="popButton">
+							</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="InnDiv" ></div>
+<div class="container">
+ <form method="post" id="saveSolution" action="/saveWatsonInfo" onsubmit="return validate()"> 
+<input type=hidden name="SL_ID" value="{{solAreaResult[0].sl_id}}">
+	<input type=hidden id="solId" name="solId" value="{{solId}}">
+	<input type=hidden id="SOL_AREA_ID" name="SOL_AREA_ID" value="{{solAreaResult[0].sol_area_id}}">
+	<input type=hidden id="indusId" name="INDUS_ID" value="{{solAreaResult[0].indus_id}}">
+	<input type=hidden name="useCaseInfoType" value="{{useCaseInfoType}}">
+	<input type=hidden id="currentSolAreaId" name="currentSolAreaId" value="{{solAreaResult[0].sol_area_id}}">
+	<input type=hidden id="testSolId" name="testSolId" value="{{testSolId}}" />
+	<input type=hidden id="soakTestId" name="soakTestId" value="{{soakTestId}}" />
+	<input type=hidden id="username" name="username" value="{{ user.emp_fname }} {{user.emp_lname}}" />
+
+	<input type=hidden id="model" name="model" value="{{model}}" />
+	<input type=hidden id="sprintWeeks" name="sprintWeeks" value="{{sprintWeeks}}" />
+	<input type=hidden id="enbTestBtn" name="enbTestBtn" value="" />
+	<input type=hidden id="isedit" name="isedit" value="{{isedit}}">
+	<input type=hidden id="amsValJson" name="amsValJson" value="" />
+	<!-- <input type=hidden id="defaultValues" name="defaultValues" value="{{defaultValues}}"> -->
+	&nbsp;&nbsp;
+	<div class="divWidth">
+	<!-- <div class="loginInfo ">Hello {{ user.emp_fname }} {{user.emp_lname}}</div> -->
+	<div class="loginInfo ">Hello {{ user.attributes.firstName }} {{user.attributes.lastName}}</div>
+	
+	<p>Capture your Use cases</p>
+			<table width="100%" cellpadding="1" cellspacing="0" border="0">		
+			<tr>
+				<td colspan="4" class="tdmarg">Solution Details</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Solution Id:</strong></td>
+				<td class="tdInputLabel" colspan="2">{{solId}}</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Lead Service Line:</strong></td>
+				<td class="tdInputLabel" colspan="2">{{solAreaResult[0].sl_name}}</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Solution Area:</strong></td>
+				<td class="tdInputLabel" colspan="2">{{solAreaResult[0].sol_area_name}}</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Industry:</strong></td>
+				<td class="tdInputLabel" colspan="2">{{solAreaResult[0].indus_name}}</td>
+			</tr>
+			<tr>
+				<td colspan="4" class="tdmarg"><font color="#000099"><b>{{solAreaResult[0].sol_area_name}}</b></font> in <font color="#000099"><b>{{solAreaResult[0].indus_name}}</b></font></td>
+			</tr>
+			<tr>
+				<td colspan="4" class="tdLabel">&nbsp;[ This tool is recommended for small and medium deals not for large deals at the moment ]</td>
+			</tr>
+		{% if errorMessage %}
+			<tr>
+				<td colspan="4" class="tdErrorMsg">{{errorMessage}}</td>
+			</tr>
+		{% endif %}			
+
+		</table>
+
+ &nbsp;&nbsp; &nbsp;&nbsp;
+ 
+ <!--Table for AMS Years  -->
+<div class="col-md-offset-1 col-md-10"> 
+<table class="table">
+	
+	 <tbody>
+	 
+		<tr >
+			<td style="border-top: none;"width="10%" ><strong>No of Use Cases<span class="asteriskField"><font color="RED">*</font></span> :</strong></td>
+			<td style="border-top: none;"width="15%" class="text-left"><input name="use_case_count" id="use_case_count" class="form-control" type="number" min="0"  style="line-height:34px;width:50%;" value="{{ defaultValues[0].Use_Case_Count }}">
+		</tr>
+		
+		<tr >
+			<td style="border-top: none;"  width="10%" ><strong>Overall Chat Solution Complexity<span class="asteriskField"><font color="RED">*</font></span></strong></td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+				<select style="line-height:34px;width:50%;" class="form-control" name="complexity" id="complexity" >
+				  <option value="1" {% if defaultValues[0].complexity_id == 1 %} selected {% endif %}>Simple</option>
+				  <option value="2" {% if defaultValues[0].complexity_id == 2 %} selected {% endif %}>Medium</option>
+				  <option value="3" {% if defaultValues[0].complexity_id == 3 %} selected {% endif %}>Complex</option>
+				</select>
+			</td>
+		</tr>
+
+
+		<tr >
+			<td style="border-top: none;"  width="10%" ><strong>Integration with IVR
+<span class="asteriskField"><font color="RED">*</font></span></strong></td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+				<select style="line-height:34px;width:50%;" class="form-control" name="iwIVR" id="iwIVR" >
+				  <option value="1" {% if defaultValues[0].iwIVR == 1 %} selected {% endif %}>No</option>
+				  <option value="2" {% if defaultValues[0].iwIVR == 2 %} selected {% endif %}>Yes</option>
+				</select>
+			</td>
+		</tr>
+
+
+		<tr >
+			<td style="border-top: none;"  width="10%" ><strong>
+Integration with Speech to Text
+<span class="asteriskField"><font color="RED">*</font></span></strong></td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+				<select style="line-height:34px;width:50%;" class="form-control" name="iSpeechtext" id="iSpeechtext" >
+					<option value="1" {% if defaultValues[0].iSpeechtext == 1 %} selected {% endif %}>No</option>
+				  <option value="2" {% if defaultValues[0].iSpeechtext == 2 %} selected {% endif %}>Yes</option>
+				</select>
+			</td>
+		</tr>
+
+
+
+		<tr >
+			<td style="border-top: none;"  width="10%" ><strong>
+Integration with Text to Speech
+
+<span class="asteriskField"><font color="RED">*</font></span></strong></td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+				<select style="line-height:34px;width:50%;" class="form-control" name="iTextSpeech" id="iTextSpeech" >
+					<option value="1" {% if defaultValues[0].iTextSpeech == 1 %} selected {% endif %}>No</option>
+				  <option value="2" {% if defaultValues[0].iTextSpeech == 2 %} selected {% endif %}>Yes</option>
+				</select>
+			</td>
+		</tr>
+
+
+		<tr >
+			<td style="border-top: none;"  width="10%" ><strong>
+Integration with Voice Gateway
+
+<span class="asteriskField"><font color="RED">*</font></span></strong></td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+				<select style="line-height:34px;width:50%;" class="form-control" name="iVoiceGtw" id="iVoiceGtw" >
+					<option value="1" {% if defaultValues[0].iVoiceGtw == 1 %} selected {% endif %}>No</option>
+				  <option value="2" {% if defaultValues[0].iVoiceGtw == 2 %} selected {% endif %}>Yes</option>
+				</select>
+			</td>
+		</tr>
+
+
+
+		<tr >
+			<td style="border-top: none;"  width="10%" ><strong>
+Legacy Data Exploration
+
+<span class="asteriskField"><font color="RED">*</font></span></strong></td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+				<select style="line-height:34px;width:50%;" class="form-control" name="legacyDataExp" id="legacyDataExp" >
+					<option value="1" {% if defaultValues[0].legacyDataExp == 1 %} selected {% endif %}>No</option>
+				  <option value="2" {% if defaultValues[0].legacyDataExp == 2 %} selected {% endif %}>Yes</option>
+				</select>
+			</td>
+		</tr>
+
+
+
+		<tr >
+			<td style="border-top: none;"  width="10%" ><strong>
+Machine Learning Models
+
+<span class="asteriskField"><font color="RED">*</font></span></strong></td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+				<select style="line-height:34px;width:50%;" class="form-control" name="mlModels" id="mlModels" >
+					<option value="1" {% if defaultValues[0].mlModels == 1 %} selected {% endif %}>No</option>
+				  <option value="2" {% if defaultValues[0].mlModels == 2 %} selected {% endif %}>Yes</option>
+				</select>
+			</td>
+		</tr>
+
+
+
+		<tr >
+			<td style="border-top: none;"  width="10%" ><strong>
+Orchestraion - Integration with Natural Language APIs
+
+<span class="asteriskField"><font color="RED">*</font></span></strong></td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+				<select style="line-height:34px;width:50%;" class="form-control" name="orchINL" id="orchINL" >
+					<option value="1" {% if defaultValues[0].orchINL == 1 %} selected {% endif %}>No</option>
+				  <option value="2" {% if defaultValues[0].orchINL == 2 %} selected {% endif %}>Yes</option>
+				</select>
+			</td>
+		</tr>
+
+
+
+		<tr >
+			<td style="border-top: none;"  width="10%" ><strong>
+Orchestration - Integration with Legacy Environment
+
+<span class="asteriskField"><font color="RED">*</font></span></strong></td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+				<select style="line-height:34px;width:50%;" class="form-control" name="orchILegacyEnv" id="orchILegacyEnv" >
+					<option value="1" {% if defaultValues[0].orchILegacyEnv == 1 %} selected {% endif %}>No</option>
+				  <option value="2" {% if defaultValues[0].orchILegacyEnv == 2 %} selected {% endif %}>Yes</option>
+				</select>
+			</td>
+		</tr>
+
+
+		<tr >
+			<td style="border-top: none;"  width="10%" ><strong>
+Route to Live Agent
+
+<span class="asteriskField"><font color="RED">*</font></span></strong></td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+				<select style="line-height:34px;width:50%;" class="form-control" name="routeLiveAgt" id="routeLiveAgt" >
+					<option value="1" {% if defaultValues[0].routeLiveAgt == 1 %} selected {% endif %}>No</option>
+				  <option value="2" {% if defaultValues[0].routeLiveAgt == 2 %} selected {% endif %}>Yes</option>
+				</select>
+			</td>
+		</tr>
+
+
+		<tr >
+			<td style="border-top: none;"  width="10%" ><strong>
+Success Measurement
+
+<span class="asteriskField"><font color="RED">*</font></span></strong></td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+				<select style="line-height:34px;width:50%;" class="form-control" name="successMt" id="successMt" >
+					<option value="1" {% if defaultValues[0].successMt == 1 %} selected {% endif %}>No</option>
+				  <option value="2" {% if defaultValues[0].successMt == 2 %} selected {% endif %}>Yes</option>
+				</select>
+			</td>
+		</tr>
+
+
+		<tr >
+			<td style="border-top: none;"  width="10%" ><strong>
+Unstructured Data Exploration
+
+<span class="asteriskField"><font color="RED">*</font></span></strong></td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+				<select style="line-height:34px;width:50%;" class="form-control" name="unstrDataExp" id="unstrDataExp" >
+					<option value="1" {% if defaultValues[0].unstrDataExp == 1 %} selected {% endif %}>No</option>
+				  <option value="2" {% if defaultValues[0].unstrDataExp == 2 %} selected {% endif %}>Yes</option>
+				</select>
+			</td>
+		</tr>
+
+
+		<tr >
+			<td style="border-top: none;"  width="10%" ><strong>
+User Interface - Integration with Conversation Management Product
+
+<span class="asteriskField"><font color="RED">*</font></span></strong></td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+				<select style="line-height:34px;width:50%;" class="form-control" name="uiICMS" id="uiICMS" >
+					<option value="1" {% if defaultValues[0].uiICMS == 1 %} selected {% endif %}>No</option>
+				  <option value="2" {% if defaultValues[0].uiICMS == 2 %} selected {% endif %}>Yes</option>
+				</select>
+			</td>
+		</tr>
+
+
+		<tr >
+			<td style="border-top: none;"  width="10%" ><strong>
+User Interface - Integration with Social Media
+
+<span class="asteriskField"><font color="RED">*</font></span></strong></td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+				<select style="line-height:34px;width:50%;" class="form-control" name="uiISM" id="uiISM" >
+					<option value="1" {% if defaultValues[0].uiISM == 1 %} selected {% endif %}>No</option>
+				  <option value="2" {% if defaultValues[0].uiISM == 2 %} selected {% endif %}>Yes</option>
+				</select>
+			</td>
+		</tr>
+
+
+		<tr >
+			<td style="border-top: none;"  width="10%" ><strong>
+User Interface Custom
+<span class="asteriskField"><font color="RED">*</font></span></strong></td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+				<select style="line-height:34px;width:50%;" class="form-control" name="uiCustom" id="uiCustom" >
+					<option value="1" {% if defaultValues[0].uiCustom == 1 %} selected {% endif %}>No</option>
+				  <option value="2" {% if defaultValues[0].uiCustom == 2 %} selected {% endif %}>Yes</option>
+				</select>
+			</td>
+		</tr>
+		
+		
+	</tbody> 
+</table>
+</div>
+
+
+<table align="center" width="100%" cellpadding="1" cellspacing="0" border="0">
+		<tr>
+			<td class="tdspace">
+				&nbsp;&nbsp;
+				<button name="submit-form" id="submit-form" class="bluebutton" >Submit</button>  
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="button" id="backButton" class="cancelbutton" value="Back" onclick="javascript:history.go(-1);">
+			</td>
+		</tr>
+</table> 
+</form> 
+
+<div id="showmodalid" class="showmodal" style="display:none">
+	<div class="center">
+	    <span id="downText" style="font-weight: bolder;font-size: x-large;display: none;"><blink>The back-end service is down. Please try after sometime</blink></span>
+	    <span id="waiText" style="font-weight: bolder;font-size: x-large;display: none;"><blink>We are saving your data...</blink></span>	    
+	     <img id="waitImg" alt="" src="/static/images/loader.gif" />
+   </div>
+</div>
+</body>
+</html>

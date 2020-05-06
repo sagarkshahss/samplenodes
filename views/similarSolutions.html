@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>iXM Solution Advisor</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="description" content="An interactive getting started guide for Edge Code CC.">
+	<link rel="stylesheet" href="static/css/style.css">
+	<link rel="stylesheet" href="static/css/jquery.modal.css">
+	<script	src="static/js/main.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.min.js"></script>
+	<script	src="static/js/jquery.modal.js"></script>	
+	<script	src="static/js/close.js"></script>
+<script language="javascript">
+$( document ).ready(function() {
+	var IOTInfo = "{{IOTInfo}}";
+	document.getElementById('IOTInfo').value = IOTInfo ;
+	//alert(IOTInfo);
+
+});
+var timeCount = 5000;
+function setOpportunity(solutionId) {
+	
+	document.getElementById("solutionId").value=solutionId;
+	document.getElementById("captureRequirementsForm").submit();
+	return true;
+}
+
+function newOpportunity() {
+	document.getElementById("solutionId").value=-1;
+	document.getElementById("captureRequirementsForm").submit();
+	return true;
+}
+function f(){
+	 var params= (window.location.href).split('?');
+	 if(params[1]){
+		 $("#btnLogout").click();
+	 }
+}
+
+//called when clicking on the copy icon in the solution tile
+function copySolution(sol_id){
+	document.getElementById("solutionId_copy").value=sol_id;
+   // document.getElementById("copySolutionForm").submit();
+	var solutionId_copy = document.getElementById("solutionId_copy").value;
+	var opportunityId = document.getElementById("opportunityId").value;
+	var clientName = document.getElementById("clientName").value;
+	var industryInfo = document.getElementById("industryInfo").value;
+	var deliveryCenterInfo = document.getElementById("deliveryCenterInfo").value;
+	var solutionAreaInfo = document.getElementById("solutionAreaInfo").value;
+	var imt_id = document.getElementById("imt_id").value;
+	var IOTInfo = document.getElementById("IOTInfo").value;
+	var risk_rating = document.getElementById("risk_rating").value;
+	var opportunity_owner_email = document.getElementById("opportunity_owner_email").value;
+	var smr_number = document.getElementById("smr_number").value;
+	//make a post request for copy solution & get the new solId in return
+	//alert("making GET req");
+	$("#showmodalid").show();
+	
+	var newSolId = -1;
+	$.ajaxSetup({async: false});
+	$.get("/copySolution",{solutionId_copy:$('#solutionId_copy').val(),
+							opportunityId:$('#opportunityId').val(), 
+							clientName:$("#clientName").val(),
+							industryInfo:$("#industryInfo").val(),
+							deliveryCenterInfo:$("#deliveryCenterInfo").val(),
+							solutionAreaInfo:$("#solutionAreaInfo").val(),
+							imt_id:$("#imt_id").val(),
+							IOTInfo:$("#IOTInfo").val(),
+							risk_rating:$("#risk_rating").val(),
+							opportunity_owner_email:$("#opportunity_owner_email").val(),
+							smr_number:$("#smr_number").val()							
+							}, function(data, status){
+		//alert(data);
+		//alert(JSON.parse(data).solId);
+		newSolId = JSON.parse(data).solId;
+	});
+	//alert("After making GET req");
+	$.ajaxSetup({async: true});
+	
+	//checkCopyStatus to check the progress of copying & show a loader till the solution is completely copied
+	checkSolutionStatus(24, newSolId);
+}
+
+function checkSolutionStatus(count, solutionId){
+	console.log("count: "+count);
+	console.log("solutionId: "+solutionId);
+	setTimeout(function() {
+		$.ajaxSetup({async: false});
+		$.post("/checkSolutionStatus",{solId:solutionId}, function(data, status){
+	        console.log("Data: " + data + "\nStatus: " + status);
+	        if(data!="Error: connect ECONNREFUSED"){
+				if(new String(data).valueOf() == new String("NO").valueOf()){
+					console.log("inside NO");
+					 if(count == 0){
+						console.log("inside count ==0");
+						 var addr= (window.location.href).split('/');	        		 
+						 window.location.href = addr[0]+"//"+addr[2]+"/dashboard";
+					 }else{
+						console.log("inside count !=0");
+						$("#waitImg").hide();
+						$(".center").css("width","350px");
+						$("#waiText").show();
+						count--;
+						setTimeout(function() {
+							var solId = solutionId;
+							console.log("solId:: "+solId);
+							checkSolutionStatus(count, solId);
+						},timeCount);
+					}
+				}else{
+					console.log("inside YES");
+					console.log("solutionId:: "+solutionId);
+					console.log("val solutionId: "+ Number(solutionId));
+					console.log("val solutionId: "+ Number("1234"));
+					console.log("val solutionId: "+ parseInt("12345"));
+					var addr= (window.location.href).split('/');	        		 
+					window.location.href = addr[0]+"//"+addr[2]+"/getSolutionInfo?searchSolId="+solutionId;
+				}
+	        }else{
+	       		var addr= (window.location.href).split('/');	        		 
+				window.location.href = addr[0]+"//"+addr[2]+"/dashboard";
+	       	}
+	    });
+		$.ajaxSetup({async: true});
+	},timeCount);
+	
+}
+
+</script>
+<style>
+    body {padding-bottom:100px;background-color:rgb(244,244,244);}
+.opportunity_wrapper {width:1000px;margin:0 auto;overflow-x:hidden;}
+.opportunity_tile {width:205px;height:280px;background-color:red;float:left;margin:22px 20px;border:1px solid black;box-shadow:6px 6px 10px black;position:relative;}
+.opportunity_tile_header_history {height:140px;color:white;font: 18px arial,sans-serif;}
+.opportunity_tile_header_text {color:white;font: 18px arial,sans-serif; padding:15px;}
+.opportunity_tile_content_text {color:gray;font: 16px arial,sans-serif; padding:10px 15px 5px 15px;}
+.opportunity_tile_content_text_history {color:black;font: 15px arial,sans-serif;}
+.dropdown_image {position:absolute;left:10px;bottom:10px;}
+.opportunity_header {width:100%;}
+.opportunity_tile_header {background-color:rgb(0,90,1);width:100%; height:140px;}
+.opportunity_tile_content {width:100%;background-color:rgb(255,255,255);height:140px;}
+.opportunity_tile_edit_link {display:inline-block;position:absolute;top:105px;left:6px;}
+.opportunity_tile_view_link {display:inline-block;position:absolute;right:10px;top:100px;}
+.arrow_div {display:inline-block;width:25px;border-radius:50%;height:25px;border:2px solid white;color:white;text-align:center;line-height:25px;font-weight:bold;font-size:20px;}
+.opportunity_id {width:100%;height:45px;word-break:break-all;overflow:hidden;}
+.opportunity_name {width:100%;height:45px;word-break:break-all;overflow:hidden;}
+.opportunity_history_select_wrapper {width:100%;text-align:center;height:40px;position:absolute;display:inline-block;left:0;bottom:0;};
+.opportunity_tile_content_text_history div {color:black;font: 14px arial,sans-serif;padding-top:5px;}
+.opportunity_history_select_wrapper select {width:95%;height:30px;font-weight:bold;font-size:12px;padding:2px;border:2px solid black;}
+</style>
+</head>
+<body class="mainInner" onload="f();">
+	<div class="divWidth">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+			<div class="NavDiv">
+				<div class="nav">
+					<ul>
+						<li class="home"><a href="dashboard">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+					</ul>
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop">
+							<img src="/static/images/search.jpg">
+							<div id="two" class="popupBox">
+							<form method="post" action="/searchOpportunity" id="search">
+								<input type="text" value="" name="searchOpportunity" id="searchOpportunity" required class="popInput placeholder-fix" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Opportunity Name">
+								<input type="submit" value="Search" class="popButton">
+							</form>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="InnDiv" ></div>
+	<div class="divWidth">
+		<div class="loginInfo ">Hello {{ user.attributes.firstName }} {{user.attributes.lastName}}</div> 
+		<p>Similar Solutions</p>
+
+		<form method="post" action="/submitSolutionDetails" id="captureRequirementsForm">
+        
+		<input type="hidden" name="solutionId" id="solutionId">
+        <input type="hidden" name="opportunityId" id="opportunityId" value="{{userRequirements.opportunityId}}">
+        <input type="hidden" name="clientName" id="clientName" value="{{userRequirements.clientName}}">
+        <input type="hidden" name="industryInfo" id="industryInfo" value={{userRequirements.industryInfo}}>
+        <input type="hidden" name="deliveryCenterInfo" id="deliveryCenterInfo" value={{userRequirements.deliveryCenterInfo}}>
+        <input type="hidden" name="solutionAreaInfo" id="solutionAreaInfo" value={{solutionAreaInfoString}}>
+        <input type="hidden" name="imt_id" id="imt_id" value={{userRequirements.imt_id}}>
+        <input type="hidden" name="LeadCountryInfo" id="LeadCountryInfo" value={{userRequirements.LeadCountryInfo}}>
+        <input type="hidden" name="IOTInfo" id="IOTInfo" value="" >
+        <input type="hidden" name="risk_rating" id="risk_rating" value={{userRequirements.risk_rating}}>
+        <input type="hidden" name="opportunity_owner_email" id="opportunity_owner_email" value="">
+        <input type="hidden" name="smr_number" id="smr_number" value="">
+            
+        <div class="opportunity_wrapper">
+                
+                {% for sol in similarSolutionsResult %}
+                                   <div class="opportunity_tile opportunity_tile_history">
+                    <div class="opportunity_tile_header opportunity_tile_header_history">
+                        <div class="opportunity_tile_header_text">
+                            <!--<div class="opportunity_id">{{ sol.customer_name }}</div>-->
+                            <div class="opportunity_header">Opportunity</div>
+                            <!-- <div class="opportunity_id">{{ sol.sol_id}}</div> -->
+                            <div class="opportunity_name">{{ sol.opportunity_name }}</div>                            
+							<div class="opportunity_name">{{ sol.customer_name }}</div>
+                            <!--
+                            <a class="opportunity_tile_edit_link"><img src="/static/images/edit_btn.png" onclick="javascript:return setOpportunity({{ sol.sol_id }});"/></a>
+                             -->
+                            <a class="opportunity_tile_view_link" href="#" onclick="copySolution({{ sol.sol_id }})"><div class="arrow_div" style="background-color:white;"><img src="/static/images/copy-icon.png" style="width:20px;padding-top:0px"></div></a>
+                        </div>
+                    </div>
+                    <div class="opportunity_tile_content opportunity_tile_content_history">
+                        <div class="opportunity_tile_content_text opportunity_tile_content_text_history">
+                            <div><strong>Created: </strong><span class="opportunity_create_date">{{ sol.creation_date }}</span></div>
+                            <div><strong>Edited: </strong><span class="opportunity_edit_date">{{sol.last_edit_date}}</span></div>
+                            <div><strong>Total Effort: </strong><span class="opportunity_effort">{{ sol.total_efforts }}</span> Hrs</div>
+                            <div><strong>Completed: </strong>
+                                <span class="opportunity_complete_status">
+                                    {% if sol.sol_status > 0 %}
+                                    YES
+                                    {% else%}
+                                    NO
+                                    {% endif %}
+                                </span></div>
+                        </div>
+                        <div class="opportunity_history_select_wrapper">
+                            <select>
+                                <option selected disabled>Solution Areas</option>
+                                {% for solArea in sol.solAreaList %}
+                                <option value="{{ solArea.sol_area_name }}" disabled>{{ solArea.sol_area_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                {% endfor %}
+                
+        </div>
+        {% if similarSolutionsResult.length > 0 %}
+		   <div style="text-align:center;padding:10px;padding-top:25px;"><a href="#" style="background-color:rgb(0,90,1);border:0px;height:30px;border-radius:4px;color:white;font-size:16px;padding:10px;text-decoration:none;" onclick="newOpportunity()">No Thanks, I will create a fresh one</a></div>
+		{% else %}
+		   <script type="text/javascript">
+		   		document.getElementById("solutionId").value=-1;
+				document.getElementById("captureRequirementsForm").submit();
+		   </script>
+		{% endif %}
+        
+        
+    </form>
+    
+    <form method="get" action="/copySolution" id="copySolutionForm">
+        
+		<input type="hidden" name="solutionId_copy" id="solutionId_copy">
+        <input type="hidden" name="opportunityId" id="opportunityId" value="{{userRequirements.opportunityId}}">
+        <input type="hidden" name="clientName" id="clientName" value="{{userRequirements.clientName}}">
+        <input type="hidden" name="industryInfo" id="industryInfo" value={{userRequirements.industryInfo}}>
+        <input type="hidden" name="deliveryCenterInfo" id="deliveryCenterInfo" value={{userRequirements.deliveryCenterInfo}}>
+        <input type="hidden" name="solutionAreaInfo" id="solutionAreaInfo" value={{solutionAreaInfoString}}>
+        <input type="hidden" name="imt_id" id="imt_id" value={{userRequirements.imt_id}}>
+       	<input type="hidden" name="IOTInfo" id="IOTInfo"  value=" ">
+        <input type="hidden" name="risk_rating" id="risk_rating" value={{userRequirements.RiskRating}}>
+        <input type="hidden" name="opportunity_owner_email" id="opportunity_owner_email" value="{{userRequirements.opportunity_owner_email}}">
+        <input type="hidden" name="smr_number" id="smr_number" value={{userRequirements.smr_number}}>
+    </form>
+    <div id="showmodalid" class="showmodal" style="display:none">
+	
+	    <div class="center">
+	    <span id="downText" style="font-weight: bolder;font-size: large;display: none;"><blink>The back-end service is down. Please try after sometime</blink></span>
+	    <span id="waiText" style="font-weight: bolder;font-size: large;display: none;">We are processing your request...</span>
+	    <img id="waitImg" alt="" src="/static/images/loader.gif" />
+		<span id="waiText2" style="font-weight: bolder;font-size: large;">This may take few seconds</span>
+	    </div>
+	</div>
+    
+</body>
+</html>

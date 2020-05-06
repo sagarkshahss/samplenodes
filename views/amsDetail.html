@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <!--<link rel="shortcut icon" type="image/png" href="./assets/favicon.ico" />-->
+  <!-- <link rel="shortcut icon" type="image/png" href="https://pages.github.ibm.com/w3/w3ds-showcase-error/assets/favicon.ico" /> -->
+  <link rel="stylesheet" class="style-switch" href="static/css/instarom/w3ds-compact.css">
+  <link rel="stylesheet" href="static/css/instarom/w3ds-border-sides.css">
+  
+  <script	src="static/js/instarom/w3ds.js"></script>
+  <script	src="static/js/instarom/masthead.js"></script>
+  <script	src="static/js/lib/jquery-2.1.4.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/additional-methods.min.js"></script>
+  
+  <title>Solution Advisor</title>
+  
+<style type="text/css">
+	.input-holder {
+	  border: 1px solid #cccccc;
+	  display: inline-block;
+	  padding: 5px;
+	}
+	.input-holder > input {
+	  border: 0;
+	  margin: 0;
+	  padding: 0;
+	  outline:none;
+	}
+	.input-holder:after {
+	  content: '%';
+	}
+  .theme-switcher {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .theme-switcher div {
+    cursor: pointer;
+    transition: color 100ms ease-out, transform 100ms ease-out;
+    padding: 9.5px 19px !important;
+  }
+
+  .theme-switcher p {
+    font-size: 17.00006px !important;
+  }
+
+  .active-highlight {
+    position: absolute;
+    background: white;
+    height: 27px;
+    width: 42%;
+    margin: 0 10px;
+    z-index: -1;
+  }
+
+  .active-theme {
+    color: #002236;
+  }
+ 
+
+.LogDiv {
+	width:290px; float:left;
+}
+.divWidth {
+	width:1024px; 
+	margin:auto; 
+}
+.NavDiv {
+	width:657px; 
+	float:right;
+}
+.InnDiv {
+	width:100%; 
+	background-image: url("/static/images/main-contact.jpg");
+	height:30px;
+}
+
+.nav ul {
+	list-style: none;
+	text-align: center; 
+}
+.nav h3 {
+    font-family: 'Oswald', arial;
+	font-size: .2em;
+	line-height: 40px;
+	height: 40px;
+}
+.nav li {
+	font-family: 'Oswald', sans-serif;
+	font-size: .2em;
+	line-height: 40px;
+	height: 40px;
+	border-bottom: 1px solid #888;
+}
+.nav a {
+	text-decoration: none;
+	color: #000;
+	display: block;
+	transition: .3s background-color;
+}
+.nav a:hover {
+	font-weight: bold;
+}
+ 
+.nav a.active {
+	color: #60676d;
+	cursor: default;
+	font-weight: bold;
+}
+@media screen and (min-width: 600px) {
+	.nav li {
+		width: 100px;
+		border-bottom: none;
+		height: 50px;
+		line-height: 50px;
+		font-size: .8em;
+		text-transform: uppercase;
+		border-right:1px solid #e1dfdf;
+	  }
+	 
+	  /* Option 1 - Display Inline */
+	.nav li {
+		display: inline-block;
+		margin-right: -4px;
+	}
+	.nav li:last-child {
+		border: none;
+	}
+}
+
+.SeaDiv {
+	z-index:999; 
+	margin-top:-60px; 
+	align:right; 
+	float:right
+}
+.popupHoverElement:hover > .popupBox {
+	visibility:visible;
+	opacity:1;
+	-webkit-transition: all 0.3s ease;
+	-moz-transition: all 0.3s ease;
+	-o-transition: all 0.3s ease;
+	transition: all 0.3s ease;
+	-webkit-transition-delay: 0s;
+	-moz-transition-delay: 0s;
+	-o-transition-delay: 0s;
+	transition-delay: 0s;
+
+
+}
+.mainOutPop{
+	float: left;
+}
+ .popupBox {
+    visibility:hidden;
+    opacity:0;
+    -webkit-transition:visibility 0s linear 0.3s, opacity 0.3s linear;
+    -moz-transition:visibility 0s linear 0.3s, opacity 0.3s linear;
+    -o-transition:visibility 0s linear 0.3s, opacity 0.3s linear;
+    transition:visibility 0s linear 0.3s, opacity 0.3s linear;
+    -webkit-transition: all 0.4s ease;
+    -moz-transition: all 0.4s ease;
+    -o-transition:all 0.4s ease;
+    transition: all 0.4s ease;
+    -webkit-transition-delay: 0.5s;
+    -moz-transition-delay: 0.5s;
+    -o-transition-delay:0.5s;
+    transition-delay: 0.5s;
+	width:150px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	height: 80px; 
+
+}
+.popButton{
+	width: 90%;
+	height: 30px;
+	margin-top: 10px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	display:inline-block;
+	font-size:15px;
+	font-weight:normal;
+	color:#fff;
+	text-decoration:none;
+	text-transform:uppercase;
+	text-align:center;
+	background-color: #ff6f29;
+	border: none;
+
+}
+.popInput
+{
+	width: 20px;
+	height: 30px;
+	margin-top: 10px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px; 
+	border: 1px solid #c9c8c8; 
+	padding-left: 10px;
+}
+.placeholder-fix:focus::-webkit-input-placeholder  { 
+	color:transparent; 
+	width:20px;
+
+}
+.placeholder-fix:focus::-moz-placeholder   { 
+	color:transparent; 
+	width:20px;
+}
+ 	
+</style>
+<script type="text/javascript">
+var amsData={};
+
+function editSolution(){
+	document.getElementById("amsDetailForm").action="/amspage";
+	document.getElementById("amsDetailForm").submit();
+}
+
+function emailAmsSolution(){
+	var solId= $('#solId').val();
+	$.ajax({url: "/emailAMSSolution?solId="+solId, success: function(data, status) {
+			alert("AMS Solution Re-Submitted successfully");
+			//var overlayElement = document.querySelector('.ds-overlay');
+			//var myOverlay = w3ds.overlay(overlayElement);
+			//myOverlay.open(overlayElement, null);
+		}
+	});
+}
+
+
+
+function downloadAmsStaffing(){
+$.ajaxSetup({async: false});
+$.post("/submitDownloadStaffingRequest",{solId:$('#solId').val()}, function(data, status){
+	/* $( "#download-dialog-message" ).dialog({
+			modal: true,
+			buttons: {
+			Ok: function() {
+			  $( this ).dialog( "close" );
+				}
+			}
+		});  */
+	});
+$.ajaxSetup({async: true});
+}
+
+function submitCostingRequest(){
+ $.ajaxSetup({async: false});
+	$.post("/submitAmsCostingRequest",{solId:$('#solId').val()}, function(data, status){
+		$( "#costing-dialog-message" ).dialog({
+				modal: true,
+				buttons: {
+				Ok: function() {
+				  $( this ).dialog( "close" );
+					}
+				}
+			});
+		});
+	$.ajaxSetup({async: true}); 
+}
+
+
+
+function populateAmsDetails() {
+	var solId= $('#solId').val();
+	$.ajax({url: "/getAmsDetailInfo",data:{solId:solId}, success: function(data, status) {
+		 amsData=data;
+		 console.log("getAmsDetailInfo "+JSON.stringify(amsData));
+		 document.getElementById("amsDataJSON").value = JSON.stringify(amsData);
+		 $('#optyName').text(data[0].opportunity_id);
+		 $('#customerName').text(data[0].Customer_Name);
+		 $('#leadCountry').text(data[0].country_name);
+		 $('#sector').text(data[0].sector_name);
+		 $('#industry').text(data[0].indus_name);
+		 $('#amsYears').text(data[0].AMS_YRS);
+		 $('#expectedVol').text(data[0].TICKET_VOLUME);
+		// var ticketByClientPer=Math.round((data[0].CLIENT_MNGD_TKTS/data[0].TICKET_VOLUME)*100);
+		 var ticketByClientPer=parseInt((data[0].CLIENT_MNGD_TKTS/data[0].TICKET_VOLUME)*100);
+		 $('#ticketByClient').text(ticketByClientPer);
+		 $('#minorEnhancement').text(data[0].MINOR_ENHANCEMENT_HRS);
+		 $('#prodGain').text(data[0].PROD_GAIN);
+		 $('#l1Tickets').text(data[0].L1_5_TKTS);
+		 $('#l2Tickets').text(data[0].L2_TKTS);
+		 $('#l3Tickets').text(data[0].L3_TKTS);
+		
+		}
+	});
+}
+
+function getPricingRequest(obj){
+	var orangehref= $(obj).attr("data-attr");
+	var solid = $("#solId").val();
+	//alert("solid " +  solid);
+	$.ajax({url: "/checkLeadCountryForExistingDeal/"+solid, success: function(data) {
+		var countryid;
+		if(typeof data[0] !== 'undefined' && data[0] !== null) {
+			countryid = data[0].COUNTRY_ID;
+		}
+		$(".pricingstatus").html("");
+		$(".pricingstatus").append("<div class='ds-icon-size-default  ds-icon-check ds-padding-right-0_5 price_res'>Costing Submitted </div>");
+		}
+	});
+}
+function checkStaffingDirty(){
+	console.log("checkStaffingDirty");
+	$.ajax({url: "/checkIsStaffingDirty",data:{solId:$('#solId').val()}, success: function(data) {
+		var countryid;
+		if(data==false){
+			$("#submitpricebtn").addClass('ds-disabled');
+			 $("#submitpricebtn").prop('disabled', true);
+			 $("#downloadstaffing").addClass('ds-disabled');
+			 $("#downloadstaffing").prop('disabled', true);
+			 
+			 
+		}
+		else{
+			$("#submitpricebtn").removeClass('ds-disabled');
+			 $("#submitpricebtn").prop('disabled', false);
+			 $("#downloadstaffing").removeClass('ds-disabled');
+			 $("#downloadstaffing").prop('disabled', false);
+			 
+			}
+	  }
+	});
+}
+
+function goBack() {
+   //window.history.back();
+    var addr= (window.location.href).split('/');	        		 
+	 window.location.href = addr[0]+"//"+addr[2]+"/dashboard";
+    
+}
+  $(document).ready(function() {
+	 console.log("entered");
+	 populateAmsDetails();
+	 $("#costing-dialog-message").hide();
+	 
+	 $("#submitpricebtn").addClass('ds-disabled');
+	 $("#submitpricebtn").prop('disabled', true);
+	 
+	 $("#submitpricebtn").click(function (){
+			getPricingRequest(this)
+		});
+		
+	 checkStaffingDirty();
+	 
+	});
+	
+	
+ 
+</script>
+</head>
+
+
+<body>
+<div id="costing-dialog-message" title="Costing Request Submitted">
+  <p>
+    <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 50px 0;"></span>
+    Your request has been sent to GPE automation tool and you will receive GPE file in next 2 hours
+  </p>
+</div>
+<div class=" ds-padding-top-4">
+	</div>
+ <div class="divWidth">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+			<div class="NavDiv">
+				<div class="nav">
+					<ul>
+						<li class="home"><a href="dashboard">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+					</ul>
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop">
+							<img src="/static/images/search.jpg">
+							<div id="two" class="popupBox">
+							<form method="post" action="/searchOpportunity" id="search">
+								<input type="text" value="" name="searchOpportunity" id="searchOpportunity" required class="popInput placeholder-fix" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Opportunity Name">
+								<input type="submit" value="Search" class="popButton">
+							</form>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div> 
+	<!-- <div class="InnDiv"></div> -->
+	
+	<div class="ds-bg-neutral-5 ds-shadow-floating ds-margin-top-3 ds-padding-top-2 ds-shadow-floating ds-padding-bottom-1 ds-margin-bottom-2">
+		<!-- <div class="ds-bg-contextual-blue-4 ds-marging-bottom-1 ds-shadow-floating "> -->
+			  <div class="ds-flex-fill-auto ds-flex-align-items-center ds-fade-in ds-delay-3 ds-bg-dark ds-no-gutter ds-padding-top-1 ds-padding-bottom-1">
+			    <div class="ds-col-12 ds-offset-1 ">
+			      <h2 class="ds-heading-2 ds-margin-bottom-0 ds-shadow-text">TICKET BASED AMS CALCULATOR</h2>
+			    </div>
+			  </div>
+			<!-- </div> -->
+	</div>
+	
+	{% if msgdisplay!== false %}
+	
+	<div class="ds-col-xs-12 ds-alert ds-success">
+	    <p class="ds-label ds-align-text-center">AMS solution triggered for your input .Please come back after sometime to download the staffing</p>
+	</div>
+	
+	{% endif  %}
+
+<div class="ds-col-xs-10 ds-offset-xs-1 ds-col-md-6 ds-offset-md-1 ds-col-lg-10 ds-offset-lg-1 ds-col-xl-10 ds-offset-xl-1 ds-align-text-left"> 
+<div class="  ds-panel ds-panel-raised ds-panel-nester ds-shadow-floating ds-padding-left-6 ds-padding-top-8 ds-margin-top-2  ">	  
+		  <!-- DataFrame -->
+	  <div class="ds-row">
+			  <div class=" ds-align-text-center">
+			   	<h3 class="ds-heading-2">AMS REQUEST DETAILS | {{solId}} </h3>
+			   </div>
+	   </div>
+<div class="ds-hr"></div>
+<form method="post" name="amsDetailForm" id="amsDetailForm" >
+	<div class="ds-row">
+	
+		 <div class="ds-col-lg-7 ds-margin-left-8">
+			  <div class="ds-row ds-margin-top-5">
+			  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-4  ds-align-text-right">
+					  	<h5 class="ds-label ds-font-weight-bold ds-heading-5">Opportunity Name/Id</h5>
+			   		 </div>
+			   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5">
+			        	<h5 class="ds-heading-5" id="optyName"> </h5>
+					 </div>
+					 <!-- <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-padding-left-3 ">
+	 			  			<button  class="ds-button" id="submitpricebtn" onclick="submitCostingRequest()" type="button">Submit Costing Request</button>
+	 			  	</div> -->
+			   	</div>
+			  	<div class="ds-row">
+			  	 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-4 ds-align-text-right">
+			   		 	<h5 class="ds-label ds-font-weight-bold ds-heading-5">Customer Name</h5>
+			   		 </div>
+			   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5">
+			        	<h5 class="ds-heading-5" id="customerName">customer Name</h5>
+					 </div>
+			   	</div>
+			    <div class="ds-row">
+			  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-4 ds-align-text-right">
+			   		 	<h5 class="ds-label ds-font-weight-bold ds-heading-5">Lead Country</h5>
+					</div>
+			   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ">
+			       		<h5 class="ds-heading-5" id="leadCountry">leadcountry</h5>
+					</div>
+			  	</div>
+			  	
+			  <div class="ds-row">
+			  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-4 ds-align-text-right">
+			   		 	<h5 class="ds-label ds-font-weight-bold ds-heading-5">Sector</h5>
+					</div>
+			   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5">
+			        	<h5 class="ds-heading-5" id="sector">sector</h5>
+					</div>
+				</div>
+				
+				 <div class="ds-row">	
+					<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-4 ds-align-text-right">
+			   		 	<h5 class="ds-label ds-font-weight-bold ds-heading-5">Industry</h5>
+					 </div>
+			   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5">
+			        	<h5 class="ds-heading-5" id="industry">industry</h5>
+					</div>
+				</div>	
+			 
+			  	<div class="ds-row">
+			  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-4 ds-align-text-right">
+			   		 	<h5 class="ds-label ds-font-weight-bold ds-heading-5">Number of AMS Years</h5>
+			   		 </div>
+			   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ">
+			        	<h5 class="ds-heading-5" id="amsYears">10 Years</h5>
+					</div> 
+			  </div>
+			  
+			  <div class="ds-row">
+			  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-4 ds-align-text-right">
+			   		 		<h5 class="ds-label ds-font-weight-bold ds-heading-5">Expected Tickets Volume</h5>
+			   		 </div>
+			   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5">
+			        	<h5 class="ds-heading-5" id="expectedVol" >Expected vol</h5>
+					</div>
+			   	</div>	
+			   	
+			   	<div class="ds-row">
+			  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-4 ds-align-text-right">
+			   		 	<h5 class="ds-label ds-font-weight-bold ds-heading-5">Tickets Managed by Client(%)</h5>
+			   		 </div>
+			   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5">
+			         	<h5 class="ds-heading-5" id="ticketByClient" >test %</h5>
+	
+					</div>
+					<!-- <span>&#37;</span> -->
+			   	</div>	
+			   	
+			   	<div class="ds-row">
+			  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-4 ds-align-text-right">
+			   		 	<h5 class="ds-label ds-font-weight-bold ds-heading-5">Minor Enhancements(hours)</h5>
+			   		 </div>
+			   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5">
+			   		 	<h5 class="ds-heading-5" id="minorEnhancement" >Minor hours</h5>
+					</div>
+			   	</div>	
+			   	<div class="ds-row">
+			  		<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-4 ds-align-text-right">
+			   		 	<h5 class="ds-label ds-font-weight-bold ds-heading-5">Productivity Gain(%)</h5>
+			   		 </div>
+			   		 <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5">
+			   		 	<h5 class="ds-heading-5" id="prodGain" ></h5>
+					</div>
+			   	</div>	
+			   	
+			  <div class="ds-row">
+					<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-4 ds-align-text-right">
+						<h5 class="ds-label ds-font-weight-bold ds-heading-5">L1 Tickets(%)</h5>
+					</div>
+					<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ">
+						<h5 class="ds-heading-5" id="l1Tickets">L1</h5>
+					</div>
+				</div>
+	
+				<div class="ds-row">
+					<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-4 ds-align-text-right">
+						<h5 class="ds-label ds-font-weight-bold ds-heading-5">L2 Tickets(%)</h5>
+					</div>
+					<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ">
+						<h5 class="ds-heading-5" id="l2Tickets">L2</h5>
+					</div>
+				</div>
+	
+				<div class="ds-row">
+					<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-4 ds-align-text-right">
+						<h5 class="ds-label ds-font-weight-bold ds-heading-5">L3 Tickets(%)</h5>
+					</div>
+					<div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-5 ">
+						<h5 class="ds-heading-5" id="l3Tickets">L3</h5>
+					</div>
+				</div>
+			
+				<input type=hidden id="solId" name="solId" value="{{solId}}"> 
+				<input type=hidden id="amsDataJSON" name="amsDataJSON" value="" />
+				
+				
+				<tbody class="dataframe ds-table-container" style="cursor: pointer;"></tbody>
+			
+		  </div>
+		  <div class="ds-col-lg-3 ds-margin-top-7">
+			  	<button class="ds-button" id="submitpricebtn" onclick="submitCostingRequest()" type="button">Submit Costing Request</button>
+			  	<span id="submitpricebtn">
+			  		<h3 class="pricingstatus" style="font-family: helvetica; font-size: 13px;color: #4b6988;">{{priceSubmitStatus}}</h3>
+			  	</span>
+		  </div>
+		  <div class="ds-row ds-margin-bottom-1_5 ds-padding-top-3 ds-align-text-center">
+				  <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-left-3 ">
+				  		<button type="button" class="ds-button ds-width-auto ds-flat" onclick="goBack()">Back</button>
+				  </div>
+				  <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-4 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-5">
+				  	<!-- 	<button class="ds-button" id="downloadstaffing" type="button" onClick="downloadAmsStaffing()">Download AMS Staffing</button> -->
+			 		<a id="downloadstaffing" href="http://{{serviceURL}}/download/request?&solId={{solId}}&nfrType=amstkt&artifactType=1" class="ds-button" >Download Staffing Estimation</a>
+				  </div>
+				  
+				  <div class="ds-col-xs-5 ds-col-sm-4 ds-col-md-2 ds-col-lg-3 ds-margin-bottom-xs-2 ds-margin-bottom-md-0 ds-padding-right-4">
+				  		<button class="ds-button " onclick="editSolution()" ></span>Edit Solution</button>
+				  </div>
+			  
+				  
+		  </div>
+	</form>			
+	 </div>
+
+<!-- <div class="details-view ds-hide"></div> -->
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Solution Advisor</title>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="description" content="An interactive getting started guide for Edge Code CC.">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="static/css/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+var timeCount = 10000;
+function closeModal(){
+	if($("[name='optradio']:checked").val() == "on"){
+		if(validatePage() == true){
+			document.getElementById("saveSolution").action = "/saveSolutionUseCasesInfo";
+			document.getElementById("saveSolution").submit();
+		}
+	}
+	else{
+		$("#myModal").modal("show");
+	}
+}
+function validate() {
+	var solAreaId = $("#SOL_AREA_ID").val();
+	console.log('solAreaId : ' + solAreaId);
+	if (solAreaId == 165) {
+		$("#myModal").modal({backdrop: "static"});
+		return false;
+	}
+	else{
+		if(validatePage()) {
+			return true;
+		}
+			else{
+				return false;
+			}
+
+	}	
+}
+
+function validatePage(){
+	if(document.getElementById("testSolId").value == "Y"){
+		if(!$('input[type="checkbox"]').attr("disabled")){
+			if(!$('#saveSolution input[name=testFlagId]:checked').length > 0){
+				alert("Please select at least one Perf Test before submitting the solution.");
+				return false;
+			}
+		}
+	}
+
+	var chks = document.getElementsByName('useCaseId');
+
+	var hasChecked = false;
+	for (var i = 0; i < chks.length; i++) {
+		if (chks[i].checked) {
+			hasChecked = true;
+			break;
+		}
+	}
+	
+	var chks2 = document.getElementsByName('useCaseId2');
+
+	var hasChecked2 = false;
+	for (var i = 0; i < chks2.length; i++) {
+		if (chks2[i].checked) {
+			hasChecked2 = true;
+			break;
+		}
+	}
+	
+	var sol_area_id = "{{solAreaResult[0].sol_area_id}}" ;
+
+	if(hasChecked2 == false){
+		if (hasChecked == false) {
+			$("[name='optradio']").prop('checked', false);
+			alert("Please select at least one use case before submitting the solution.");
+			return false;
+		}
+	}
+	
+	
+	
+	//if(document.getElementById("useCaseInfoType").value==2)
+		
+	//document.getElementById("submitButton").disabled=true;
+	//document.getElementById("showmodalid").style.top=window.pageYOffset;
+	window.scrollTo(0, 0);
+	$(".showmodal").show();
+	checkSaveStatus(0);
+	return true;
+}
+
+function setLoad(){
+	//consol.log(window.pageYOffset +" "+window.pageXOffset);
+	if($(".showmodal").css("display") != 'none'){
+		$(".showmodal").css("top",window.pageYOffset);
+	}
+}
+
+
+function checkSaveStatus(count){
+	//alert($('#serviceURL').val()+'/download/query?solId='+$('#solId').val()+'&solAreaId='+$('#solAreaId').val());
+	var values = new Array();
+	$.each($("input[name='testFlagId']:checked"), function() {
+  		values.push($(this).val());
+	});
+	setTimeout(function() {
+		$.ajaxSetup({async: false});
+		$.post("/checkSaveStatus",{solId:$('#solId').val(),solAreaId:$('#currentSolAreaId').val(), testSolId:$("#testSolId").val(),enbTestBtn:values.length}, function(data, status){
+	        //alert("Data: " + data + "\nStatus: " + status);
+	        if(data!="Error: connect ECONNREFUSED"){
+	        if(data=="No"){
+	        	 if(count > 0){
+	        		 var addr= (window.location.href).split('/');	        		 
+	        		 window.location.href = addr[0]+"//"+addr[2]+"/dashboard";
+	        	 }else{
+	        	$("#waitImg").hide();
+	        	$(".center").css("width","350px");
+	        	$("#waiText").show();
+	        	count++;
+	        	setTimeout(function() {
+	        		//checkSaveStatus(1);
+					checkSaveStatus(count);
+	        	},timeCount);
+	        }
+	        }else{
+	        	//$("#waiText").hide();
+	        	//$(".showmodal").hide();
+				setTimeout(function() {
+					document.getElementById("saveSolution").action = "/gotoSolutionDetails";
+					document.getElementById("enbTestBtn").value = values.length;
+					document.getElementById("saveSolution").submit();
+					/* $.post("/gotoSolutionDetails",{solId:$('#solId').val(),enbTestBtn:values.length}, function(data, status){
+						
+					}); */
+				}, 10000);
+
+	        }
+	        }else{
+	       		$("#waitImg").hide();
+	        	$(".center").css("width","350px");
+	        	$("#waiText").hide();
+	        	$("#downText").show();
+	        	setTimeout(function() {
+	        		$("#downText").hide();
+	        		$(".showmodal").hide();
+	        	},3000);
+	       	}
+	    });
+		$.ajaxSetup({async: true});
+	},timeCount);
+	
+}
+
+
+$(document).ready(function(){
+	
+	if ($("#useCaseId:not(:checked)").length  == 0 ){
+
+		$("#selectAllLOB").prop("checked", true);
+
+	}
+
+	if ($("#testFlagId:not(:checked)").length  == 0 ){
+
+		$("#selectAllPC").prop("checked", true);
+	}
+
+	var fixedId = $('#useCaseId2').val();
+	document.getElementById("useCaseId2Fixed").value = fixedId ;
+	
+
+	$(".testCheckBox").each(function(){
+		$(this).change(function(){
+			if(this.checked){			
+				//this.value='9';
+			}else{			
+				this.value='0';
+				$("#selectAllPC").prop('checked', $(this).prop("checked")); //change "select all" checked status to false
+			}
+		});		
+	});	
+	
+	$("#selectAllLOB").change(function(){  //"select all" change
+		if($("#selectAllLOB").prop("checked")){
+			$("#selectAllPC").removeAttr("disabled");
+		}
+		$(".lobCheckBox").each(function(){ 
+			$(this).prop('checked', $("#selectAllLOB").prop("checked"));
+			toggleCheck(this);
+		});
+	    //$(".lobCheckBox").prop('checked', $(this).prop("checked")); //change all ".checkbox" checked status
+	});
+	
+	$("#selectAllPC").change(function(){  //"select all" change
+		
+		$(".testCheckBox").each(function(){ 
+			if(!$(this).attr("disabled")){
+				$(this).prop('checked', $("#selectAllPC").prop("checked"));
+			}
+		});
+	    //$(".testCheckBox").prop('checked', $(this).prop("checked")); //change all ".checkbox" checked status
+	});
+	
+	if(!$("#selectAllLOB").prop("checked")){
+		$("#selectAllPC").attr("disabled", true);
+	}
+	$(".modal-body").click(function(){
+		var radio = $("[name='optradio']:checked").val();
+		if(radio == "Portal" || radio == "WCM"){
+			$("#myModal").modal("hide");
+			document.getElementById("radioSel").value = radio;
+			var st = validatePage();
+			console.log("Submit : " + st);
+			if(st == "true" || st == true){
+				console.log("Inside Submit");
+				
+				document.getElementById("saveSolution").action = "/saveSolutionUseCasesInfo";
+				document.getElementById("saveSolution").submit();
+			}
+		}
+	});
+});
+
+function toggleCheck(elm){
+	if(elm.checked){		
+		$(elm).parent().parent().find('.testCheckBox').removeAttr("disabled");
+	}else{
+		$(elm).parent().parent().find('.testCheckBox').prop("checked", false);		
+		$(elm).parent().parent().find('.testCheckBox').attr("disabled", true);		
+	}
+
+	 if(false == $(elm).prop("checked")){ //if this item is unchecked
+	        $("#selectAllLOB").prop('checked', $(elm).prop("checked")); //change "select all" checked status to false
+			$("#selectAllPC").prop('checked', $(elm).prop("checked")); //change "select all" checked status to false
+			$("#selectAllPC").attr("disabled", true);  //disable selectAll of Perf unless selectAll of LOB is checked again
+	    }
+}
+
+function toggleEditCheck(elm){
+	
+}
+</script>
+
+</head>
+<body class="mainInner" onscroll="setLoad()">
+	<div class="divWidth">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+			<div class="NavDiv">
+				<div class="nav">
+					<ul>
+						<li class="home"><a href="dashboard" id="advisorHome">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+					</ul>
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop">
+							<img src="/static/images/search.jpg">
+							<div id="two" class="popupBox">
+							<form method="post" action="/searchOpportunity" id="search">
+								<input type="text" value="" name="searchOpportunity" id="searchOpportunity" required class="popInput placeholder-fix" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Opportunity Name">
+								<input type="submit" value="Search" class="popButton">
+							</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>	
+	<div class="InnDiv" ></div>
+	<form method="post" id="saveSolution" action="/saveSolutionUseCasesInfo" onsubmit="return validate()">
+	<input type=hidden name="SL_ID" value="{{solAreaResult[0].sl_id}}">
+	<input type=hidden id="solId" name="solId" value="{{solId}}">
+	<input type=hidden id="SOL_AREA_ID" name="SOL_AREA_ID" value="{{solAreaResult[0].sol_area_id}}">
+	<input type=hidden id="LOGICAL_COMP_ID" name="LOGICAL_COMP_ID" value="{{solAreaResult[0].LOGICAL_COMP_ID}}">
+	<input type=hidden name="INDUS_ID" value="{{solAreaResult[0].indus_id}}">
+	<input type=hidden id="useCaseInfoType" name="useCaseInfoType" value="{{useCaseInfoType}}">
+	<input type=hidden id="currentSolAreaId" name="currentSolAreaId" value="{{solAreaResult[0].sol_area_id}}">	
+	<input type=hidden id="testSolId" name="testSolId" value="{{testSolId}}" />
+	<input type=hidden id="soakTestId" name="soakTestId" value="{{soakTestId}}" />
+	<input type=hidden id="enbTestBtn" name="enbTestBtn" value="" />
+	<input type=hidden id="useCaseId2Fixed" name="useCaseId2Fixed" value=""/>
+
+	<input type=hidden id="model" name="model" value="{{model}}" />
+	<input type=hidden id="sprintWeeks" name="sprintWeeks" value="{{sprintWeeks}}" />
+	<input type=hidden id="isedit" name="isedit" value="{{isedit}}">
+	<input type=hidden id="radioSel" name="radioSel" value="" />
+	&nbsp;
+	<div class="divWidth">
+	<div class="loginInfo ">Hello {{ user.attributes.firstName }} {{user.attributes.lastName}}</div>
+	<p>Capture your Use cases (Detailed View)</p>
+		<table width="100%" cellpadding="1" cellspacing="0" border="0">		
+			<tr>
+				<td colspan="5" class="tdmarg">Solution Details</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Solution Id:</strong></td>
+				<td class="tdInputLabel" colspan="3">{{solId}}</td>
+			</tr>
+			<!-- <tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Lead Service Line:</strong></td>
+				<td class="tdInputLabel" colspan="3">{{solAreaResult[0].sl_name}}</td>
+			</tr> -->
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Solution Area:</strong></td>
+				<td class="tdInputLabel" colspan="3">{{solAreaResult[0].sol_area_name}}</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Industry:</strong></td>
+				<td class="tdInputLabel" colspan="3">{{solAreaResult[0].indus_name}}</td>
+			</tr>
+			<tr>
+				<td colspan="5" class="tdmarg">Use cases for <font color="#000099"><b>{{solAreaResult[0].sol_area_name}}</b></font> in <font color="#000099"><b>{{solAreaResult[0].indus_name}}</b></font></td>
+			</tr>
+			<tr>
+				<td colspan="5" class="tdLabel">&nbsp;</td>
+			</tr>
+		{% if errorMessage %}
+			<tr>
+				<td colspan="5" class="tdErrorMsg">{{errorMessage}}</td>
+			</tr>
+		{% endif %}			
+			<tr>					
+				<td class="tdmarg" width="7%">&nbsp;</td>
+				<td class="tdmarg" width="20%"><strong>Line of Business</strong></td>
+				<td class="tdmarg" width="30%"><strong>Usecase Category</strong></td>
+				<td class="tdmarg" width="43%"><strong>Use Case Information</strong></td> 
+				{% if testSolId=='Y' %}
+				<td class="tdmarg" width="10%"><strong>Performance critical?</strong></td>
+				{% else %}
+					<td class="tdmarg">&nbsp;</td>
+				{% endif %}	
+			</tr>
+			<tr>
+			<td class="tdSelectAllLabel" align="center" ><input type="checkbox" id="selectAllLOB" name="selectAllLOB" value=""></td>
+			<td class="tdmarg">Select All</td>
+			<td class="tdmarg"></td>
+			<td class="tdmarg"></td>
+			{% if testSolId=='Y' %}
+				<td class="tdSelectAllLabel" align="center"><input type="checkbox" id="selectAllPC" name="selectAllPC" value=""></td>
+				{% else %}
+					<td class="tdmarg">&nbsp;</td>
+				{% endif %}	
+			</tr>
+		{% for ob in solAreaResult %}
+				
+			{% if ob.IS_ALWAYS_INSCOPE == 1 %}
+				<tr style="height:35px">						
+					<td class="tdLabel" align="center"><input type="checkbox" name="useCaseId2" class="lobCheckBox2"  checked="true" disabled="true" id="useCaseId2" value="{{ob.use_case_id}}" ></td>
+					
+					<td class="tdLabel" align="left">&nbsp;&nbsp;&nbsp;&nbsp;{{ ob.line_of_business }}</td>
+					<td class="tdLabel" align="left">&nbsp;&nbsp;&nbsp;&nbsp;{{ ob.reqsubcategory }}</td>
+					<td class="tdLabel" align="left">&nbsp;&nbsp;&nbsp;&nbsp;{{ ob.use_case_description }}</td>
+					<td class="tdLabel">&nbsp;</td>
+					
+				{% else %}
+				
+			<tr style="height:35px">						
+				<td class="tdLabel" align="center"><input type="checkbox" name="useCaseId" class="lobCheckBox" onchange="toggleCheck(this);" id="useCaseId" value="{{ob.use_case_id}}" 
+				{% if ob.isselected > 0 %}
+							checked
+				{% endif %}
+				></td>
+					
+				<td class="tdLabel" align="left">&nbsp;&nbsp;&nbsp;&nbsp;{{ ob.line_of_business }}</td>
+				<td class="tdLabel" align="left">&nbsp;&nbsp;&nbsp;&nbsp;{{ ob.reqsubcategory }}</td>
+				<td class="tdLabel" align="left">&nbsp;&nbsp;&nbsp;&nbsp;{{ ob.use_case_description }}</td>
+				{% if testSolId=='Y' %}
+				<td class="tdLabel" align="center"><input type="checkbox" class="testCheckBox" onchange="toggleEditCheck(this);" name="testFlagId" id="testFlagId" value="{{ob.use_case_id}}" 
+				{% if ob.isperfselected > 0 %}
+							checked
+				{% else %}
+					{% if ob.isselected > 0 %}
+						//do nthg
+					{% else %}				
+						disabled	
+					{% endif %}
+				{% endif %}
+				></td>
+				{% else %}
+					<td class="tdLabel">&nbsp;</td>
+				{% endif %}	
+			</tr>
+			{% endif %}
+		{% endfor %}
+
+			<tr>
+				<td colspan="5" class="tdLabel">&nbsp;</td>
+			</tr>
+			<tr>
+				<td class="tdLabel">&nbsp;</td>
+				<td class="tdLabel" colspan="2">
+					<input type="button" id="backButton" class="cancelbutton" value="Back" onclick="javascript:history.go(-1);">
+				</td>
+				<td class="tdLabel" colspan="2" style="padding-left: 28%;">
+					<button class="bluebutton">
+						{% if isAddlParam =='1' %} Next {% else %} Submit {% endif %}					
+					</button>					
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5" class="tdLabel">&nbsp;</td>
+			</tr>
+
+		</table>
+	</div>
+	</form>
+	 <div id="showmodalid" class="showmodal" style="display:none">
+	
+	    <div class="center">
+	    <span id="downText" style="font-weight: bolder;font-size: x-large;display: none;"><blink>The back-end service is down. Please try after sometime</blink></span>
+	    <span id="waiText" style="font-weight: bolder;font-size: x-large;display: none;">We are saving your data...</span>
+	        <img id="waitImg" alt="" src="/static/images/loader.gif" />
+	    </div>
+	</div>
+	<div class="modal fade" id="myModal" role="dialog">
+		<div class="modal-dialog" style="padding-top: 17%;">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+					<h4 class="modal-title">Choose opportunity type</h4>
+				</div>
+				<div class="modal-body">
+					<label class="radio-inline"><input type="radio" id="optradio" name="optradio" value="Portal" {% if param == 'Portal' %} checked {% endif %}>Portal</label>
+					<label class="radio-inline"><input type="radio" id="optradio" name="optradio" value="WCM" {% if param == 'WCM' %} checked {% endif %}>WCM</label>
+				</div>
+				<div class="modal-footer" style="border: 0 !important;">
+					<button type="button" class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target="#confirm-submit" onclick="closeModal();">Close</button>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</body>
+</html>

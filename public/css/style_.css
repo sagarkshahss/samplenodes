@@ -1,0 +1,381 @@
+html {
+	font-family: helvetica
+}
+
+body {
+	margin: 0 auto;
+	padding: 0;
+	font-family: helvetica
+}
+.LogDiv {
+	width:290px; float:left;
+}
+.divWidth {
+	width:1024px; 
+	margin:auto; 
+}
+.NavDiv {
+	width:657px; 
+	float:right;
+}
+.InnDiv {
+	width:100%; 
+	background-image: url("/static/images/main-contact.jpg");
+	height:180px;
+}
+
+.SeaDiv {
+	z-index:999; 
+	margin-top:-60px; 
+	align:right; 
+	float:right
+}
+.mainInner{
+	background-image: url("/static/images/inner_bg.jpeg");
+}
+
+.nav ul {
+	list-style: none;
+	text-align: center; 
+}
+.nav h3 {
+    font-family: 'Oswald', arial;
+	font-size: .2em;
+	line-height: 40px;
+	height: 40px;
+}
+.nav li {
+	font-family: 'Oswald', sans-serif;
+	font-size: .2em;
+	line-height: 40px;
+	height: 40px;
+	border-bottom: 1px solid #888;
+}
+ 
+.nav a {
+	text-decoration: none;
+	color: #000;
+	display: block;
+	transition: .3s background-color;
+}
+ 
+.nav a:hover {
+	font-weight: bold;
+}
+ 
+.nav a.active {
+	color: #60676d;
+	cursor: default;
+	font-weight: bold;
+}
+ 
+@media screen and (min-width: 600px) {
+	.nav li {
+		width: 100px;
+		border-bottom: none;
+		height: 50px;
+		line-height: 50px;
+		font-size: .8em;
+		text-transform: uppercase;
+		border-right:1px solid #e1dfdf;
+	  }
+	 
+	  /* Option 1 - Display Inline */
+	.nav li {
+		display: inline-block;
+		margin-right: -4px;
+	}
+	.nav li:last-child {
+		border: none;
+	}
+}
+ 
+.loginInfo {
+	content: "";
+	height: 32px;
+	float: right;
+	margin: -7px 6px 0 0;
+	font-family: helvetica;
+	font-size:13px;
+	color: #000066;  
+	font-weight:bold;
+}
+ 
+p:before {
+	content: "";
+	background: url("/static/images/iocn.png") no-repeat ;
+	width: 35px;
+	height: 32px;
+	float: left;
+	margin: -7px 6px 0 0;
+	font-family: helvetica;
+	text-transform: uppercase;
+  
+}
+p {
+	color: #0b3f64
+}
+
+input[type="text"] {
+	display: block;
+	margin: 0;
+	width: 95%;
+	height:30px;
+	font-family: sans-serif;
+	font-size: 12px;
+	appearance: none;
+	box-shadow: none;
+	border-radius: none;
+	padding-left: 10px;
+	font-style: italic;
+	color: #6a858c
+}
+
+input[type="text"]:focus {
+	box-shadow: 0 0 5px 1px #969696;
+}
+select {
+	margin: 0;
+	width: 98%;
+	height:40px;
+	font-family: sans-serif;
+	font-size: 12px;
+	appearance: none;
+	box-shadow: none;
+	border-radius: none;
+	padding-left: 10px;
+	font-style: italic;
+	color: #b0c1c5;
+}
+select:focus {
+	box-shadow: 0 0 5px 1px #969696;
+}
+
+.tdspace {
+	padding: 7px 0 7px 0;
+}
+.tdErrorMsg {
+	margin-top:30px;  
+	height:35px; 
+	padding-left:15px; 
+	padding-bottom:10px; 
+	font-weight:bold;
+	font-size:15px;
+	color:red;
+}
+
+.tdmarg {
+	margin-top:30px;  
+	background-color:#cccccc; 
+	height:35px; 
+	line-height:35px; 
+	padding-left:15px; 
+	font-weight:bold;
+	font-size:15px;
+	color: #000066;
+}
+
+.tdLabel {
+	height:25px; 
+	padding-left:3px; 
+	font-weight:normal;
+	font-size:13px;
+	color: #000000;
+	background-color:#e1e0e0; 	
+}
+.tdInputLabel {
+	height:40px; 
+	padding-left:15px; 
+	font-weight:normal;
+	font-size:13px;
+	color: #000000;
+	background-color:#e1e0e0; 	
+}
+
+.tdTableHeaderLabel {
+	height:40px; 
+	padding-left:15px; 
+	font-weight:normal;
+	font-size:13px;
+	color: #000000;
+	background-color:#ccccdf; 	
+}
+
+.tdTableLabel {
+	height:40px; 
+	padding-left:15px; 
+	font-weight:normal;
+	font-size:13px;
+	color: #000000;
+}
+
+
+.tdsp {
+	padding: 10px 0 10px 0
+}
+.cancelbutton {
+	background-color: #f4f4f4;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-border-radius: 2px;
+	border: none;
+	padding: 10px 25px 10px 25px;
+	color: #000;
+	font-size: 15px;
+	border: 1px solid #cccccc
+}
+.bluebutton {
+	background-color: #005eb5;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-border-radius: 2px;
+	border: none;
+	padding: 10px 25px 10px 25px;
+	color: #FFF;
+	font-size: 15px;
+}
+
+.greenbutton {
+	background-color: #336633;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-border-radius: 2px;
+	border: none;
+	padding: 10px 25px 10px 25px;
+	color: #FFF;
+	font-size: 15px;
+	cursor: pointer; 
+	cursor: hand;
+	width:185px;
+}
+.smallgreenbutton {
+	background-color: #336633;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-border-radius: 2px;
+	border: none;
+	padding: 5px 20px 5px 20px;
+	color: #FFF;
+	font-size: 15px;
+	cursor: pointer; 
+	cursor: hand;
+	height:30px;
+}
+
+.proceedbutton {
+	background-color: #cccccc;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-border-radius: 2px;
+	border: none;
+	padding: 10px 25px 10px 25px;
+	color: #000;
+	font-size: 15px;
+	border: 1px solid #cccccc
+	cursor: pointer; 
+	cursor: hand;
+	cursor: hand;
+	width:185px;
+}
+
+
+
+
+
+#popUpButton {
+    position:relative;
+    width:10px;
+    height:30px;
+    line-height:27px;
+    display:block;
+    border:1px solid #dadada;
+    margin:15px 0 0 10px;
+    text-align:center;
+}
+#two {
+    background: none repeat scroll 0 0 #fff;
+    border: 1px solid #DADADA;
+    color: #9c9aa3;
+    overflow:hidden;
+    left: 0;
+    line-height: 20px;
+    position: absolute;
+    top: 30px;
+}
+.popupBox {
+    visibility:hidden;
+    opacity:0;
+    -webkit-transition:visibility 0s linear 0.3s, opacity 0.3s linear;
+    -moz-transition:visibility 0s linear 0.3s, opacity 0.3s linear;
+    -o-transition:visibility 0s linear 0.3s, opacity 0.3s linear;
+    transition:visibility 0s linear 0.3s, opacity 0.3s linear;
+    -webkit-transition: all 0.4s ease;
+    -moz-transition: all 0.4s ease;
+    -o-transition:all 0.4s ease;
+    transition: all 0.4s ease;
+    -webkit-transition-delay: 0.5s;
+    -moz-transition-delay: 0.5s;
+    -o-transition-delay:0.5s;
+    transition-delay: 0.5s;
+	width:150px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	height: 80px; 
+
+}
+.popupHoverElement:hover > .popupBox {
+	visibility:visible;
+	opacity:1;
+	-webkit-transition: all 0.3s ease;
+	-moz-transition: all 0.3s ease;
+	-o-transition: all 0.3s ease;
+	transition: all 0.3s ease;
+	-webkit-transition-delay: 0s;
+	-moz-transition-delay: 0s;
+	-o-transition-delay: 0s;
+	transition-delay: 0s;
+
+
+}
+.mainOutPop{
+	float: left;
+}
+.popInput
+{
+	width: 20px;
+	height: 30px;
+	margin-top: 10px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px; 
+	border: 1px solid #c9c8c8; 
+	padding-left: 10px;
+}
+.popButton{
+	width: 90%;
+	height: 30px;
+	margin-top: 10px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	display:inline-block;
+	font-size:15px;
+	font-weight:normal;
+	color:#fff;
+	text-decoration:none;
+	text-transform:uppercase;
+	text-align:center;
+	background-color: #ff6f29;
+	border: none;
+
+}
+.placeholder-fix:focus::-webkit-input-placeholder  { 
+	color:transparent; 
+	width:20px;
+
+}
+.placeholder-fix:focus::-moz-placeholder   { 
+	color:transparent; 
+	width:20px;
+}

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Solution Advisor</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="description" content="An interactive getting started guide for Edge Code CC.">
+	<link rel="stylesheet" href="static/css/style.css">
+	<script	src="static/js/main.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.min.js"></script>
+	<link rel="stylesheet" href="static/css/jquery.modal.css">
+	<script	src="static/js/jquery.modal.js"></script>	
+	<script	src="static/js/close.js"></script>
+	
+
+<script>
+
+
+$(document).ready(function(){
+
+	/// Opening the Section for populating the Solution Area drop down basis on changes done in Service Line Drop Down
+	$( "#serviceLineInfo" ).change(function(){
+			var id=$('#serviceLineInfo').val();
+			getSolutionAreaInfo(id);
+	}
+);
+	/// Closing the Section for populating the Solution Area drop down basis on changes done in Service Line Drop Down
+
+
+{% if serviceLineInfo != "" %}
+	var id= {{serviceLineInfo}};
+//	alert("Calling On load : "+id);
+	getSolutionAreaInfo(id);
+{% endif %}
+
+
+	/// Opening the Section for populating Service Line Drop Down while loading the page
+	var serviceLineInfo = $('#serviceLineInfo');
+	serviceLineInfo.empty();
+	$.ajax({url: "/serviceLineInfo", success: function(data) {
+		var option = $("<option/>");
+		option.attr("value", "").text("Select");
+		serviceLineInfo.append(option);
+		var selectionValue= "{{serviceLineInfo}}";
+		for (var i = 0; i < data.length; i++) {	
+			if(selectionValue == data[i].sl_id)
+				option = $("<option selected/>");
+			else
+				option = $("<option/>");
+				
+			option.attr("value", data[i].sl_id).text(data[i].sl_name);
+			serviceLineInfo.append(option);
+		}
+		
+	}
+	});
+	/// Closing the Section for populating Service Line Drop Down while loading the page
+
+
+	/// Opening the Section for populating Industry Information Drop Down while loading the page
+	var industryInfo = $('#industryInfo');
+	industryInfo.empty();
+	$.ajax({url: "/getIndustryInfo", success: function(data) {
+		var option = $("<option/>");
+		option.attr("value", "").text("Select");
+		industryInfo.append(option);
+		var selectionValue= "{{industryInfo}}";
+		for (var i = 0; i < data.length; i++) {	
+			if(selectionValue == data[i].indus_id)
+				option = $("<option selected/>");
+			else
+				option = $("<option/>");
+
+			option.attr("value", data[i].indus_id).text(data[i].indus_name);
+			industryInfo.append(option);
+		}
+	}
+	});
+	/// Closing the Section for populating Service Line Drop Down while loading the page
+
+	/// Opening the Section for populating Industry Information Drop Down while loading the page
+	var deliveryCenterInfo = $('#deliveryCenterInfo');
+	deliveryCenterInfo.empty();
+	$.ajax({url: "/getDeliveryCenterInfo", success: function(data) {
+		var option = $("<option/>");
+		option.attr("value", "").text("Select");
+		deliveryCenterInfo.append(option);
+		var selectionValue= "{{deliveryCenterInfo}}";
+		
+		for (var i = 0; i < data.length; i++) {	
+			if(selectionValue == data[i].delivery_org_id)
+				option = $("<option selected/>");
+			else
+				option = $("<option/>");
+
+			option.attr("value", data[i].delivery_org_id).text(data[i].delivery_org_type+" - "+data[i].delivery_org_name);
+			deliveryCenterInfo.append(option);
+		}
+	}
+	});
+	/// Closing the Section for populating Service Line Drop Down while loading the page
+});
+
+
+
+/// Start of function for populating Solution Area Information Drop Down for Service Line Id
+function getSolutionAreaInfo(id){
+
+	var solutionAreaInfo = $('#solutionAreaInfo');
+	solutionAreaInfo.empty();
+	/// Calling REST service to get the data of Solution Area information by passing service line id.
+	$.ajax({url: "/solutionAreaInfo/"+id, success: function(data) {
+		//option.attr("value", "").text("-Select-");
+		//solutionAreaInfo.append(option);
+//		option.attr("value","Selected");
+		{% if errorMessage != "" %}
+			var selectionValue= new Array({{solAreaSelectedValue}});
+		{% endif %}
+		{% if errorMessage == "" %}
+			var selectionValue= new Array(0);
+		{% endif %}
+
+		//var selectionValue= new Array({{solAreaSelectedValue}});
+//		alert("Array length : "+selectionValue.length);
+		for (var i = 0; i < data.length; i++) {
+		
+			var option = $("<option/>");
+
+			if(selectionValue.length>0)
+			{
+				for (var j=0;j< selectionValue.length; j++)
+				{
+					if(selectionValue[j] == data[i].sol_area_id)
+					{
+					//	alert("selectionValue[j] :"+selectionValue[j] + "\n data[i].SOL_AREA_ID : "+ data[i].SOL_AREA_ID);
+						option = $("<option selected/>");
+						break;
+					}
+				}
+			}
+			option.attr("value", data[i].sol_area_id).text(data[i].sol_area_name);			
+			solutionAreaInfo.append(option);
+		}
+	}
+	});
+
+}
+/// End of function for populating Solution Area Information Drop Down for Service Line Id
+//$("solutionAreaInfo").attr('required', 'required');
+//$("industryInfo").attr('required', 'required');
+</script>
+
+
+
+</head>
+<body class="mainInner">
+	<div class="divWidth">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+			<div class="NavDiv">
+				<div class="nav">
+					<ul>
+						<li class="home"><a href="advisorHome">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+					</ul>
+					<!-- <div class="SeaDiv"><img src="/static/images/search.jpg"></div> -->
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop">
+							<img src="/static/images/search.jpg">
+							<div id="two" class="popupBox">
+							<form method="post" action="/getSolutionInfo" id="search">
+								<input type="text" value="" name="searchSolId" id="searchSolId" required class="popInput placeholder-fix" pattern="[0-9]*" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Solution Id">
+								<input type="submit" value="Search" class="popButton">
+							</form>
+							</div>
+						</div>
+					</div> 
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="InnDiv" ></div>
+	<form action="/submitSolutionDetails" method="post" >
+	<div class="divWidth">
+	<div class="loginInfo ">Hello {{ user.attributes.firstName }} {{user.attributes.lastName}}</div>
+	<p>Specify your Requirements</p>
+		<table width="100%" cellpadding="0" cellspacing="0" border="0">
+		{% if errorMessage %}
+			<tr>
+				<td colspan="2" class="tdErrorMsg">{{errorMessage}}</td>
+			</tr>
+		{% endif %}
+			<tr>
+				<td colspan="2" class="tdmarg">About your Clients</td>
+			</tr>
+			<tr>
+					<td colspan="2"><font color="red">*Do not put in real names of customers or clients that are identifiable. Use anonymization.</font></td>
+				</tr>
+			<tr>
+				<td class="tdsp"> <input type="text"  class="focus" name="opportunityId" id="opportunityId" value="{{opportunityId}}" placeholder="Enter Opportunity Name..."   maxlength=20 autocomplete="off" /></td>
+				<td align="right"><input type="text" class="focus" name="clientName" id="clientName" value="{{clientName}}" placeholder="Enter Client's name..." /></td>
+			</tr>
+			<tr>
+				<td colspan="2" class="tdmarg">About your Solution</td>
+			</tr>
+			<tr>
+				<td  class="tdspace">  
+					<select name="serviceLineInfo" id="serviceLineInfo" required>
+						<option value="" selected>-Lead Service Line-</option>
+					</select> 
+				</td>
+				<td  class="tdspace" align="right"> 
+					<select  name="solutionAreaInfo" id="solutionAreaInfo" class="focus" style="height:75px;" required multiple>		
+						<option value="" selected>-Solution Area-</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td  class="tdspace">  
+					<select name="industryInfo" id="industryInfo" required>
+						<option value="" selected>-Industry-</option>
+					</select> 
+				</td>
+				<td  class="tdspace" align="right"> 
+					<select name="deliveryCenterInfo" id="deliveryCenterInfo" required>
+						<option value="" selected>-Proposed Delivery Center-</option>
+					</select> 
+				</td>
+			</tr>
+		
+			<tr>
+				<td colspan="2"> <button class="bluebutton">Submit</button>  &nbsp;&nbsp;&nbsp;<button class="cancelbutton">Cancel</button></td>
+			</tr>
+		</table>
+	</div>
+	</form>
+</body>
+</html>

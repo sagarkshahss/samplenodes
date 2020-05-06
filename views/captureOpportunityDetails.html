@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- 	<title>Solution Advisor -COD</title> -->
+	<title>captureOpportunityDetails</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="description" content="An interactive getting started guide for Edge Code CC.">
+	<link rel="stylesheet" href="static/css/style.css">
+	<script	src="static/js/main.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.min.js"></script>
+	<link rel="stylesheet" href="static/css/jquery.modal.css">
+	<script	src="static/js/jquery.modal.js"></script>	
+	<script	src="static/js/close.js"></script>
+	
+
+	<script> 
+	var industryInfoID="";
+
+	$(document).ready(function(){
+		
+		
+		industryInfoid="";
+		/*$( "#industryInfo" ).change(function(){
+			var id=$('#industryInfo').val();
+				getSolutionAreaInfo(id);
+			}
+		);
+*/
+$( "#IOTInfo" ).change(function(){
+	var id=$('#IOTInfo').val();
+	getIMTInfo(id);
+});
+
+$( "#LeadCountryInfo" ).change(function(){
+	var id=$('#LeadCountryInfo').val();
+	getIMTIOTInfo(id);
+});
+
+{% if industryInfo != "" %}
+var id= {{industryInfo}};
+getSolutionAreaInfo(id);
+{% endif %}
+
+{% if IOTInfo != "" %}
+var id= {{IOTInfo}};
+
+getIMTInfo(id);
+{% endif %}
+
+{% if LeadCountryInfo != "" %}
+var id= {{LeadCountryInfo}};
+
+getIMTIOTInfo(id);
+{% endif %}
+
+	/// Closing the Section for populating the Solution Area drop down basis on changes done in Service Line Drop Down
+
+
+
+	// /// Opening the Section for populating Industry Information Drop Down while loading the page
+	// var industryInfo = $('#industryInfo');
+	// industryInfo.empty();
+	// $.ajax({url: "/getIndustryInfo", success: function(data) {
+	// 	var option = $("<option/>");
+	// 	option.attr("value", "").text("-Industry-");
+	// 	industryInfo.append(option);
+	// 	var selectionValue= "{{industryInfo}}";
+	// 	for (var i = 0; i < data.length; i++) {	
+	// 		if(selectionValue == data[i].indus_id)
+	// 			option = $("<option selected/>");
+	// 		else
+	// 			option = $("<option/>");
+
+	// 		//option.attr("value", data[i].indus_id).text(data[i].indus_name);
+			
+	// 		industryInfo.append(option);
+	// 	}
+	// }
+	
+	/// Closing the Section for populating Indusrty Line Drop Down while loading the page
+
+	/// Opening the Section for populating Delivery Center Information Drop Down while loading the page
+	var deliveryCenterInfo = $('#deliveryCenterInfo');
+	deliveryCenterInfo.empty();
+	$.ajax({url: "/getDeliveryCenterInfo", success: function(data) {
+		var option = $("<option/>");
+		option.attr("value", "").text("-Proposed Delivery Center-");
+		deliveryCenterInfo.append(option);
+		var selectionValue= "{{deliveryCenterInfo}}";
+		
+		for (var i = 0; i < data.length; i++) {	
+			if(selectionValue == data[i].delivery_org_id)
+				option = $("<option selected/>");
+			else
+				option = $("<option/>");
+
+			option.attr("value", data[i].delivery_org_id).text(data[i].delivery_org_type+" - "+data[i].delivery_org_name);
+			deliveryCenterInfo.append(option);
+		}
+	}
+});
+	/// Closing the Section for populating Service Line Drop Down while loading the page
+    // Starting Salesconnect info popup select fields #5215
+    var IOTInfo = $('#IOTInfo');
+    IOTInfo.empty();        
+    $.ajax({url: "/getIOTInfo", success: function(data) {
+    	var option = $("<option/>");
+    	option.attr("value", "").text("-IOT-");
+    	IOTInfo.append(option);
+    	var selectionValue= "{{iotinfo}}";
+    	for (var i = 0; i < data.length; i++) {	
+    		if(selectionValue == data[i].iot_id)
+    			option = $("<option selected/>");
+    		else
+    			option = $("<option/>");
+
+    		option.attr("value", data[i].iot_id).text(data[i].iot_name);
+    		IOTInfo.append(option);
+    	}
+    }
+	});
+    
+
+    var LeadCountryInfo = $('#LeadCountryInfo');
+    LeadCountryInfo.empty();  
+    
+    $.ajax({url: "/getLeadCountryInfo", success: function(data) {
+    	var option = $("<option/>");
+    	option.attr("value", "").text("-Lead Country-");
+    	LeadCountryInfo.append(option);
+    	var selectionValue= "{{leadcountryinfo}}";
+    	for (var i = 0; i < data.length; i++) {	
+    		if(selectionValue == data[i].COUNTRY_ID)
+    			option = $("<option selected/>");
+    		else
+    			option = $("<option/>");
+
+    		option.attr("value", data[i].COUNTRY_ID).text(data[i].COUNTRY_NAME);
+    		LeadCountryInfo.append(option);
+    	}
+    }
+	});
+	
+	var SolutionTypeInfo = $('#SolutionTypeInfo');
+    SolutionTypeInfo.empty();  
+    
+    $.ajax({url: "/getSolutionTypeInfo", success: function(data) {
+    	var option = $("<option/>");
+    	option.attr("value", "").text("-Solution Type-");
+    	SolutionTypeInfo.append(option);
+    	var selectionValue= "{{SolutionTypeInfo}}";
+    	for (var i = 0; i < data.length; i++) {	
+    		if(selectionValue == data[i].SOLUTION_TYPE)
+    			option = $("<option selected/>");
+    		else
+    			option = $("<option/>");
+
+    		option.attr("value", data[i].ID).text(data[i].SOLUTION_TYPE);
+    		SolutionTypeInfo.append(option);
+    	}
+    }
+	});
+
+
+function getIMTInfo(id) {
+	var IMTInfo = $('#IMTInfo');
+	IMTInfo.empty();        
+	$.ajax({url: "/getIMTInfo/"+id, success: function(data) {
+		var option = $("<option/>");
+		option.attr("value", "").text("-IMT-");
+		IMTInfo.append(option);
+		var selectionValue= "{{imtinfo}}";
+		for (var i = 0; i < data.length; i++) {	
+			if(selectionValue == data[i].imt_id)
+				option = $("<option selected/>");
+			else
+				option = $("<option/>");
+
+			option.attr("value", data[i].imt_id).text(data[i].imt_name);
+			IMTInfo.append(option);
+		}
+	}
+}); 
+}
+	
+	
+	function getIMTIOTInfo(id) {
+		$.ajax({url: "/getIMTIOTInfo/"+id, success: function(data) {
+			for (var i = 0; i < data.length; i++) {	
+				$("#country_id").val(id);
+				$("#imt_id").val(data[i].imt_id);
+				$("#iot_id").val(data[i].iot_id);
+				$("#IOTInfo").val(data[i].iot_id)
+			}
+		}
+	}); 
+    // Closing Salesconnect info popup select fields
+
+}
+
+/// Start of function for populating Solution Area Information Drop Down as per the industry id
+function getSolutionAreaInfo2(id){
+
+	var solutionAreaInfo = $('#solutionAreaInfoTemp');
+	solutionAreaInfo.empty();
+	/// Calling REST service to get the data of Solution Area information by passing service line id.
+	$.ajax({url: "/solutionAreaForIndustry/"+id, success: function(data) {
+
+		var option = $("<option/>");
+		option.attr("value", "").text("Select");
+		solutionAreaInfo.append(option);
+		var selectionValue= "{{solutionAreaInfo}}";
+		for (var i = 0; i < data.length; i++) {	
+			if(selectionValue == data[i].sol_area_id)
+				option = $("<option selected/>");
+			else
+				option = $("<option/>");
+
+			option.attr("value", data[i].sol_area_id).text(data[i].sol_area_name);
+			solutionAreaInfo.append(option);
+		}
+	}
+});
+
+}
+/// End of function for populating Solution Area Information Drop Down for industry Id
+
+
+
+function addRow(val, id) {
+	var table = document.getElementById("solAreaTable");
+	//var x=document.getElementById("solutionAreaInfoTemp");
+	//var val = x.options[x.selectedIndex].text;
+	//var id = x.options[x.selectedIndex].value;
+	//var index = x.selectedIndex
+	if(id) { 
+
+		var row = table.insertRow(0);
+		row.innerHTML = "<tr bgcolor='#e1e0e0'><td id='solAreaName' class=\"tdTableLabel\" colspan='1' align=left></td><td> <input type=\"hidden\" id='solutionAreaInfo' name ='solutionAreaInfo'></td><td  class=\"tdspace\" colspan='1' align=\"right\"><button class=\"redbutton\" onclick=\"deleteR(this)\">Delete</button></td></tr>";
+		//var x=document.getElementById("solutionAreaInfoTemp");
+		//var val = x.options[x.selectedIndex].text;
+		//var id = x.options[x.selectedIndex].value;
+		document.getElementById("solAreaName").innerHTML = val;
+
+		document.getElementById("solutionAreaInfo").value = id;
+
+		//x.value = '';
+		//x.remove(index);
+
+	}
+
+
+
+}
+
+function deleteR(r) {
+	var i = r.parentNode.parentNode.rowIndex;
+
+	document.getElementById("solAreaTable").deleteRow(i);
+	var x=document.getElementById("solutionAreaInfoTemp");
+	var option = document.createElement("option");
+
+	option.text = r.parentNode.parentNode.cells[0].innerHTML;
+	option.value = r.parentNode.parentNode.cells[1].getElementsByTagName("input")[0].value;
+	x.add(option);
+
+
+}
+
+
+//Changes done for #5215
+function showSalesConnectInfo(){
+	document.getElementById("salesConnectInfo").style.display = "inline";
+}
+//Changes done for #5215
+function closeSalesConnectInfo(){
+	document.getElementById("salesConnectInfo").style.display = "none";
+}
+//Changes done for #5215
+function addSalesConnectInfo(){
+	if(document.getElementById("smr").value==""){
+		alert("Please enter SMR number");
+		return false;
+	}else{
+		document.getElementById("smr_number").value = document.getElementById("smr").value;        
+	}	
+
+	if(document.getElementById("IMTInfo").value==""){
+		alert("Please select IMT value");
+		return false;
+	}else{
+		document.getElementById("imt_id").value = document.getElementById("IMTInfo").value;
+	}
+
+	if(document.getElementById("IOTInfo").value==""){
+		alert("Please select IOT value");
+		return false;
+	}else{
+		document.getElementById("iot_id").value = document.getElementById("IOTInfo").value;
+	}
+	
+	
+	if(document.getElementById("LeadCountryInfo").value==""){
+		alert("Please select Lead Country");
+		return false;
+	}else{
+		document.getElementById("country_id").value = document.getElementById("LeadCountryInfo").value;
+	}
+	
+	
+	if(document.getElementById("SolutionTypeInfo").value==""){
+		alert("Please select Solution Type");
+		return false;
+	}else{
+		document.getElementById("solution_type_id").value = document.getElementById("SolutionTypeInfo").value;
+	}
+	
+	if(document.getElementById("ownerEmail").value!=""){	
+		var email = document.getElementById("ownerEmail").value;
+		var filter = /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/;
+		if (filter.test(email)) {
+			document.getElementById("opportunity_owner_email").value = email;     
+		}else {
+			alert("Please enter valid email");
+			return false;
+		}
+	}
+
+	if(document.getElementById("RiskRating").value>=1 && document.getElementById("RiskRating").value <= 10){
+		document.getElementById("risk_rating").value = document.getElementById("RiskRating").value;
+	}else{
+		alert("Risk rating value should be in range of 1 to 10");
+		return false;
+	}
+
+	document.getElementById("salesConnectInfo").style.display = "none";
+
+}
+});
+</script>
+
+
+
+</head>
+<style>
+body{
+	background: #f4f4f4;
+	border-top: 5px solid #0074c1;
+}
+.slider-wrap {
+	position: relative;
+	margin: 50px auto;
+	width: 520px;
+}
+.mainInner {
+	background-image:none;
+}
+.slider-arrow {
+	position: absolute;
+	top: 40px;
+	width: 20px;
+	height: 20px;
+	background: black;
+	color: #fff;
+	text-align: center;
+	text-decoration: none;
+	border-radius: 50%;
+}
+.box-style{
+	background: #fff;
+	border: 3px solid #467656;
+	display: inline-block;
+	height: 150px;
+	width: 150px;
+	margin: 10px 2%;
+	padding: 61px 8px;
+	text-align: center;
+	vertical-align: middle;
+	cursor:pointer;
+}
+.carousel-control{
+	width:2% !important;
+    color: #467656 !important;
+    text-shadow: 0 1px 2px rgb(0, 0, 0, 0.6) !important;
+    filter: alpha(opacity=50) !important;
+}
+.carousel-control::hover{
+	width:2% !important;
+    color: #333333 !important;
+    text-shadow: 0 1px 2px rgb(0, 0, 0, 0.9) !important;
+    filter: alpha(opacity=50) !important;
+}
+.carousel-control.left{
+	background:none !important;
+}
+.carousel-control.right{
+	background:none !important;
+}
+.selected{
+	background: #467656;
+}
+.carousel-control .glyphicon-chevron-left, .carousel-control .glyphicon-chevron-right, .carousel-control .icon-next, .carousel-control .icon-prev{
+	margin-left:-60px !important;
+}
+.box-style2{
+	background: #a2a2a2;
+	border:none;
+	display: inline-block;
+	margin: 25px 0% 12px;
+	text-align: center;
+	vertical-align: middle;
+	height: 110px;
+	width: 110px;
+	padding: 10px;
+	color: #e0e0e0;
+	font-size: 13px;
+	overflow: hidden;
+}
+.box-style2active{
+	background: #fff;
+	border: 3px solid #467656;
+	display: inline-block;
+	margin: 25px 0% 12px;
+	text-align: center;
+	vertical-align: middle;
+	height: 110px;
+	width: 110px;
+	padding: 10px;
+	font-size: 13px;
+	overflow:hidden;
+	color: #0f0f0f;
+	cursor: pointer;
+}
+.leftside{
+	width:130px !important;
+	font-weight: bold;
+}
+.tdlebel2{
+	margin-top: 30px;
+	background-color: #cccccc;
+	height: 35px;
+	line-height: 35px;
+	padding-left: 15px;
+	font-weight: bold;
+	font-size: 15px;
+	color: #000066;
+}
+
+
+.carousel-control .glyphicon-chevron-left, .carousel-control .glyphicon-chevron-right, .carousel-control .icon-next, .carousel-control .icon-prev {
+    width: 30px !important;
+    height: 30px;
+    margin-top: -10px;
+    font-size: 60px !important;
+}
+
+
+.btnstyle2select{
+	border: 3px solid #467656;
+	background: #467656;
+	color:#fff;
+	cursor: pointer;
+}
+::-webkit-scrollbar {
+	width: 5px;
+}
+
+::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+	border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 5px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+.carousel-control.right {
+	right: 100px !important;
+}
+#industryInfo{
+	visibility: hidden !important;
+}
+button, input, select, textarea {
+	font-family: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	width: 95%;
+	/* padding: 2px 0px; */
+	height: 30px;
+}
+.divWidth {
+	margin-top: 15px;
+}
+.bluebutton{
+	width:40%;
+	height:40px;
+	margin-top: 0px;
+	margin-left: 150px;
+}
+.cancelbutton{
+	width: 40%;
+	height: 40px;
+}
+#solAreaTable{
+	visibility: hidden;
+}
+body{
+	position: relative;
+}
+</style>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<body>
+	<div class="divWidth">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+			<div class="NavDiv">
+				<div class="nav">
+					<ul>
+						<li class="home"><a href="dashboard" id="btnHome">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+					</ul>
+					<!-- <div class="SeaDiv"><img src="/static/images/search.jpg"></div> -->
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop">
+							<img src="/static/images/search.jpg">
+							<div id="two" class="popupBox">
+								<form method="post" action="/searchOpportunity" id="search">
+									<input type="text" value="" name="searchOpportunity" id="searchOpportunity" required class="popInput placeholder-fix" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Opportunity Name">
+									<input type="submit" value="Search" class="popButton">
+								</form>
+							</div>
+						</div>
+					</div> 
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="InnDiv" ></div>
+
+	<form action="/submitSolutionDetails" method="post" onsubmit="return validate()">
+	<!--<form id="createOpty" action="/similarSolutions" method="post" onsubmit="return validate()">-->
+		<div class="divWidth">
+			<div class="loginInfo ">Hello {{ user.attributes.firstName }} {{user.attributes.lastName}}</div>
+			<p>Specify your Requirements</p>
+			<table width="100%" cellpadding="0" cellspacing="0" border="0">
+				{% if errorMessage %}
+				<tr>
+					<td colspan="3" class="tdErrorMsg">{{errorMessage}}</td>
+				</tr>
+				{% endif %}
+				<tr>
+					<td colspan="2" class="tdmarg">About your Clients</td>
+				</tr>
+				<tr>
+					<td colspan="2"><font color="red">*Do not put in real names of customers or clients that are identifiable. Use anonymization.</font></td>
+				</tr>
+				<tr>
+					<td class="tdspace" colspan="1"> 
+					<input type="text"  class="focus" name="opportunityId" id="opportunityId" value="{{opportunityId}}" placeholder="Enter Opportunity name or Sales Connect Id"   maxlength=20 autocomplete="off" tabindex=1/>
+					</td>
+
+					<td class="tdspace" colspan="1" align="right">
+					<input type="text" maxlength="255" class="focus" name="clientName" id="clientName" value="{{clientName}}" placeholder="Enter Client's name...(max 255 chars)" tabindex=2 />
+					</td>
+				</tr>
+				<tr>
+					<td  class="tdspace" colspan="1">  
+						<!-- <select name="industryInfo" id="industryInfo">
+							<option value="" selected id="industryInfooption">-Industry-</option>
+						</select>  -->
+						<input type="/hidden/" class="form-control" name="industryInfo" id="industryInfo" >
+					</td>
+					<td  class="tdspace" colspan="1" align="right"> 
+						<select name="deliveryCenterInfo" id="deliveryCenterInfo" tabindex=4>
+							<option value="" selected>-Proposed Delivery Center-</option>
+						</select> 
+					</td>
+				</tr>
+			
+			<tr>
+						<td class="tdspace" colspan="1">
+							<select name="IOTInfo" id="IOTInfo" style="top: -45px;position: relative;display:none">
+								<option value="" selected>-IOT-</option>
+							</select>
+						</td>
+				</tr>
+				<tr>
+				<td class="tdspace" colspan="1">
+							<select name="LeadCountryInfo" id="LeadCountryInfo" style="top: -57px;position: relative;" required tabindex=3>
+								<option value="" selected>-Lead Country-</option>
+							</select>
+						</td>
+				<tr>
+				<tr>
+				<td class="tdspace" colspan="1">
+							<select name="SolutionTypeInfo" id="SolutionTypeInfo" style="top: -57px;position: relative;" required tabindex=3>
+								<option value="" selected>-Solution Type-</option>
+							</select>
+						</td>
+				<tr>
+				<tr>
+					<td colspan="2" style="top: -57px;position: relative;"><font color="red">*While you create indicative solution for ADM on solution advisor, the artifacts will be in READ only mode with default value of productivity levers. If you need to make any changes in the parameters, please modify your solution on solution advisor.</font></td>
+				</tr>				
+						<!--
+						<td class="tdspace" colspan="1" align="right">
+							<select name="IMTInfo" id="IMTInfo" required>
+								<option value="" selected>-IMT-</option>
+							</select>
+						</td>
+					</tr>
+					
+					<tr>
+						<td class="tdspace" colspan="1"> <input type="text" class="focus" name="smr" id="smr" placeholder="Enter SMR Number"
+							maxlength=20 autocomplete="off" required /></td>
+
+						<td class="tdspace" colspan="1" align="right"><input type="email" class="focus" name="ownerEmail" id="ownerEmail" placeholder="Enter Opportunity Owner Email"
+							required /></td>
+					</tr>
+					<tr>
+						<td class="tdspace" colspan="1"> 
+							<input type="number" class="focus" name="RiskRating" id="RiskRating" placeholder="Enter Risk Rating" maxlength=20 autocomplete="off" min=1 max=10 
+							style="height: 30px;margin:0;width: 95%;font-family: sans-serif;font-size: 12px;padding-left: 10px;font-style: italic;color:#6a858c;" required />
+						</td>
+					</tr>
+				-->
+
+			</table>
+
+			<input type="hidden" id='smr_number' name='smr_number'>
+			<input type="hidden" id='imt_id' name='imt_id'>
+			<input type="hidden" id='iot_id' name='iot_id'>
+			<input type="hidden" id='country_id' name='country_id'>
+			<input type="hidden" id='solution_type_id' name='solution_type_id'>
+			<input type="hidden" id='opportunity_owner_email' name='opportunity_owner_email'>
+			<input type="hidden" id='risk_rating' name='risk_rating'>
+
+			<table width="100%" cellpadding="0" cellspacing="0" border="0" style="overflow:scroll ;margin-top: -50px;">
+
+				<tr>
+					<td colspan=2 align=right class="tdspace" style="padding-right:15px;"><button class="bluebutton" style="display:none;">Import</button></td>
+				</tr>					
+				<tr>
+					<td colspan="3" class="tdmarg">Industry</td>
+				</tr>
+
+			</table>
+
+			<table width="100%" cellpadding="0" cellspacing="0" border="0" id="solAreaTable">
+
+				<!-- <tr bgcolor='#e1e0e0'>
+					<td class="tdLabel" colspan="2" align=left>+Add another solution area</td>
+
+					<td class="tdspace" colspan="1" align="right">
+						<select name="solutionAreaInfoTemp" id="solutionAreaInfoTemp" onChange="addRow()">		
+							<option value="" selected>-Solution Area-</option>
+						</select>
+					</td>
+				</tr> -->
+				<tr style="position: absolute; bottom: -100px;">
+				<td colspan="7" align=right class="tdspace" style="padding-right:14px;visibility:visible; display:block"> 
+					<!--<input type="submit" class="bluebutton" value="Submit">-->
+					<input type="submit" class="bluebutton" value="Submit"  style="float:left; margin-left:0px; margin-right:30px;">&nbsp;&nbsp;&nbsp;
+					<input type="button" class="cancelbutton" onclick="javascript:history.go(-1);" value="Cancel" style="float:left">
+				</td>
+			</tr>
+			</table>
+			<div class="container">
+				<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="false" style="padding-top: 30px">
+					<!-- Wrapper for slides -->
+					<div class="carousel-inner" id="itemcontainer" style="margin-left: 20px;">
+
+					</div>
+					<!-- Left and right controls -->
+					<a class="left carousel-control" href="#myCarousel" data-slide="prev">
+						<span class="glyphicon glyphicon-chevron-left"></span>
+						<span class="sr-only">Previous</span>
+					</a>
+					<a class="right carousel-control" href="#myCarousel" data-slide="next">
+						<span class="glyphicon glyphicon-chevron-right"></span>
+						<span class="sr-only">Next</span>
+					</a>
+				</div>
+			</div>
+
+			<div class="tdlebel2">Solution Architecture</div>
+			<div class="datacontainer">
+				<table width="100%" id="solarch"  cellpadding="5" cellspacing="5">
+				</table>
+			</div>
+		</div>
+		<table>
+			
+		</table>
+	</form>
+	<script>
+	$(document).ready(function(){
+		selectedIndustryArr=[];
+		selectedIndustry={};
+		comlogicalCompLists=[];
+		solArList=[];
+		var selectedIndustryArrT=[];
+		var selectedIndustryT={};
+		var logicalData= "";
+		mapdata=[];
+		mapdataArr=[];
+		var flag=1
+		oldindusname="";
+		a={};
+
+		//main ajax call for getting all the data 
+		$.ajax({url: "/getAllLogicalComponent", success: function(data) {
+			a=data.industryList;
+			//console.log("a Before sort " + JSON.stringify(a));
+			//alert("a::  " + JSON.stringify( a) );
+			for(let i = 0; i < a.length; i++)
+			{
+				start = i;
+				i += 4;
+				end = i < a.length ? i : a.length - 1;
+				start != 0 ? loadCarousel(start, end) : loadCarousel(start, end, true);
+			}
+				
+			function loadCarousel(start, end, active){
+				var element= active ? $('<div class="item active"></div>') : $('<div class="item"></div>');
+				for(var i = start; i <= end; i++){
+					var test = $(`<span class="box-style" id="${data.industryList[i].Indus_id}" value="${data.industryList[i].Indus_Name}">${data.industryList[i].Indus_Name}</span>`);
+		    	  element.append(test);
+		    	}
+		    	element.appendTo("#itemcontainer");
+		    }		
+
+		    //function for creating own json for populating and sorting data 
+			setSolarealist();
+			function setSolarealist(){					
+				for(i=0; i<a.length; i++){	
+					selectedIndustry[a[i].Indus_Name]=[];
+					$.each(a[i].logicalCompList, function(index, value) {
+						for(j=0;j<a[i].logicalCompList[index].solutionAreaList.length; j++){
+							selectedIndustry[a[i].Indus_Name].push({
+								'id': a[i].logicalCompList[index].solutionAreaList[j].sol_area_id,
+								'active': false
+							});
+						}
+					});
+				}
+			}
+			selectedIndustryArr = selectedIndustry;
+			
+			//alert("selectedIndustryArr -> " + JSON.stringify( selectedIndustryArr) );
+
+			//function for creating own json for populating and sorting data 
+			mappingdatafunc();
+			function mappingdatafunc(){
+				for(i=0; i<a.length; i++){						
+					$.each(a[i].logicalCompList, function(index, value) {	
+						if ($.inArray(a[i].logicalCompList[index].LOGICAL_COMP_NAME, comlogicalCompLists) === -1) {
+							
+							comlogicalCompLists.push(a[i].logicalCompList[index].LOGICAL_COMP_NAME);
+							
+							mapdata={};
+								
+								mapdata=({
+									'logicalcompid':a[i].logicalCompList[index].LOGICAL_COMP_ID,
+									'logicalcompname': a[i].logicalCompList[index].LOGICAL_COMP_NAME,
+									'sortorder':a[i].logicalCompList[index].SORT_ORDER,
+									'solutionarea':a[i].logicalCompList[index].solutionAreaList
+									});
+								
+								
+								$.each(a[i].logicalCompList[index].solutionAreaList, function(index1, value) {
+									
+									if ($.inArray(a[i].logicalCompList[index].solutionAreaList[index1].sol_area_name, solArList) === -1) {
+										
+										solArList.push(a[i].logicalCompList[index].solutionAreaList[index1].sol_area_name);
+									}
+								});
+								
+							mapdataArr.push(mapdata);	
+					
+						} else {
+							
+							//Pushing additional SolAreas in existing list of SolArea for repeated Logical Components
+							
+							$.each(mapdataArr, function(index2, value) { 
+								
+								if(mapdataArr[index2].logicalcompname == a[i].logicalCompList[index].LOGICAL_COMP_NAME) {
+									
+									$.each(a[i].logicalCompList[index].solutionAreaList, function(index1, value) {
+										
+										if ($.inArray(a[i].logicalCompList[index].solutionAreaList[index1].sol_area_name, solArList) === -1) {
+											
+											solArList.push(a[i].logicalCompList[index].solutionAreaList[index1].sol_area_name);
+											
+											solareadata={};
+											solareadata=({
+												'sol_area_id': a[i].logicalCompList[index].solutionAreaList[index1].sol_area_id,
+												'sol_area_name': a[i].logicalCompList[index].solutionAreaList[index1].sol_area_name
+											});
+											
+											mapdataArr[index2].solutionarea.push(solareadata);
+											
+										}
+									});
+									
+								}
+								
+							});
+							
+						}
+					});
+				}
+			}
+			
+			//alert("no sort:: " + JSON.stringify(mapdataArr));
+			
+			sortedmapArr=mapdataArr.sort(compare);
+			
+			//console.log("sorted  selectedIndustryArr:: " + JSON.stringify(selectedIndustryArr));
+			
+			//console.log("sorted  sortedmapArr:: " + JSON.stringify(sortedmapArr));
+			
+			//sorted mapdataarr 
+			function compare(a,b) {
+			  if (a.sortorder < b.sortorder)
+			    return -1;
+			  if (a.sortorder > b.sortorder)
+			    return 1;
+			  return 0;
+			}
+			
+			
+			
+			loaddata(a);
+			function loaddata(pdata){
+				for(i=0; i<sortedmapArr.length; i++){
+				var ele=$("<tr></tr>");
+					var ldata=`<td class="leftside" id="lcname"><span id="${sortedmapArr[i].logicalcompid}">${sortedmapArr[i].logicalcompname}: </span></td>`;
+					ele.append(ldata);
+					for(j=0;j<sortedmapArr[i].solutionarea.length;j++){
+						var ldata2=`<td class="leftside" id="lcname"><span class="box-style2" value="${sortedmapArr[i].solutionarea[j].sol_area_id}" id="${sortedmapArr[i].solutionarea[j].sol_area_id}">${sortedmapArr[i].solutionarea[j].sol_area_name}</span></td>`;
+							ele.append(ldata2);
+
+					}
+					ele.appendTo("#solarch");
+				}
+			}
+			
+			
+			if(a.length<5){
+				$(".carousel-control").css("display","none")
+			}
+			else{
+				$(".carousel-control").css("display","block")
+			}
+
+			var count = 0;
+			//funciton for do operation on click on industry block
+			$(".box-style").click(function () {
+				//console.log("m here");
+				var indusid=$(this).attr("id");	
+				//$("#industryInfo").attr("value",indusid);	
+		    	$(".box-style").not(this).removeClass("selected");
+				//$("#industryInfo").not(this).attr("value","");
+				
+		    	$(this).toggleClass("selected");
+		    	
+				if($(this).hasClass("selected")){
+					$("#industryInfo").attr("value",indusid);
+					$(".box-style2").addClass("box-style2active");
+					//alert("has selected class");
+				} else{
+					$("#industryInfo").not(this).attr("value","");
+					$(".box-style2").removeClass("box-style2active");
+					emptytable();
+					//alert("has not selected class");
+				}
+				
+				var indusname= $(this).text();
+		    		    	
+		    	//$(".box-style2").removeClass("btnstyle2select"); Removing this for defect fix to retains selected solareas
+		    	//selectsolarea(indusname);
+		    	selectAllSolArea(indusname);
+		    	getSolutionAreaInfo(indusid);
+		    	//emptytable();
+		    });
+			
+			//new function to display all solution area irrespective of industry Use case Backlog 143
+			 function selectAllSolArea(solname){
+
+					if(oldindusname == solname){
+						flag=1;
+					}
+					else{
+						flag=0
+					}
+			    	if(flag == 1){
+			    		oldindusname ="";
+			    	}else{
+			    	
+					oldindusname=solname;
+			    	}
+					//$(".box-style2").addClass("box-style2active");
+			}
+			//end og selectAllSolArea
+			
+			
+		    //function for selecting the solution area based on industry name 
+	        function selectsolarea(solname){
+		    	
+				if(oldindusname == solname){
+					flag=1;
+				}
+				else{
+					flag=0
+				}
+		    	
+		    	if(flag == 1){
+		    		oldindusname ="";
+		    	}else{
+		    	
+				oldindusname=solname;
+		    	}
+				$(".box-style2").removeClass("box-style2active");
+				for(i=0;i<Object.keys(selectedIndustryArr).length;i++){
+					for(j=0; j<selectedIndustryArr[solname].length; j++){
+						for(k=0; k<$(".box-style2").length; k++){
+							if($(".box-style2").eq(k).attr("id")==selectedIndustryArr[solname][j].id)
+							{
+							if(flag==0){
+								$(".box-style2").eq(k).addClass("box-style2active");	
+								}
+								else{													
+									$(".box-style2").removeClass("btnstyle2select");
+									$(".box-style2").removeClass("box-style2active");
+								}
+							} 
+						}
+					}
+				}
+			}
+
+		    
+			//for empty the previous selection on industry change	
+		    function emptytable(){
+		    	let rowcount =$("#solAreaTable").find("tr").length;
+		    	console.log("emptytabled called ");
+	            if(rowcount>1){
+	            	for(i=$("#solAreaTable").find("tr").length-2; i>=0; i--){
+	            		$("#solAreaTable").find("tr").eq(i).remove();
+	            	}
+	            }
+	        }
+		    var amsArray=[];
+			//Adding all Ams based id in Amsarray
+			$('[id^="lcname"]').each(function(index,object){
+				var id =$(this).parents("tr").find('span:eq(0)').attr('id');
+				if(id==9){
+					var solAreaId=$(this).find('span').attr('id');
+					amsArray.push(solAreaId);
+				} 
+					
+			});
+		    var solareaarr=[];
+	        $(".box-style2").click(function(){
+				//console.log("here:"+$(this).text()+ "id "+$(this).attr('id'));
+				var solAreaId=$(this).attr('id');
+				if($(this).hasClass("btnstyle2select") && $(this).hasClass("box-style2active")){
+					console.log("after clicking already selected solarea:::removing selection "+$(this).attr("id"));
+					solareapop($(this).text())
+					console.log("after removing solareaarr "+solareaarr);
+					removeRow2($(this).text());
+					$(this).removeClass("btnstyle2select");
+					
+				}
+				else if($(this).hasClass("box-style2active")){
+					console.log("after active but not already selected solarea:: adding selection ");
+					$(this).toggleClass("btnstyle2select");
+					//disabling rest of the ams sol areas other than selected
+					if(amsArray.indexOf(solAreaId)>0){
+						var point=amsArray.indexOf(solAreaId);
+						for(var i=1; i<amsArray.length; i++){
+							 if(i!=point){
+								$(this).parents("tr").find('span:eq('+i+')').removeClass("btnstyle2select");
+							 }
+							 var amsText= $("#"+amsArray[i]).text();
+							  if(solareaarr.indexOf(amsText)>-1){
+							 		solareapop(amsText);
+							 		removeRow2(amsText);
+							 }
+						}
+						
+					}//end of if
+					solareapush($(this).text());
+					addRow2($(this).html(), $(this).attr('id'));
+				}
+			});
+			
+			function solareapush(x){
+				//console.log("Added to Array "+x);
+				solareaarr.push(x);
+				console.log("solareaarr "+solareaarr);
+			}
+			function solareapop(y){
+				for(i in solareaarr){
+					if(solareaarr[i]==y){
+						solareaarr.splice(solareaarr.indexOf(y),1);
+					}
+				}
+			}
+			
+
+		}
+	});// end of ajax call
+
+	
+
+	//for adding row in table for each selected solution area
+	function addRow2(solareaval, solareaid) {
+		var table=document.getElementById("solAreaTable");
+		var id =solareaid;
+		var val = solareaval;
+		if(id) { 						
+			var row = table.insertRow(0);
+			row.innerHTML  = "<tr id="+id+"><td id='solAreaName' style='display:none' class=\"tdTableLabel\" colspan='1' align=left></td><td> <input type=\"hidden\" id='solutionAreaInfo' name ='solutionAreaInfo'></td></tr>";
+			//console.log(row);
+			document.getElementById("solAreaName").innerHTML = val;
+			document.getElementById("solutionAreaInfo").value = id;						
+		}
+	}
+	
+	function removeRow2(sname){
+		var table=document.getElementById("solAreaTable");
+		$("#solAreaTable tr").each(function(index){
+			if($("#solAreaTable tr").eq(index).find("td").eq(0).text() == sname)
+			{
+				$("#solAreaTable").find("tr").eq(index).remove();
+			}
+		})
+	}
+
+	/// Start of function for populating Solution Area Information Drop Down as per the industry id
+	function getSolutionAreaInfo(id){
+		//console.log(id)
+		var solutionAreaInfo = $('#solutionAreaInfoTemp');
+		solutionAreaInfo.empty();
+		/// Calling REST service to get the data of Solution Area information by passing service line id.
+		$.ajax({url: "/solutionAreaForIndustry/"+id, success: function(data) {
+	
+			//console.log("solutionAreaForIndustry JSON :----> "+JSON.stringify(data));
+			
+			var option = $("<option/>");
+			option.attr("value", "").text("Select");
+			solutionAreaInfo.append(option);
+			var selectionValue= "{{solutionAreaInfo}}";
+			for (var i = 0; i < data.length; i++) {	
+				if(selectionValue == data[i].sol_area_id)
+					option = $("<option selected/>");
+				else
+					option = $("<option/>");
+				option.attr("value", data[i].sol_area_id).text(data[i].sol_area_name);
+				solutionAreaInfo.append(option);
+			}
+		}
+		});
+
+		}
+		/// End of function for populating Solution Area Information Drop Down for industry Id
+
+	})
+	
+	function validate() {
+		var exists = false;
+		
+		
+		$.ajax({url: "/checkSCIDExists?scid="+$("#opportunityId").val().trim(), async: false, success: function(data) {
+	
+			//console.log("solutionAreaForIndustry JSON :----> "+JSON.stringify(data));
+			
+			if(data[0].count > 0){
+				exists = true;
+			} else{
+				//keep going;
+			}
+		}
+		});
+		
+		if(exists){
+			alert("Please provide unique value for opportunityId.");
+
+			return false;
+		}
+		
+	if($("#opportunityId").val().trim() == ''){
+		alert("Please provide suitable value for opportunityId.");
+
+		return false;
+	}
+
+	if($("#industryInfo").val().trim() == ""){
+		
+		alert("Please select any of the industry");
+		return false;
+	}
+
+	if($("#deliveryCenterInfo").val().trim() == ''){
+		
+		alert("Please provide Proposed Delivery Center");
+		return false;
+	}
+
+
+	if($("#clientName").val().trim() == ''){
+		alert("Please provide suitable value for clientName.");
+		let rowcount=$(".solAreaTable tr").length;
+
+		return false;
+	}
+
+
+	
+    var amsArray2=[];
+	//Adding all Ams based id in Amsarray
+	$('[id^="lcname"]').each(function(index,object){
+		var id =$(this).parents("tr").find('span:eq(0)').attr('id');
+		if(id==9){
+			var solAreaId=$(this).find('span').attr('id');
+			amsArray2.push(solAreaId);
+		} 
+			
+	});
+	
+	if(amsArray2.length > 0){
+		var form = document.getElementById('createOpty');
+		form.action="/submitSolutionDetails";
+	}
+	
+
+	if (document.getElementById("solAreaTable").rows.length > 1) {
+
+		return true;
+	}	else{
+		alert("Please select at least one solution area.");
+		return false;
+	}
+}
+	
+	
+	
+</script>
+</body>
+</html>

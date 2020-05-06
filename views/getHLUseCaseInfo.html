@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Solution Advisor</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="description" content="An interactive getting started guide for Edge Code CC.">
+	<link rel="stylesheet" href="static/css/style.css">
+	<script	src="static/js/main.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.min.js"></script>
+	<link rel="stylesheet" href="static/css/jquery.modal.css">
+	<script	src="static/js/jquery.modal.js"></script>	
+	<script	src="static/js/close.js"></script>
+<script type="text/javascript">
+var timeCount = 10000;
+function validate() {
+	if(document.getElementById("testSolId").value == "Y"){
+		if(!$('input[type="checkbox"]').attr("disabled")){
+			if(!$('#saveSolution input[name=testFlagId]:checked').length > 0){
+				alert("Please select at least one Perf Test before submitting the solution.");
+				return false;
+			}
+		}
+	}
+
+	var chks = document.getElementsByName('useCaseId');
+
+	var hasChecked = false;
+	for (var i = 0; i < chks.length; i++) {
+		if (chks[i].checked) {
+			hasChecked = true;
+			break;
+		}
+	}
+
+	if (hasChecked == false) {
+		alert("Please select at least one use case before submitting the solution.");
+		return false;
+	}
+	//document.getElementById("submitButton").disabled=true;
+	//document.getElementById("showmodalid").style.top=window.pageYOffset;
+	window.scrollTo(0, 0);
+	$(".showmodal").show();
+	checkSaveStatus(0);
+	/* if($("#saveFlg").val()=="Yes"){
+		$(".showmodal").show();
+		
+	} */
+	return true;	
+}
+
+function setLoad(){
+	//consol.log(window.pageYOffset +" "+window.pageXOffset);
+	if($(".showmodal").css("display") != 'none'){
+		$(".showmodal").css("top",window.pageYOffset);
+	}
+}
+
+
+function checkSaveStatus(count){
+	//alert($('#serviceURL').val()+'/download/query?solId='+$('#solId').val()+'&solAreaId='+$('#solAreaId').val());
+	var values = new Array();
+	$.each($("input[name='testFlagId']:checked"), function() {
+  		values.push($(this).val());
+	});
+	setTimeout(function() {
+		$.ajaxSetup({async: false});
+		$.post("/checkSaveStatus",{solId:$('#solId').val(),solAreaId:$('#currentSolAreaId').val(), testSolId:$("#testSolId").val(),enbTestBtn:values.length}, function(data, status){
+	        //alert("Data: " + data + "\nStatus: " + status);
+	       	if(data!="Error: connect ECONNREFUSED"){
+	        if(data=="No"){
+	        	 if(count > 0){
+	        		 //$('a#advisorHome').click();
+	        		 var addr= (window.location.href).split('/');	        		 
+	        		 window.location.href = addr[0]+"//"+addr[2]+"/dashboard";
+	        	 }else{
+	        	$("#waitImg").hide();
+	        	$(".center").css("width","350px");
+	        	$("#waiText").show();
+	        	count++;
+	        	setTimeout(function() {
+	        		checkSaveStatus(1);
+	        	},timeCount);
+	        	}
+	        }else{
+	        	//$("#waiText").hide();
+	        	//$(".showmodal").hide();
+				setTimeout(function() {
+					document.getElementById("saveSolution").action = "/gotoSolutionDetails";
+					document.getElementById("enbTestBtn").value = values.length;
+					document.getElementById("saveSolution").submit();
+				}, 10000);	
+				/*
+	        	document.getElementById("saveSolution").action = "/gotoSolutionDetails";
+	        	document.getElementById("enbTestBtn").value = values.length;
+	        	document.getElementById("saveSolution").submit();
+				*/
+	        	/* $.post("/gotoSolutionDetails",{solId:$('#solId').val(),enbTestBtn:values.length}, function(data, status){
+	        		
+	        	}); */
+	        }
+	       	}else{
+	       		$("#waitImg").hide();
+	        	$(".center").css("width","350px");
+	        	$("#waiText").hide();
+	        	$("#downText").show();
+	        	setTimeout(function() {
+	        		$("#downText").hide();
+	        		$(".showmodal").hide();
+	        	},3000);
+	       	}
+	    });
+		$.ajaxSetup({async: true});
+		
+	},timeCount);
+	
+}
+
+$(document).ready(function(){
+	
+	if ($("#useCaseId:not(:checked)").length  == 0 ){
+
+		$("#selectAllLOB").prop("checked", true);
+
+	}
+
+	if ($("#testFlagId:not(:checked)").length  == 0 ){
+
+		$("#selectAllPC").prop("checked", true);
+	}
+
+	$(".testCheckBox").each(function(){
+		$(this).change(function(){
+			if(this.checked){			
+				//this.value='9';
+			}else{			
+				this.value='0';
+				$("#selectAllPC").prop('checked', $(this).prop("checked")); //change "select all" checked status to false
+			}
+		});		
+	});
+	
+	$("#selectAllLOB").change(function(){  //"select all" change
+		if($("#selectAllLOB").prop("checked")){
+			$("#selectAllPC").removeAttr("disabled");
+		}
+		$(".lobCheckBox").each(function(){ 
+			$(this).prop('checked', $("#selectAllLOB").prop("checked"));
+			toggleCheck(this);
+		});
+	    //$(".lobCheckBox").prop('checked', $(this).prop("checked")); //change all ".checkbox" checked status
+	});
+	
+	$("#selectAllPC").change(function(){  //"select all" change
+		
+		$(".testCheckBox").each(function(){ 
+			if(!$(this).attr("disabled")){
+				$(this).prop('checked', $("#selectAllPC").prop("checked"));
+			}
+		});
+	    //$(".testCheckBox").prop('checked', $(this).prop("checked")); //change all ".checkbox" checked status
+	});
+	
+	if(!$("#selectAllLOB").prop("checked")){
+		$("#selectAllPC").attr("disabled", true);
+	}
+});
+
+function toggleCheck(elm){
+	if(elm.checked){
+		$(elm).parent().parent().find('.testCheckBox').removeAttr("disabled");
+	}else{
+		$(elm).parent().parent().find('.testCheckBox').prop("checked", false);		
+		$(elm).parent().parent().find('.testCheckBox').attr("disabled", true);		
+	}
+
+	if(false == $(elm).prop("checked")){ //if this item is unchecked	
+        $("#selectAllLOB").prop('checked', $(elm).prop("checked")); //change "select all" checked status to false
+		$("#selectAllPC").prop('checked', $(elm).prop("checked")); //change "select all" checked status to false
+		$("#selectAllPC").attr("disabled", true);
+    }
+}
+
+function toggleCheck2(elm){
+	//alert(elm.value);
+}
+
+
+
+</script>
+
+</head>
+<body class="mainInner" onscroll="setLoad()">
+	<div class="divWidth">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+			<div class="NavDiv">
+				<div class="nav">
+					<ul>
+						<li class="home"><a href="dashboard" id="advisorHome">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+					</ul>
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop">
+							<img src="/static/images/search.jpg">
+							<div id="two" class="popupBox">
+							<form method="post" action="/searchOpportunity" id="search">
+								<input type="text" value="" name="searchOpportunity" id="searchOpportunity" required class="popInput placeholder-fix" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Opportunity Name">
+								<input type="submit" value="Search" class="popButton">
+							</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="InnDiv" ></div>
+	<form method="post" id="saveSolution" action="/saveSolutionHLUseCasesInfo" onsubmit="return validate()">
+	<input type=hidden name="SL_ID" value="{{solAreaResult[0].sl_id}}">
+	<input type=hidden id="solId" name="solId" value="{{solId}}">
+	<input type=hidden id="SOL_AREA_ID" name="SOL_AREA_ID" value="{{solAreaResult[0].sol_area_id}}">
+	<input type=hidden name="INDUS_ID" value="{{solAreaResult[0].indus_id}}">
+	<input type=hidden name="useCaseInfoType" value="{{useCaseInfoType}}">
+	<input type=hidden id="currentSolAreaId" name="currentSolAreaId" value="{{solAreaResult[0].sol_area_id}}">
+	<input type=hidden id="testSolId" name="testSolId" value="{{testSolId}}" />
+	<input type=hidden id="soakTestId" name="soakTestId" value="{{soakTestId}}" />
+
+	<input type=hidden id="model" name="model" value="{{model}}" />
+	<input type=hidden id="sprintWeeks" name="sprintWeeks" value="{{sprintWeeks}}" />
+	<input type=hidden id="enbTestBtn" name="enbTestBtn" value="" />
+	<input type=hidden id="isedit" name="isedit" value="{{isedit}}">
+	
+	<div class="divWidth">
+	<div class="loginInfo ">Hello {{ user.attributes.firstName }} {{user.attributes.lastName}}</div>
+	<p>Capture your Use cases (High Level View)</p>
+		<table width="100%" cellpadding="1" cellspacing="0" border="0">		
+			<tr>
+				<td colspan="4" class="tdmarg">Solution Details</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Solution Id:</strong></td>
+				<td class="tdInputLabel" colspan="2">{{solId}}</td>
+			</tr>
+			<!-- <tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Lead Service Line:</strong></td>
+				<td class="tdInputLabel" colspan="2">{{solAreaResult[0].sl_name}}</td>
+			</tr> -->
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Solution Area:</strong></td>
+				<td class="tdInputLabel" colspan="2">{{solAreaResult[0].sol_area_name}}</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Industry:</strong></td>
+				<td class="tdInputLabel" colspan="2">{{solAreaResult[0].indus_name}}</td>
+			</tr>
+			<tr>
+				<td colspan="4" class="tdmarg">Use cases for <font color="#000099"><b>{{solAreaResult[0].sol_area_name}}</b></font> in <font color="#000099"><b>{{solAreaResult[0].indus_name}}</b></font></td>
+			</tr>
+			<tr>
+				<td colspan="4" class="tdLabel">&nbsp;</td>
+			</tr>
+		{% if errorMessage %}
+			<tr>
+				<td colspan="4" class="tdErrorMsg">{{errorMessage}}</td>
+			</tr>
+		{% endif %}			
+			<tr>					
+				<td class="tdmarg" align="center" width="7%">&nbsp;</td>
+				<td class="tdmarg" width="23%"><strong>Line of Business</strong></td>
+				<td class="tdmarg" width="60%"><strong>Usecase Category</strong></td>
+				{% if testSolId=='Y' %}
+				<td class="tdmarg" width="10%"><strong>Performance critical?</strong></td>
+				{% else %}
+					<td class="tdmarg">&nbsp;</td>
+				{% endif %}
+				<!-- <td class="tdmarg" align="center" width="0%"><strong>Use Case Information</strong></td> -->
+			</tr>
+			<tr>
+			<td class="tdSelectAllLabel" align="center"><input type="checkbox" id="selectAllLOB" name="selectAllLOB" value=""></td>
+			<td class="tdmarg">Select All</td>
+			<td class="tdmarg"></td>
+			{% if testSolId=='Y' %}
+				<td class="tdSelectAllLabel" align="center"><input type="checkbox" id="selectAllPC" name="selectAllPC" value=""></td>
+				{% else %}
+					<td class="tdmarg">&nbsp;</td>
+				{% endif %}	
+			</tr>
+		{% for ob in solAreaResult %}	
+			<tr style="height:35px">		
+				<td class="tdLabel" align="center"><input type="checkbox" name="useCaseId" class="lobCheckBox" onchange="toggleCheck(this);" id="useCaseId" value="{{ob.reqsubcategoryid}}" 		
+				{% if ob.isselected > 0 %}
+							checked
+				{% endif %}
+				></td>
+				<td class="tdLabel" align="left">&nbsp;&nbsp;&nbsp;&nbsp;{{ ob.line_of_business }}</td>
+				<td class="tdLabel" align="left">&nbsp;&nbsp;&nbsp;&nbsp;{{ ob.reqsubcategory }}</td>
+				{% if testSolId=='Y' %}
+				<td class="tdLabel" align="center"><input type="checkbox" class="testCheckBox" name="testFlagId" onchange="toggleCheck2(this);" id="testFlagId" value="{{ob.reqsubcategoryid}}" 
+				{% if ob.isperfselected > 0 %}
+							checked
+				{% else %}
+					{% if ob.isselected > 0 %}
+						//do nthg
+					{% else %}				
+						disabled	
+					{% endif %}
+				{% endif %}
+				></td>
+				{% else %}
+					<td class="tdLabel">&nbsp;</td>
+				{% endif %}	
+				<!-- <td class="tdlabel" align="center">{{ ob.USE_CASE_DESCRIPTION }}</td> -->							
+			</tr>
+		{% endfor %}
+
+			<tr>
+				<td colspan="4" class="tdLabel">&nbsp;</td>
+			</tr>
+			<tr>
+				<td class="tdLabel">&nbsp;</td>
+				<td class="tdLabel" colspan="2">
+					<input type="button" id="backButton" class="cancelbutton" value="Back" onclick="javascript:history.go(-1);">
+				</td>
+				<td class="tdLabel" colspan="2" style="padding-right: 5%;">
+					<button class="bluebutton">Submit</button>					
+				</td>
+			</tr>
+			<tr>
+				<td colspan="4" class="tdLabel">&nbsp;</td>
+			</tr>
+
+		</table>
+	</div>	
+	</form>
+	<div id="showmodalid" class="showmodal" style="display:none">
+	
+	    <div class="center">
+	    <span id="downText" style="font-weight: bolder;font-size: x-large;display: none;"><blink>The back-end service is down. Please try after sometime</blink></span>
+	    <span id="waiText" style="font-weight: bolder;font-size: x-large;display: none;"><blink>We are saving your data...</blink></span>	    
+	        <img id="waitImg" alt="" src="/static/images/loader.gif" />
+	    </div>
+	    
+	        
+	</div>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Solution Advisor</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="description" content="An interactive getting started guide for Edge Code CC.">
+	<link rel="stylesheet" href="static/css/style.css">
+	<script	src="static/js/main.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.min.js"></script>
+	<script	src="static/js/jspdf.debug.js"></script>
+	<link rel="stylesheet" href="static/css/jquery.modal.css">
+	<script	src="static/js/jquery.modal.js"></script>	
+	<script	src="static/js/close.js"></script>
+<script>
+
+function htmltopdf() {
+	var pdf = new jsPDF('p', 'pt', 'letter');
+	pdf.setFontSize(2);
+	source = $('#htmlexportPDF')[0];
+    specialElementHandlers = {
+        '#bypassme': function (element, renderer) {
+            return true
+        }
+    };
+    margins = {
+        top: 40,
+        bottom: 40,
+        left: 80,
+        width: 700
+    };
+    pdf.fromHTML(
+    source, 
+    margins.left,
+    margins.top, { 
+        'width': margins.width, 
+        'elementHandlers': specialElementHandlers
+    },
+
+    function (dispose) {
+        pdf.save('Functional Requirements.pdf');
+    }, margins);
+}
+
+$(document).ready(function(){
+
+	/// apply event to test include
+	$("#soakTestTr").css('display','none');
+	/* $("#testSolId").change(function(){
+		if(this.checked){
+			$("#soakTestTr").css('display','');	
+			this.value='Y';
+		}else{
+			$("#soakTestTr").css('display','none');
+			this.value='N';
+		}
+	});	
+	$("#soakTestId").change(function(){
+		if(this.checked){
+			this.value='Y';
+		}else{
+			this.value='N';
+		}
+	}); */
+	var is_perf_test_in_scope = $("#is_perf_test_in_scope").val();
+	var is_soak_test_in_scope = $("#is_soak_test_in_scope").val();
+	if(is_perf_test_in_scope !=null && is_perf_test_in_scope !=""){
+		if(is_perf_test_in_scope == '1'){
+			//$("#testSolId").prop( "checked", true );
+			//$("#testSolId").val('Y');
+			$("#soakTestTr").css('display','');			
+		}else{
+			//$("#testSolId").prop( "checked", false );
+			//$("#testFlag").css('display','none');
+			//$("#testFlagL").css('display','none');
+		}
+	}
+	
+	/* if(is_soak_test_in_scope !=null && is_soak_test_in_scope !=""){
+		if(is_soak_test_in_scope == 1){
+			$("#soakTestId").prop( "checked", true );
+			$("#soakTestId").val('Y');
+		}else{
+			$("#soakTestId").prop( "checked", false );
+		}
+	} */
+	
+});
+</script>
+
+</head>
+<body class="mainInner">
+<div class="divWidth">
+	<div style="height:90px">
+		<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+		<div class="NavDiv">
+			<div class="nav">
+				<ul>
+
+						<li class="home"><a href="dashboard">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+					<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+				</ul>
+				<div class="SeaDiv">
+					<div id="popUpButton" class="popupHoverElement mainOutPop">
+						<img src="/static/images/search.jpg">
+						<div id="two" class="popupBox">
+						<form method="post" action="/searchOpportunity" id="search">
+								<input type="text" value="" name="searchOpportunity" id="searchOpportunity" required class="popInput placeholder-fix" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Opportunity Name">
+								<input type="submit" value="Search" class="popButton">
+						</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="InnDiv" ></div>
+
+<div class="divWidth">
+<div class="loginInfo ">Hello {{ user.attributes.firstName }} {{user.attributes.lastName}}</div>
+<p>Functional Requirements</p>
+<form method="post" action="/saveSolutionInfo" onsubmit="return validate()" style="width:90%">
+<input type=hidden name="SL_ID" value="{{solRequirementResult.sl_id}}">
+<input type=hidden name="SOL_AREA_ID" value="{{solRequirementResult[0].sol_area_id}}">
+<input type=hidden name="INDUS_ID" value="{{solRequirementResult[0].indus_id}}">
+<input type=hidden id="is_perf_test_in_scope" name="is_perf_test_in_scope" value="{{solRequirementResult[0].test_in_scope}}">
+	<input type=hidden id="is_soak_test_in_scope" name="is_soak_test_in_scope" value="{{solRequirementResult[0].is_soak_test_in_scope}}">
+	<input type=hidden id="enbTestBtn" name="enbTestBtn" value="{{enbTestBtn}}">
+	<table width="100%" cellpadding="1" cellspacing="0" border="0" id="htmlexportPDF">		
+		<tr>
+			<td colspan="5" class="tdmarg">Solution Details</td>
+		</tr>
+		<tr  bgcolor='#e1e0e0'>
+			<td class="tdInputLabel"><strong>Solution Id:</strong></td>
+			<td class="tdInputLabel">{{solRequirementResult[0].sol_id}}</td>
+			<td class="tdInputLabel" colspan="3"></td>
+		</tr>
+		<!-- <tr>
+			<td class="tdInputLabel"><strong>Lead Service Line:</strong></td>
+			<td class="tdInputLabel">{{solRequirementResult[0].sl_name}}</td>
+			<td class="tdInputLabel" colspan="3"></td>
+		</tr> -->
+		<tr bgcolor='#e1e0e0'>
+			<td class="tdInputLabel"><strong>Solution Area:</strong></td>
+			<td class="tdInputLabel">{{solRequirementResult[0].sol_area_name}}</td>
+			<td class="tdInputLabel" colspan="3"></td>
+		</tr>
+		<tr>
+			<td class="tdInputLabel"><strong>Industry:</strong></td>
+			<td class="tdInputLabel">{{solRequirementResult[0].indus_name}}</td>
+			<td class="tdInputLabel" colspan="3"></td>
+		</tr>
+		<tr>
+			<td class="tdInputLabel" style="height:35px"><strong>Performance test in scope:</strong></td>
+			<td class="tdInputLabel">
+			{% if solRequirementResult[0].test_in_scope==1 %}Yes {% else %} No {% endif %}
+			</td>	
+			<td class="tdInputLabel" colspan="3"></td>						
+		</tr>
+		<tr id="soakTestTr">
+			<td class="tdInputLabel" style="height:35px"><strong>Soak Test Required:</strong></td>
+			<td class="tdInputLabel">
+			{% if solRequirementResult[0].is_soak_test_in_scope==1 %}Yes {% else %} No {% endif %}
+			</td>	
+			<td class="tdInputLabel" colspan="3"></td>						
+		</tr>
+		<tr>
+			<td colspan="5" class="tdLabel">&nbsp;</td>
+		</tr>			
+		<tr>
+			<td colspan="5" class="tdLabel">
+				<table width=100% border=1 cellpadding=0 cellspacing=0 style="border-color:#FFFFFF">
+					<tr>				
+						<td class="tdmarg" width="15%"><strong>Line of Business</strong></td>
+						<td class="tdmarg" width="20%"><strong>Usecase Category</strong></td>
+						<td class="tdmarg" width="35%"><strong>Use Case Description</strong></td> 
+						<td class="tdmarg" width="15%"><strong>Complexity</strong></td>
+						{% if solRequirementResult[0].test_in_scope==1 %}
+						<td id="testFlagL" class="tdmarg" width="15%"><strong>Performance critical?</strong></td>
+						{% endif %}
+					</tr>					
+				{% for ob in solRequirementResult %}
+					<tr style="height:35px">						
+						<td class="tdLabel">&nbsp;&nbsp;{{ ob.line_of_business }}</td>
+						<td class="tdLabel">{{ ob.reqsubcategory }}</td>
+						{% if solRequirementResult[0].sol_area_id==105 %}
+							<td class="tdLabel">{{ ob.tech1 }} &nbsp; | &nbsp; {{ ob.tech2 }}  &nbsp; | &nbsp; {{ ob.reqsubcategory}}</td>
+						{% else %}
+							<td class="tdLabel">{{ ob.use_case_description }}</td>
+						{% endif %}	
+												
+						{% if solRequirementResult[0].sol_area_id==105 %}
+							{% set cTitle = "Simple:  " + ob.new_simple_complexity_count + ",  Medium: " + ob.new_medium_complexity_count + ",  Complex: " + ob.new_complex_complexity_count %}
+							<td class="tdLabel">{{ cTitle }}</td>
+						{% elseif solRequirementResult[0].sol_area_id==104 %}
+							{% set cTitle = "Simple:  " + ob.simple_count + ",  Medium: " + ob.medium_count + ",  Complex: " + ob.complex_count %}
+							<td class="tdLabel">{{ cTitle }}</td>
+						{% else %}
+							<td class="tdLabel">{{ ob.complexity_title }}</td>
+						{% endif %}
+						
+						
+						
+						{% if solRequirementResult[0].test_in_scope==1 %}
+						<td class="tdLabel" align="center">{% if ob.is_perf_test_in_scope==1 %}Yes {% else %} No {% endif %}</td>
+						{% endif %}
+					</tr>
+				{% endfor %}
+					</table> 
+			</td>
+		</tr>
+		<tr>
+			<td colspan="5" class="tdLabel">&nbsp;</td>
+		</tr>
+		<tr>
+			
+			<td class="tdInputLabel" colspan="5">
+			<input type="button" id="submitButton" value="Download Requirements" onclick="javascript:htmltopdf();" class="bluebutton">   
+			&nbsp;&nbsp;	<a href="http://{{serviceURL}}/download/request?sessionId={{sid}}&solId={{solRequirementResult[0].sol_id}}&solAreaId={{solRequirementResult[0].sol_area_id}}" target="_blank">
+			<button class="greenbutton" type="button">Download Use Cases Estimation</button>			
+			</a>
+			
+			&nbsp;&nbsp;  <input type="button" id="backButton" class="cancelbutton" value="Back" onclick="javascript:history.go(-1);">
+			
+			</td>
+		</tr>
+		<tr>
+			<td colspan="5" class="tdLabel">&nbsp;</td>
+		</tr>
+
+	</table>
+	</form>
+</div>
+</body>
+</html>

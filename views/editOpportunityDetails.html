@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Solution Advisor</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="description" content="An interactive getting started guide for Edge Code CC.">
+	<link rel="stylesheet" href="static/css/style.css">
+	<script	src="static/js/main.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.min.js"></script>
+	<link rel="stylesheet" href="static/css/jquery.modal.css">
+	<script	src="static/js/jquery.modal.js"></script>	
+	<script	src="static/js/close.js"></script>
+	
+
+	<script> 
+
+	var solAreasUpperIds = [];
+	var solAreasLowerIds = [];
+	var deletedSolnAreas = [];
+	var touchedSolAreas = []; //this is to take care of sol areas that were initially selected, then user deselected them, but then selected again
+	//var amsArray=['9','168','169','170'];	
+	comlogicalCompLists=[];
+	$(document).ready(function(){
+		mapdataArr=[];
+		
+		//For delete function
+		for(i=0; i<$("#solAreaTable tr").length-1 ;i++){
+			var id  = $("#solAreaTable tr").eq(i).find("td").eq(0).attr("name");
+			//console.log("upper  : "+id);
+			solAreasUpperIds.push(id);
+		}
+		
+	
+			
+	/// Opening the Section for populating the Solution Area drop down basis on changes done in Service Line Drop Down
+	$("#industryInfoSelect").each(function(){
+			indusid= $(this).children(":selected").attr("value");
+			//console.log(indusid);
+		});
+	
+	$( "#IOTInfo" ).change(function(){
+		var id=$('#IOTInfo').val();
+		getIMTInfo(id);
+	});
+	
+	$( "#LeadCountryInfo" ).change(function(){
+		var id=$('#LeadCountryInfo').val();
+		getIMTIOTInfo(id);
+	});
+
+	{% if industryInfo != "" %}
+	var id= {{industryInfo}};
+
+	getSolutionAreaInfo(id);
+	{% endif %}
+
+	{% if IOTInfo != "" %}
+	var id= {{IOTInfo}};
+
+	getIMTInfo(id);
+	{% endif %}
+	
+
+	{% if LeadCountryInfo != "" %}
+	var id= {{LeadCountryInfo}};
+
+	getIMTIOTInfo(id);
+	{% endif %}
+
+	/// Closing the Section for populating the Solution Area drop down basis on changes done in Service Line Drop Down
+
+
+	/// Opening the Section for populating Industry Information Drop Down while loading the page
+	var industryInfo = $('#industryInfoSelect');
+	industryInfo.empty();
+	$.ajax({url: "/getIndustryInfo", success: function(data) {
+		//var option = $("<option/>");
+		//option.attr("value", "").text("Select");
+		//industryInfo.append(option);
+		var selectionValue= "{{industryInfo}}";
+
+		{% if solInfo[0].indus_id %}	
+		var selectionValue= {{solInfo[0].indus_id}};
+		{% endif %}		
+		for (var i = 0; i < data.length; i++) {	
+			if(selectionValue == data[i].indus_id){
+				//option = $("<option selected/>");
+				var ele="<span class='box-style btnstyle2select' value="+data[i].indus_id+" style='cursor:auto'>"+data[i].indus_name+"</span>"
+			}
+			// else
+			// 	option = $("<option/>");
+
+			// option.attr("value", data[i].indus_id).text(data[i].indus_name);
+			//industryInfo.append(option);
+			
+		}
+		industryInfo.append(ele)
+	}
+});
+	/// Closing the Section for populating Indusrty Line Drop Down while loading the page
+
+	/// Opening the Section for populating Delivery Center Information Drop Down while loading the page
+	var deliveryCenterInfo = $('#deliveryCenterInfo');
+	deliveryCenterInfo.empty();
+	$.ajax({url: "/getDeliveryCenterInfo", success: function(data) {
+		var option = $("<option/>");
+		option.attr("value", "").text("Select");
+		deliveryCenterInfo.append(option);
+		var selectionValue= "{{deliveryCenterInfo}}";
+		{% if solInfo[0].indus_id %}	
+		var selectionValue= {{solInfo[0].PROPOSED_DELIVERY_CENTER}};
+		{% endif %}	
+
+		for (var i = 0; i < data.length; i++) {	
+			if(selectionValue == data[i].delivery_org_id)
+				option = $("<option selected/>");
+			else
+				option = $("<option/>");
+
+			option.attr("value", data[i].delivery_org_id).text(data[i].delivery_org_type+" - "+data[i].delivery_org_name);
+			deliveryCenterInfo.append(option);
+		}
+	}
+});
+	/// Closing the Section for populating Service Line Drop Down while loading the page
+
+
+
+/// Start of function for populating Solution Area Information Drop Down as per the industry id
+
+	var solutionAreaInfo = $('#solutionAreaInfoTemp');
+	solutionAreaInfo.empty();
+	
+			$('#solAreaTable td:first-child').each(function() {
+			  //  console.log("first child "+$(this).text());
+			});
+			
+			
+var industryId = {{solInfo[0].indus_id}};
+	
+	$.ajax({url: "/solutionAreaForIndustry/"+industryId, success: function(data) {
+		a=data;
+		//console.log("solAreaIndus data "+data);
+		var solareadata="";
+		var selected_solArea ="";
+		var ldata2 = "";
+		
+		
+		//function for creating own json for populating and sorting data 
+		mappingdatafunc();
+		function mappingdatafunc(){
+			for(i=0; i<a.industryList.length; i++){						
+				$.each(a.industryList[i].logicalCompList, function(index, value) {				
+					if ($.inArray(a.industryList[i].logicalCompList[index].LOGICAL_COMP_NAME, comlogicalCompLists) === -1) {
+					comlogicalCompLists.push(a.industryList[i].logicalCompList[index].LOGICAL_COMP_NAME);
+						mapdata={};
+						mapdata=({
+						'logicalcompid':a.industryList[i].logicalCompList[index].LOGICAL_COMP_ID,
+						'logicalcompname': a.industryList[i].logicalCompList[index].LOGICAL_COMP_NAME,
+						'sortorder':a.industryList[i].logicalCompList[index].SORT_ORDER,
+						'solutionarea':a.industryList[i].logicalCompList[index].solutionAreaList
+						});
+					mapdataArr.push(mapdata);							
+					}
+				});
+			}
+		}
+		sortedmapArr=mapdataArr.sort(compare);
+		//sorted mapdataarr 
+		function compare(a,b) {
+		  if (a.sortorder < b.sortorder)
+		    return -1;
+		  if (a.sortorder > b.sortorder)
+		    return 1;
+		  return 0;
+		}
+	//console.log("sortedMap "+sortedmapArr);
+	//console.log("JSON :"+JSON.stringify(data));
+	
+	var solution_area = "";
+		for(var j=0; j<mapdataArr.length; j++){
+			var ele=$("<tr></tr>");				
+			var ldata="<td class='leftside' id='lcname'><span>"+mapdataArr[j].logicalcompname +": </span></td>";
+			ele.append(ldata);
+			for(var c=0;c<mapdataArr[j].solutionarea.length; c++){
+				
+				var ldata2="<td class='leftside' id='lcname'><span class='box-style2 box-style2active' id="+mapdataArr[j].solutionarea[c].sol_area_id+">"+mapdataArr[j].solutionarea[c].sol_area_name +"</span></td>";
+				
+				ele.append(ldata2);
+			}
+			ele.appendTo("#solarch");
+		}
+		console.log("ELE: "+ele);
+			//}
+	
+		var amsArray=[];
+		//Adding all Ams based id in Amsarray
+		$('[id^="lcname"]').each(function(index,object){
+			var id =$(this).parents("tr").find('span:eq(0)').text();
+			//console.log("id "+id);
+			 if(id.toString().trim()==="AMS:"){
+					 console.log("id "+id);
+					var solAreaId=$(this).find('span').attr('id');
+					amsArray.push(solAreaId);
+			} 
+				
+		});	
+		changeColorSolutionArea();
+	
+	function changeColorSolutionArea(){
+		for(i=0; i<$("#solAreaTable tr").length-1 ;i++){
+			var result  = $("#solAreaTable tr").eq(i).find("td").eq(0).text();
+			var c= 1;
+			$("#solarch tr td").each(function(index){
+				//console.log("1 "+$("#solarch tr").find("td").eq(c).text());
+				//console.log("BBBBBBBBB  "+($("#solarch tr").find("td").eq(c).text().trim() == result.toString().trim()));
+				if(($("#solarch tr").find("td").eq(c).text().trim() == result.toString().trim())){
+					//$(this).removeClass('box-style2.box-style2active').addClass('box-style2.box-style2active.btnstyle2select');
+					//$(".box-style2").addClass('box-style2 box-style2active btnstyle2select');
+					console.log("THIS "+$(this));
+					var element = $("#solarch tr td").find("span").eq(c).attr("id");
+					$("#"+element).attr('class','');
+					$("#"+element).attr('class','box-style2 box-style2active btnstyle2select');
+					// on load adding disabling the other two ams sol areas 
+					/*  var point=amsArray.indexOf(element);
+					if(amsArray.indexOf(element)>0){
+					    for(var i=1; i<amsArray.length; i++){
+							if(i!=point){
+								console.log("disabling "+amsArray[i]);
+								 $("#"+amsArray[i]).attr('class',''); 	
+								 $("#"+amsArray[i]).attr('class','box-style2');
+							}
+						}
+					 }//end of disabling  */
+					//  console.log("ELEMENT "+element);
+					 // $().removeClass('box-style2 box-style2active').addClass('box-style2 box-style2active btnstyle2select');
+				}
+				c=c+1;
+				
+			});
+		}//end of for 	
+	}
+	
+		/*}*/
+		$(".box-style2").click(function(){
+				//console.log($(this));
+				//removerows();
+				var solAreaId=$(this).attr('id');
+				if($(this).hasClass("btnstyle2select") && $(this).hasClass("box-style2active")){
+					//solareapop($(this).text())
+					console.log("after clicking already selected solarea:::removing selection "+solAreaId);
+					//solAreaButton
+					removeRow2($(this).text(),solAreaId);
+					//touchedSolAreas.remove($(this).attr('id'));
+					var index = touchedSolAreas.indexOf(solAreaId);
+					if (index > -1) {
+					  touchedSolAreas.splice(index, 1);
+					}
+
+					for(i=0; i<$("#solAreaTable").find("tr").length-1; i++){
+						$("#solAreaTable tr").eq(i).css("display", "none")
+					}
+					$(this).removeClass("btnstyle2select");
+					
+					
+				}
+				else if($(this).hasClass("box-style2active")){
+					console.log("after active but not already selected solarea:: adding selection ");
+					$(this).toggleClass("btnstyle2select");
+					//solareapush($(this).text(),);
+					var currentId = $(this).attr('id');
+					var preexists = solAreasUpperIds.find( function( ele ) { 
+						return ele === currentId;
+					} );
+					
+					
+					
+					//alert("preexists: "+preexists);
+					if (typeof preexists === 'undefined'){
+						addRow2($(this).html(), $(this).attr('id'));
+						for(i=0; i<$("#solAreaTable").find("tr").length-1; i++){
+							$("#solAreaTable tr").eq(i).css("display", "none")
+						}
+					} else{
+						
+						touchedSolAreas.push($(this).attr('id'));
+					}
+					
+					//disabling rest of the ams sol areas other than selected
+					if(amsArray.indexOf(solAreaId)>0){
+						var index=amsArray.indexOf(solAreaId);
+						for(var i=1; i<amsArray.length; i++){
+							 if(i!=index){
+								 	//console.log('removing remaining '+amsArray[i]);
+									removeRow2($(this).parents("tr").find('span:eq('+i+')').text(),amsArray[i]);
+									touchedSolAreas.splice(index, 1);
+									$(this).parents("tr").find('span:eq('+i+')').removeClass("btnstyle2select");
+									//console.log(" touchedSolAreas ..."+touchedSolAreas);
+							 }
+						}
+						 
+					}//end of if
+					
+											
+					//console.log('touchedSolAreas '+touchedSolAreas);
+				}
+		});
+		var solareaarr=[];
+			function solareapush(x){
+				solareaarr.push(x);
+				//console.log(solareaarr)
+			}
+			function solareapop(y){
+				for(i in solareaarr){
+					if(solareaarr[i]==y){
+						solareaarr.splice(solareaarr.indexOf(y),1);
+					}
+					//console.log(solareaarr)
+				}
+			}
+			function removeRow2(sname, id){
+				//console.log("remove row")
+				//deletedSolnAreas.push(id);
+				var table=document.getElementById("solAreaTable");
+				//table.deleteRow(0);
+				$("#solAreaTable tr").each(function(index){
+					if($("#solAreaTable tr").eq(index).find("td").eq(0).text() == sname)
+					{
+						//console.log("oooo : "+Object.values($("#solAreaTable tr td").find('button')));
+						//deletedSolnAreas.push($("#solAreaTable tr td").find('button'));
+						//alert("Remove : "+sname);
+						$("#solAreaTable").find("tr").eq(index).remove();
+						
+					}
+				})
+				
+			}
+			
+		
+		function addRow2(solareaval, solareaid) {
+			//console.log("addRow2 val "+solareaval);
+			var table=document.getElementById("solAreaTable");
+			//console.log("addRow2 id "+solareaid);
+			var id =solareaid;
+			var val = solareaval;
+			//var index = x.selectedIndex;
+
+			//alert("Solution area id : " + id + "Name : " + solareaval);
+			if(id) { 
+				
+				var row = table.insertRow(0);
+			
+
+				row.innerHTML  = "<tr id="+id+" name='solAreaEntry'><td id='solAreaName' name = '"+id+"' class=\"tdTableLabel\" colspan='1' align='left'>"+val+"</td><td class='tdTableLabel' > <input type=\"hidden\" id='solutionAreaInfo' name ='solutionAreaInfo'><button type='button' name='1' class='redbutton' id='solAreaButton1' onclick='deleteExistingSolArea(this)'>Delete&nbsp;&nbsp;</button></td></tr>";
+				//console.log("row "+row);
+				document.getElementById("solAreaName").innerHTML = val;
+
+				document.getElementById("solutionAreaInfo").value = id;
+				//$(row).appendTo("#solAreaTable");
+
+				//x.value = '';
+				//x.remove(index);
+				//console.log(x);
+			}
+		}
+				
+		
+	}	
+	});
+
+
+
+	/// Calling REST service to get the data of Solution Area information by passing service line id.
+	/*$.ajax({url: "/solutionAreaForIndustry/"+industryId, success: function(data) {
+
+		var option = $("<option/>");
+		option.attr("value", "").text("Select");
+		solutionAreaInfo.append(option);
+		var selectionValue= "{{solutionAreaInfo}}";
+		for (var i = 0; i < data.length; i++) {	
+			if(selectionValue == data[i].sol_area_id)
+				option = $("<option selected/>");
+			else
+				option = $("<option/>");
+
+			option.attr("value", data[i].sol_area_id).text(data[i].sol_area_name);
+			var flag = true;
+
+			{% for ob in solAreaDetails %}
+			var existing = {{ ob.sol_area_id }};
+
+			if(existing == data[i].sol_area_id ) {
+
+				flag = false;
+
+			}
+
+			{% endfor %}
+			if(flag == true) {
+				solutionAreaInfo.append(option);
+			}
+			
+		}
+	}
+});*/
+/// End of function for populating Solution Area Information Drop Down for industry Id
+// Changes made for #5215
+var IOTInfo = $('#IOTInfo');
+IOTInfo.empty();        
+
+$.ajax({url: "/getIOTInfo", success: function(data) {
+	var option = $("<option/>");
+	option.attr("value", "").text("Select");
+	IOTInfo.append(option);
+	var selectionValue= "{{iotinfo}}";
+	{% if solInfo[0].iot_id %}	
+	var selectionValue= {{solInfo[0].iot_id}};
+	{% endif %}
+	for (var i = 0; i < data.length; i++) {	
+		if(selectionValue == data[i].iot_id) {
+			option = $("<option selected/>");
+		} else {
+			option = $("<option/>");
+		}
+			
+		option.attr("value", data[i].iot_id).text(data[i].iot_name);
+		IOTInfo.append(option);
+	}
+}
+});
+
+
+var LeadCountryInfo = $('#LeadCountryInfo');
+LeadCountryInfo.empty();  
+
+$.ajax({url: "/getLeadCountryInfo", success: function(data) {
+	var option = $("<option/>");
+	option.attr("value", "").text("Select");
+	LeadCountryInfo.append(option);
+	var selectionValue= "{{leadcountryinfo}}";
+	{% if solInfo[0].country_id %}	
+	var selectionValue= {{solInfo[0].country_id}};
+	{% endif %}
+	for (var i = 0; i < data.length; i++) {	
+		if(selectionValue == data[i].COUNTRY_ID) {
+			option = $("<option selected/>");
+		} else {
+			option = $("<option/>");
+		}
+			
+		option.attr("value", data[i].COUNTRY_ID).text(data[i].COUNTRY_NAME);
+		LeadCountryInfo.append(option);
+	}
+}
+});
+
+});
+
+function getIMTInfo(id) {
+
+   // Changes made for #5215         
+   var IMTInfo = $('#IMTInfo');
+   IMTInfo.empty();        
+
+   $.ajax({url: "/getIMTInfo/"+id, success: function(data) {
+   	var option = $("<option/>");
+   	option.attr("value", "").text("Select");
+   	IMTInfo.append(option);
+   	var selectionValue= "{{imtinfo}}";
+   	{% if solInfo[0].imt_id %}	
+   	var selectionValue= {{solInfo[0].imt_id}};
+   	{% endif %}
+   	for (var i = 0; i < data.length; i++) {	
+   		if(selectionValue == data[i].imt_id)
+   			option = $("<option selected/>");
+   		else
+   			option = $("<option/>");
+
+   		option.attr("value", data[i].imt_id).text(data[i].imt_name);
+   		IMTInfo.append(option);
+   	}
+   }
+});
+
+}
+
+
+function getIMTIOTInfo(id) {
+	$.ajax({url: "/getIMTIOTInfo/"+id, success: function(data) {
+		for (var i = 0; i < data.length; i++) {	
+			$("#country_id").val(id);
+			$("#imt_id").val(data[i].imt_id);
+			$("#iot_id").val(data[i].iot_id);
+			$("#IOTInfo").val(data[i].iot_id)
+	
+		}
+	}
+});
+}
+
+function addRow() {
+	var table = document.getElementById("solAreaTable");
+	var x=document.getElementById("solutionAreaInfoTemp");
+	var val = x.options[x.selectedIndex].text;
+	var id = x.options[x.selectedIndex].value;
+	var index = x.selectedIndex
+	if(id) { 
+
+		var row = table.insertRow(0);
+		row.innerHTML = "<tr bgcolor='#e1e0e0'><td id='solAreaName' class=\"tdTableLabel\" colspan='1' align=left></td><td> <input type=\"hidden\" id='solutionAreaInfo' name ='solutionAreaInfo'></td><td  class=\"tdspace\" colspan='1' align=\"right\"><button class=\"redbutton\" id=\"solAreaButton\"  onclick=\"deleteR(this)\">Delete&nbsp;&nbsp;</button></td></tr>";
+
+		row.setAttribute("name","solAreaEntry");
+		
+		var x=document.getElementById("solutionAreaInfoTemp");
+		var val = x.options[x.selectedIndex].text;
+		var id = x.options[x.selectedIndex].value;
+		document.getElementById("solAreaName").innerHTML = val;
+
+		document.getElementById("solutionAreaInfo").value = id;
+
+		x.value = '';
+		x.remove(index);
+
+	}
+
+}
+
+function deleteR(r) {
+	var i = r.parentNode.parentNode.rowIndex;
+
+	document.getElementById("solAreaTable").deleteRow(i);
+	var x=document.getElementById("solutionAreaInfoTemp");
+	var option = document.createElement("option");
+
+	option.text = r.parentNode.parentNode.cells[0].innerHTML;
+	option.value = r.parentNode.parentNode.cells[1].getElementsByTagName("input")[0].value;
+	x.add(option);
+
+
+}
+
+function deleteExistingSolArea(row){
+	//alert("entered::deleteExistingSolArea");
+	var rowButton = document.getElementById(row.id);
+	rowButton.innerHTML = "Restore";
+	//rowButton.onclick="restoreExistingSolArea(this)";
+	rowButton.setAttribute( "onClick", "javascript: restoreExistingSolArea(this);" );
+	//add it in a list for tracking
+	deletedSolnAreas.push(row);
+	//alert("deletedSolnAreas::--"+deletedSolnAreas);
+}
+
+function restoreExistingSolArea(row){
+	//alert("entered::restoreExistingSolArea");
+	var rowButton = document.getElementById(row.id);
+	rowButton.innerHTML = "Delete&nbsp;&nbsp;";
+	//rowButton.onclick="deleteExistingSolArea(this)";
+	rowButton.setAttribute( "onClick", "javascript: deleteExistingSolArea(this);" );
+	
+	var index = -1;
+	
+	deletedSolnAreas.splice(deletedSolnAreas.indexOf(row),1);
+	//alert("deletedSolnAreas::"+deletedSolnAreas);
+}
+
+
+
+function validate() {
+
+		var exists = false;
+		
+		
+		$.ajax({url: "/checkSCIDExists?scid="+$("#opportunityId").val().trim(), async: false, success: function(data) {
+	
+			//console.log("solutionAreaForIndustry JSON :----> "+JSON.stringify(data));
+			
+			if(data[0].count > 0){
+				exists = true;
+			} else{
+				//keep going;
+			}
+		}
+		});
+		
+		if(exists){
+			alert("Please provide unique value for opportunityId.");
+
+			return false;
+		}
+
+	if($("#opportunityId").val().trim() == ''){
+		alert("Please provide suitable value for opportunityId.");
+		
+		return false;
+	}
+	
+	if($("#clientName").val().trim() == ''){
+		alert("Please provide suitable value for clientName.");
+		
+		return false;
+	}
+
+	if (document.getElementById("solutionAreaInfo")) {
+		return true;
+	}
+
+	else {
+		alert("Please select at least one solution area.");
+		return false;
+	}
+}
+
+function markDeletion(r) {
+
+	var table = document.getElementById("solAreaTable");
+	var x=document.getElementById("solutionAreaInfoTemp");
+	var val = x.options[x.selectedIndex].text;
+	var id = x.options[x.selectedIndex].value;
+	if(id) { 
+
+		var row = table.insertRow(0);
+		row.innerHTML = "<tr bgcolor='#e1e0e0' name='solAreaEntry'><td id='solAreaName' class=\"tdTableLabel\" colspan='1' align=left></td><td> <input type=\"hidden\" id='solutionAreaInfo' name ='solutionAreaInfo'></td><td  class=\"tdspace\" align=\"right\"><button class=\"smallredbutton\" id=\"solAreaButton\" onclick=\"deleteR(this)\" >Delete&nbsp;&nbsp;</button></td></tr>";
+		
+		row.setAttribute("name","solAreaEntry");
+		
+		var x=document.getElementById("solutionAreaInfoTemp");
+		var val = x.options[x.selectedIndex].text;
+		var id = x.options[x.selectedIndex].value;
+		document.getElementById("solAreaName").innerHTML = val +'(New)';
+		document.getElementById("solutionAreaInfo").value = id;
+
+	}
+}
+
+function OnSubmitForm() {
+	
+	
+	if(clicked == 'submit') {
+		
+		//alert("enter inside OnSubmitForm ");
+		//Delete functionality
+		for(var j=0; j<$("#solAreaTable tr").length-1 ;j++){
+			var id2  = $("#solAreaTable tr").eq(j).find("td").eq(0).attr("name");
+			console.log("Lower  : "+id2);
+			solAreasLowerIds.push(id2);
+		}
+		
+		//Delete machanism
+		function arrayDiff(a, b) {
+    return a.filter(function(i) {
+        if (b.indexOf(i) < 0) {
+            diffIndexes.push(a.indexOf(i));
+            return true;
+       	 } else {
+            return false;
+       		 }
+    	});
+	};
+	var diffIndexes = [];
+	
+	console.log(JSON.stringify("solAreasUpperIds: "+solAreasUpperIds));
+	console.log(JSON.stringify("solAreasLowerIds: "+solAreasLowerIds));	
+	console.log(JSON.stringify("touchedSolAreas: "+touchedSolAreas));
+	
+	touchedSolAreas = $.unique(touchedSolAreas);
+	
+	console.log(JSON.stringify("touchedSolAreas: "+touchedSolAreas));
+	
+	var concatenatedArray = solAreasLowerIds.concat(touchedSolAreas);
+	
+	console.log(JSON.stringify("concatenatedArray: "+concatenatedArray));
+	
+	var diffValues = arrayDiff(solAreasUpperIds, concatenatedArray);
+
+	console.log("differences  : "+diffValues); 
+
+console.log(JSON.stringify("diffValues: "+diffValues));
+	diffValues = $.unique(diffValues);
+    
+    console.log("diffval "+diffValues);
+    
+    for(var i=0 ;i<diffValues.length; i++){
+		deletedSolnAreas.push(diffValues[i]);
+	}
+	
+console.log(JSON.stringify("deletedSolnAreas: "+deletedSolnAreas));		
+		//Make sure that atleast one soln Area is added in opportunity
+		
+		var buttons = $("table[id='solAreaTable'] tr button[id^='solAreaButton']")
+		
+		//alert("count: "+buttons.length);
+		
+		var goodToGo = false;
+		
+		/*
+		for (var i = 0; i < buttons.length; i++){
+			//alert("o.innerHTML::"+buttons[i].innerHTML);
+			if(buttons[i].innerHTML.search("Delete") != -1){
+				goodToGo = true;
+				break;
+			}
+		} */
+		
+		//alert("concatenatedArray.length: "+concatenatedArray.length);
+		
+		if(concatenatedArray.length > 0){
+			goodToGo = true;
+		}
+		
+		//alert("goodToGo::"+goodToGo);
+		
+		if(!goodToGo){
+			alert("Please select atleast one solution area");
+			return false;
+		}
+		
+		//Delete deleted soln areas one by one from Server
+		$.ajaxSetup({async: false});
+		//alert("Delete count " +  deletedSolnAreas.length);
+		
+		$(deletedSolnAreas).each(function( index ) {
+			//remove that row now
+			//var i = deletedSolnAreas[index].parentNode.parentNode.rowIndex;
+			//alert("row num>>"+i);
+			var tElement = document.getElementById("solAreaTable");
+			//tElement.deleteRow(i);
+			
+			deletedSolnAreas = $.unique(deletedSolnAreas);
+			//alert("sol_area_id to be deleted :: "+deletedSolnAreas[index]);
+			$.post("/deleteSolArea",{sol_id:$('#sol_id').val(),sol_area_id:deletedSolnAreas[index]}, function(data, status){
+				if(data!="Error: connect ECONNREFUSED"){
+					//alert(data);
+				}else{	
+					//alert("failed");//need to check what to do here
+				}
+			});
+		});
+
+		//alert("Before modify action :: ??");
+		//$.ajaxSetup({async: false});
+		//do regular flow	
+		document.getElementById("modifySolutionDetailsForm").action="/modifySolutionDetails";
+	} else {
+		document.getElementById("modifySolutionDetailsForm").action="/deleteOpportunity";
+		return confirm("Are you sure you want to delete the selected item?");
+	}	
+	
+	return true;
+
+}
+
+
+function deleteOpportunity(solutionId) {
+	
+	
+	document.getElementById("modifySolutionDetailsForm").action="/deleteOpportunity";
+	document.getElementById("modifySolutionDetailsForm").submit();
+	return true;
+}
+
+// Changes done for #5215
+function showSalesConnectInfo(){
+	document.getElementById("salesConnectInfo").style.display = "inline";
+}
+//Changes done for #5215
+function closeSalesConnectInfo(){
+	document.getElementById("salesConnectInfo").style.display = "none";
+}
+//Changes done for #5215
+function addSalesConnectInfo(){
+	if(document.getElementById("smr").value==""){
+		alert("Please enter SMR number");
+		return false;
+	}else{
+		document.getElementById("smr_number").value = document.getElementById("smr").value;        
+	}	
+
+	if(document.getElementById("IMTInfo").value==""){
+		alert("Please select IMT value");
+		return false;
+	}else{
+		document.getElementById("imt_id").value = document.getElementById("IMTInfo").value;
+	}
+
+	if(document.getElementById("IOTInfo").value==""){
+		alert("Please select IOT value");
+		return false;
+	}else{
+		document.getElementById("iot_id").value = document.getElementById("IOTInfo").value;
+	}
+	
+	if(document.getElementById("LeadCountryInfo").value==""){
+		alert("Please select Lead Country");
+		return false;
+	}else{
+		document.getElementById("country_id").value = document.getElementById("LeadCountryInfo").value;
+	}
+
+	if(document.getElementById("ownerEmail").value!=""){	
+		var email = document.getElementById("ownerEmail").value;
+		var filter = /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/;
+		if (filter.test(email)) {
+			document.getElementById("opportunity_owner_email").value = email;     
+		}else {
+			alert("Please enter valid email");
+			return false;
+		}
+	}
+
+
+	if(document.getElementById("RiskRating").value>=1 && document.getElementById("RiskRating").value <= 10){
+		document.getElementById("risk_rating").value = document.getElementById("RiskRating").value;
+	}else{
+		alert("Risk rating value should be in range of 1 to 10");
+		return false;
+	}
+
+	document.getElementById("salesConnectInfo").style.display = "none";
+
+}
+</script>
+
+<style>
+.slider-wrap {
+	position: relative;
+	margin: 50px auto;
+	width: 520px;
+}
+.slider {
+	position: relative;
+	width: 450px;
+	margin: auto;
+}
+ul {
+	margin: 0;
+	padding: 0;
+}
+ul li {
+	list-style: none;
+	text-align: center;
+}
+ul li span {
+	display: inline-block;
+	vertical-align: middle;
+	width: 100px;
+	height: 100px;
+	background: black;
+}
+.slider-arrow {
+	position: absolute;
+	top: 40px;
+	width: 20px;
+	height: 20px;
+	background: black;
+	color: #fff;
+	text-align: center;
+	text-decoration: none;
+	border-radius: 50%;
+}
+.sa-left {
+	left: 10px;
+}
+.sa-right {
+	right: 10px;
+}
+.black {
+	background: black;
+}
+.red {
+	background: red;
+}
+.green {
+	background: green;
+}
+.blue {
+	background: blue;
+}
+.yellow {
+	background: yellow;
+}
+.btnstyle3select {
+    border: 3px solid #467656;
+    background: #467656;
+    color: #fff;
+    width: 32%;
+ }  
+.box-style{
+	background: #fff;
+	border: 3px solid #467656;
+	display: inline-block;
+	height: 169px;
+	width: 169px;
+	margin: 10px 2%;
+	padding: 61px 8px;
+	text-align: center;
+	vertical-align: middle;
+	cursor:pointer;
+}
+.carousel-control{
+	width:2% !important;
+}
+.carousel-control.left{
+	background:none !important;
+}
+.carousel-control.right{
+	background:none !important;
+}
+.selected{
+	background: #467656;
+}
+.carousel-control .glyphicon-chevron-left, .carousel-control .glyphicon-chevron-right, .carousel-control .icon-next, .carousel-control .icon-prev{
+	margin-left:-60px !important;
+}
+.box-style2{
+	background: #a2a2a2;
+	border:none;
+	display: inline-block;
+	margin: 25px 1% 12px;
+	text-align: center;
+	vertical-align: middle;
+	height: 110px;
+	width: 110px;
+	padding: 10px;
+	color: #e0e0e0;
+	font-size: 13px;
+	overflow: hidden;
+}
+.box-style2active{
+	background: #fff;
+	border: 3px solid #467656;
+	display: inline-block;
+	margin: 30px 10px;
+	text-align: center;
+	vertical-align: middle;
+	height: 79px;
+    width: 110px;
+    padding: 14% 11px 0px;
+	font-size: 13px;
+	overflow:hidden;
+	color: #0f0f0f;
+}
+.leftside{
+	width:130px !important;
+}
+.tdlebel2{
+	margin-top: 30px;
+	background-color: #cccccc;
+	height: 35px;
+	line-height: 35px;
+	padding-left: 15px;
+	font-weight: bold;
+	font-size: 15px;
+	color: #000066;
+}
+.datacontainer{
+	width:800px;
+}
+.btnstyle2select{
+	border: 3px solid #467656;
+	background: #467656;
+	color:#fff;
+	cursor: pointer;
+}
+::-webkit-scrollbar {
+    width: 5px;
+}
+ 
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 5px;
+}
+ 
+::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+.carousel-control.right {
+    right: 100px !important;
+}
+
+body{
+	background: #f4f4f4;
+	border-top: 5px solid #0074c1;
+}
+.slider-wrap {
+	position: relative;
+	margin: 50px auto;
+	width: 520px;
+}
+.mainInner {
+	background-image:none;
+} 
+
+</style>
+</head>
+<body class="mainInner">
+	<div class="divWidth">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+			<div class="NavDiv">
+				<div class="nav">
+					<ul>
+						<li class="home"><a href="dashboard">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+					</ul>
+					<!-- <div class="SeaDiv"><img src="/static/images/search.jpg"></div> -->
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop">
+							<img src="/static/images/search.jpg">
+							<div id="two" class="popupBox">
+								<form method="post" action="/searchOpportunity" id="search">
+									<input type="text" value="" name="searchOpportunity" id="searchOpportunity" required class="popInput placeholder-fix" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Opportunity Name or Sol Id">
+									<input type="submit" value="Search" class="popButton">
+								</form>
+							</div>
+						</div>
+					</div> 
+				</div>
+			</div>
+		</div>
+	
+
+
+	</div>
+	<div class="InnDiv" ></div>
+	<form  method="post" name="modifySolutionDetailsForm" id ="modifySolutionDetailsForm" onsubmit="return OnSubmitForm();">
+		<div class="divWidth">
+			<div class="loginInfo ">Hello {{ user.attributes.firstName }} {{user.attributes.lastName}}</div>
+			<p>Modify Opportunity</p>
+			<table width="100%" cellpadding="0" cellspacing="0" border="0">
+				{% if errorMessage %}
+				<tr>
+					<td colspan="2" class="tdErrorMsg">{{errorMessage}}</td>
+				</tr>
+				{% endif %}
+				<tr>
+					<td colspan="2" class="tdmarg">About your Clients</td>
+				</tr>
+				<tr>
+					<td colspan="2"><font color="red">*Do not put in real names of customers or clients that are identifiable. Use anonymization.</font></td>
+				</tr>
+				<tr>
+					<td class="tdspace" colspan="1"> <input type="text"  class="focus" name="opportunityId" id="opportunityId" value="{{solInfo[0].opportunity_id}}" placeholder="{{solInfo[0].opportunity_id}}"   maxlength=20 autocomplete="off" required /></td>
+
+					<td class="tdspace" colspan="1" align="right">
+						<input type="text" class="focus" name="clientName" id="clientName" value="{{solInfo[0].Customer_Name}}" placeholder="{{solInfo[0].sol_id}}" required />
+						<input type="hidden" id='sol_id' name ='sol_id' value="{{solInfo[0].sol_id}}">
+						<input type="hidden" id='industryInfo' name ='industryInfo' value="{{solInfo[0].indus_id}}">
+					</td>
+				</tr>
+				<tr>
+					<td  class="tdspace" colspan="1" align="left"> 
+						<select name="LeadCountryInfo" id="LeadCountryInfo" required>
+							<option value="" selected>-Lead Country-</option>
+						</select> 
+					</td>
+					<td  class="tdspace" colspan="1" align="right" style="display:none"> 
+						<select name="IOTInfo" id="IOTInfo" style="display:none">
+							<option value="" selected>-IOT-</option>
+						</select> 
+					</td>
+					<td  class="tdspace" colspan="1" align="right"> 
+						<select name="deliveryCenterInfo" id="deliveryCenterInfo" required>
+							<option value="" selected>-Proposed Delivery Center-</option>
+						</select> 
+					</td>
+					
+					
+				</tr>
+				
+				<tr>
+					<td colspan="2" class="tdmarg">Industry</td>
+				</tr>
+				
+				<tr>
+					<td  class="tdspace">  
+						<!-- <select disabled name="industryInfoSelect" id="industryInfoSelect" required>
+							<option value="" selected>-Industry-</option>
+						</select>  -->
+						<div id="industryInfoSelect">
+							<span class="box-style2"></span>
+						</div>
+					</td>
+				</tr>
+			</table>
+			<table width="100%" cellpadding="0" cellspacing="0" border="0" id="solAreaTable">
+
+				{% for ob in solAreaDetails %}
+				<tr name="solAreaEntry">
+					<td class="tdTableLabel" name = {{ob.sol_area_id}} align=left>{{ ob.sol_area_name }}</td>
+
+					<td class="tdTableLabel">{{ ob.creation_date }}</td>
+					{% set idVal = "solAreaButton" + ob.sol_area_id %}
+					<td  class="tdspace" align="right"><button type="button"  name = {{ob.sol_area_id}} class="redbutton" id = {{ idVal }} onclick="deleteExistingSolArea(this)">Delete&nbsp;&nbsp;</button></td>
+				</tr>
+				{% endfor %}
+
+				<tr bgcolor='#e1e0e0'style="display:none">
+					<td class="tdLabel" colspan="2" align=left >+Add another solution area</td>
+
+					<td  class="tdspace" colspan="1" align="right"> 
+						<select  name="solutionAreaInfoTemp" id="solutionAreaInfoTemp" onChange="addRow()" >		
+							<option value="" selected>-Solution Area-</option>
+						</select>
+					</td>
+				</tr>
+				
+				
+				</table>
+			
+			<input type="hidden" id='smr_number' name ='smr_number' value="{{solInfo[0].smr_number}}">  
+			<input type="hidden" id='imt_id' name ='imt_id' value="{{solInfo[0].imt_id}}">
+			<input type="hidden" id='iot_id' name ='iot_id' value="{{solInfo[0].iot_id}}">
+			<input type="hidden" id='country_id' name ='country_id' value="{{solInfo[0].country_id}}">
+			<input type="hidden" id='opportunity_owner_email' name ='opportunity_owner_email' value="{{solInfo[0].opportunity_owner_email}}">
+			<input type="hidden" id='risk_rating' name ='risk_rating' value="{{solInfo[0].risk_rating}}">
+			
+			<div class="tdlebel2">Solution Architecture</div>
+			<table width="100%" id="solarch"  cellpadding="5" cellspacing="5">
+			</table>
+		
+			
+			<table width="100%">
+			<tr>
+						<td style="width:15%" align="left"> <input type="submit" class="bluebutton" value="Submit" onclick="clicked='submit'"></td>
+						<td><input type="button" class="cancelbutton" onclick="javascript:history.go(-1);" value="Cancel"></td>
+						{% if showDelete==1 %}
+							<td align="right"><input type="submit" class="redbutton" onclick="clicked='delete'" value="Delete Opportunity"></td>
+						{% endif %}
+
+					</tr>
+			</table>
+			</div>
+		</form>
+		<div id="salesConnectInfo" >
+			<table width="100%" cellpadding="0" cellspacing="0" border="0">
+				<tr><td class="salesConnectInfoLabel" >SMR Number:</td><td class="tdspace" style="padding-right:15px;">
+					{% if solInfo[0].smr_number %}	
+					<input type="text"  class="focus"  name="smr" id="smr" value="{{solInfo[0].smr_number}}" pattern="[0-9]*"/>	
+					{% else %}
+					<input type="text"  class="focus"  name="smr" id="smr" />	
+					{% endif %}
+
+				</td></tr>
+				<tr><td colspan=2 align=right class="tdspace" style="padding-right:15px;"><button type="button" class="bluebutton" style="display:none;">Import</button></td></tr>
+
+				<tr>
+					<td class="salesConnectInfoLabel">IOT:</td>
+					<td class="tdspace" style="padding-right:11px;"><select name="IOTInfo" id="IOTInfo" required>
+						<option value="" selected></option>
+					</select>
+				</td>
+			</tr>
+			<tr><td class="salesConnectInfoLabel">IMT:</td>
+				<td class="tdspace" style="padding-right:11px;">
+					<select name="IMTInfo" id="IMTInfo" required>
+						<option value="" selected></option>
+					</select>
+				</td>
+			</tr>
+			<tr><td class="salesConnectInfoLabel">Opportunity owner Email:</td>
+				<td class="tdspace" style="padding-right:15px;">
+					{% if solInfo[0].opportunity_owner_email %}	
+					<input type="email" name="ownerEmail" value="{{solInfo[0].opportunity_owner_email}}" id="ownerEmail"> 
+					{% else %}
+					<input type="email" name="ownerEmail" id="ownerEmail"> 
+					{% endif %}
+				</td>
+			</tr>
+			<tr><td colspan=2 class="salesConnectInfoLabel"><hr></td></tr>
+			<tr><td class="salesConnectInfoLabel" width="35%">Risk Rating:</td>
+				<td class="tdspace"><input type="number" name="RiskRating" id="RiskRating" value="{{solInfo[0].risk_rating}}" style="width:35px;" min=1 max=10 /></td>
+			</tr>
+			<tr>
+				<td colspan=2 align=right class="tdspace" style="padding-right:7px;"><button class="bluebutton" onclick="addSalesConnectInfo();" >Save</button>&nbsp;&nbsp;&nbsp;<button type="button" class="cancelbutton" onclick="closeSalesConnectInfo()">Cancel</button></td>
+			</tr>
+		</table>
+
+		
+	</div>
+	<div class="divWidth">
+	
+	<div class="datacontainer">
+		<div id="solareacontainer">
+		
+		
+		</div>
+	</div>
+	<!--  <div class="divWidth">
+		<table width="100%" cellpadding="0" cellspacing="0" border="0">
+			<tr>
+				<td colspan="2"> 
+					<input type="submit" class="bluebutton" value="Submit" onclick="clicked='submit'">  &nbsp;&nbsp;&nbsp;
+					<input type="button" class="cancelbutton" onclick="javascript:history.go(-1);" value="Cancel">
+				</td>
+				<td align="right">
+					<input type="submit" class="redbutton" onclick="clicked='delete'" value="Delete Opportunity">
+				</td>
+			</tr>
+		</table>
+		<br><br>
+	</div>-->
+</div>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		function removerows3(){
+			for(i=0; i<$("#solAreaTable").find("tr").length-1; i++){
+				$("#solAreaTable tr").eq(i).css("display", "none");
+			}
+		};
+	removerows3();
+	
+	})
+	</script>
+</body>
+</html>

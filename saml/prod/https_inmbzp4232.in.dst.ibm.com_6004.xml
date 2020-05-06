@@ -1,0 +1,28 @@
+<EntityDescriptor entityID="https://inmbzp4232.in.dst.ibm.com:6004" xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+  <SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:X509Data>
+          <ds:X509Certificate>MIICzjCCAbYCCQDPCL4tiP6p2DANBgkqhkiG9w0BAQsFADApMScwJQYDVQQDDB5p
+bm1ienA0MjMyLmluLmRzdC5pYm0uY29tOjYwMDQwHhcNMTgwODAzMTIwMjI1WhcN
+MjgwODAyMTIwMjI1WjApMScwJQYDVQQDDB5pbm1ienA0MjMyLmluLmRzdC5pYm0u
+Y29tOjYwMDQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCz99lFrjFj
+TmRBeJ28c3lHNMNwcIhT99HDoapsyitOD0DC12TSfHuDh/EfVvntRzRDLxU0p4Pt
+SeC4/YdqZYHph5HWWTsysuDGrtFb1/dlcxQEwXwyomEho9Sg0Z3QFGrrGGRciixb
+NlXDZLj3r9E+4m6y4A1uCjXYyH1Ft8jbzqAybMvHje6N+wb5QZ8C8YRXCr+dpLwS
+VdryrI+QlBcSub2Gjq2h/6Y8V8YvcWR+ZGnSuOZhBmx5XfAbUpokrwQvGp6bfHwW
+CaklZ+POsAP6BwjiU2P8O3J+u4de+b7Zl/RZf9cJq98V+BQWG+c/ggHyF4Nzdwzy
+y08BB0WgW7mBAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAHu1kn7IflUCFXUsv+oq
+wRUQtu7jUTHoj9pvkfmMm+nansuyspGVVdecYoAkU54GLBu3dqSLnxE7EQ17Xunm
+O0fde+yRxV8MgIWIpzMOYf66awHbsRH9Vw63VzDF+imGzdqjTFhu5udLGXIWMptl
+8V+6oVH0koJ4CXa8sCMO8K4qL8xfoaze6CvrpgKAON89ymrxOhhsGpMBwuIIKmtt
+5Ucv9yiNYClMLldkWgc++IxQaAP/DV6H93VAcMo5TbkLMG+E6/kMI4A4illfhWH2
+B1gE0JONdSSJROveegnEZgnubTFOkXx704dujYywz/H7glh/DLZzLjHMeOdNHaHm
+TR0=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://inmbzp4232.in.dst.ibm.com:6004/logout"/>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://inmbzp4232.in.dst.ibm.com:6004/dashboard" index="0"/>
+  </SPSSODescriptor>
+</EntityDescriptor>

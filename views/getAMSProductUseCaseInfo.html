@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+		<title>Solution Advisor</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta "description" content="An interactive getting started guide for Edge Code CC.">
+	<link rel="stylesheet" href="static/css/style.css">
+	<link rel="stylesheet" href="static/css/jquery.modal.css">
+	<link rel="stylesheet" href="static/css/icon.css"> 
+ 	<link rel="stylesheet" href="static/css/3.3.7/bootstrap.min.css">
+ 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+ 	
+ 	
+	<script	src="static/js/main.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.min.js"></script>
+	<script	src="static/js/jquery.modal.js"></script>		
+ 	<script	src="static/js/close.js"></script>
+ 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+ 	<script src="static/js/3.3.7/bootstrap.min.js"></script>
+ 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	
+	
+<style type="text/css">
+   .select-editable1 {
+     position:relative;
+     background-color:white;
+    /*  border:solid grey 1px; */
+     border:none;
+     width:120px;
+     height:18px;
+ }
+ .select-editable2 {
+     position:relative;
+     background-color:white;
+    /*  border:solid grey 1px; */
+     border:none;
+     width:120px;
+     height:18px;
+ }
+ .select-editable3 {
+     position:relative;
+     background-color:white;
+    /*  border:solid grey 1px; */
+     border:none;
+     width:120px;
+     height:18px;
+ }
+ .select-editable1 select {
+     position:absolute;
+     top:0px;
+     left:0px;
+     border-style: solid;
+     width:240px;
+     margin:0;
+ }
+  .select-editable2 select {
+     position:absolute;
+     top:0px;
+     left:0px;
+     border-style: solid;
+     width:198px;
+     margin:0;
+ }
+  .select-editable3 select {
+     position:absolute;
+     top:0px;
+     left:0px;
+     border-style: solid;
+     width:169px;
+     margin:0;
+ }
+ .select-editable1 input {
+     position:absolute;
+     top:1px;
+     left:3px;
+     width:217px;
+     padding:1px;
+     font-size:12px;
+     /* border-style: solid; */
+     border:none;
+ }
+ .select-editable2 input {
+     position:absolute;
+     top:1px;
+     left:3px;
+     width:173px;
+     padding:1px;
+     font-size:12px;
+     /* border-style: solid; */
+     border:none;
+ }
+ .select-editable3 input {
+     position:absolute;
+     top:1px;
+     left:3px;
+     width:146px;
+     padding:1px;
+     font-size:12px;
+     /* border-style: solid; */
+     border:none;
+ }
+ 
+ .select-editable select:focus, .select-editable input:focus {
+     outline:none;
+ }
+    .table-title {
+        padding-bottom: 10px;
+        margin: 0 0 10px;
+    }
+    .table-title h2 {
+        margin: 6px 0 0;
+        font-size: 22px;
+    }
+    .table-title .add-new {
+        float: right;
+		height: 30px;
+		font-weight: bold;
+		font-size: 12px;
+		text-shadow: none;
+		min-width: 100px;
+		border-radius: 50px;
+		line-height: 13px;
+    }
+    
+	.table-title .add-new i {
+		margin-right: 7px;
+	}
+    table.table {
+        table-layout: fixed;
+    }
+    table.table tr th, table.table tr td {
+        border-color: #B2B2B2;
+    } 
+    table.table th i {
+        font-size: 13px;
+        margin: 0 5px;
+        cursor: pointer;
+    }
+    table.table th:last-child {
+        width: 100px;
+    }
+    table.table td a {
+		cursor: pointer;
+        display: inline-block;
+        margin: 0 1px;
+		min-width: 24px;
+    }    
+	table.table td a.add {
+        color: #27C46B;
+    }
+    table.table td a.edit {
+        color: #FFC107;
+    }
+    table.table td a.delete {
+        color: #E34724;
+    }
+    table.table td i {
+        font-size: 19px;
+    }
+	table.table td a.add i {
+        font-size: 24px;
+    	margin-right: -1px;
+        position: relative;
+        top: 3px;
+    }    
+    table.table .form-control {
+        height: 32px;
+        line-height: 32px;
+        box-shadow: none;
+        border-radius: 2px;
+        padding: 6px 8px;
+        font-family: sans-serif;
+        font-style: italic;
+        font-size: 12px;
+        color: #6a858c;
+    }
+	table.table .form-control.error {
+		border-color: #f50000;
+	}
+	table.table td .add {
+		display: none;
+	}
+	
+	.btn-color{
+		color:#fff;
+		background-color:#005eb5;
+		border-color:#2e6da4;
+		padding: 6px 20px;
+		font-size: 15px;
+	}
+	th {
+	    background-color: #C5C3C3;
+	 } 
+	
+	
+</style>
+	 
+<script type="text/javascript">
+var timeCount = 10000;
+var complexityobj={
+		Simple:20,
+		Medium:25,
+		Complex:30
+}
+function isProperValue(val){
+	
+	var temp = ""+val;
+	if(temp.length > 1 && temp.indexOf("0") == 0 ){
+		return false;
+	}
+	
+	return ($.isNumeric(val) && (val >= 0) && (Math.floor(val) == val));
+}
+
+/* var jsonArr = { 
+				"perfPercent":0, 
+				"entries": [],
+				"adapters": []
+			}; */
+var jsonArr = { entries: []};
+function validate() {
+	if ($("tr[id^='row']").length  == 0 ){
+		alert("Please provide atleast one service combination.");
+		return false;
+	}
+	
+	var allGood = true;
+	
+	//gather all records & make a json out of them
+	$( "tr[id^='row']" ).each(function( index, element ) {
+		var component = $(this).find('td:eq(0)').text();
+		var dcutEffort = $(this).find('td:eq(1)').text();
+		var complexity = $(this).find('td:eq(2)').text();
+		var complexityPercent = $(this).find('td:eq(3)').text();
+		var adjustedEfforts = $(this).find('td:eq(5)').text();
+		var justification = $(this).find('td:eq(6)').text();
+		
+		//allGood = isProperValue(dcutEffort) ;
+		//allGood = isProperValue(adjustedEfforts) ;
+		
+		if(($(this).find('.add').css('display')) == 'inline'){
+			allGood=false;
+			alert("Please confirm your changes by clicking Add or Delete button under Actions column to proceed");
+			return false;
+		}
+		var obj = {component:" ",dcutEffort:" ",adjustedEfforts:" ",complexity:" ",complexityPercent:"",justification:" "};
+		obj.component = component;
+		obj.dcutEffort = dcutEffort;
+		obj.adjustedEfforts = adjustedEfforts;
+		obj.justification = justification;
+		obj.complexity=complexity;
+		obj.complexityPercent=complexityPercent;
+		obj.indusId = $("#indusId").val();
+		
+		
+		jsonArr.entries[index] = obj;  
+	});
+
+	
+	/* $(document).on("click", "#submit-form", function(){ */
+	
+	if ($('#amsyears').val()==0){
+		alert("Please select AMS years.");
+		return false;
+	}
+	 if(parseInt($('#l15Support').val())==0 || parseInt($('#l2Support').val())==0 || parseInt($('#l3Support').val())==0){
+			alert("Please provide values for L1,L2,L3 support ");
+			return false;
+		} 
+		
+	//allGood=false;
+		//$("#submit-form").prop("disabled", true);
+    //});
+
+	if(allGood){
+		document.getElementById("amsValJson").value = JSON.stringify(jsonArr);
+		window.scrollTo(0, 0);
+		$(".showmodal").show();
+		checkSaveStatus(0);
+		return true;		
+	} else{
+		//alert("Please provide proper values ");
+		return false;
+	}		
+}
+
+function setLoad(){
+	//consol.log(window.pageYOffset +" "+window.pageXOffset);
+	if($(".showmodal").css("display") != 'none'){
+		$(".showmodal").css("top",window.pageYOffset);
+	}
+}
+
+function checkSaveStatus(count){
+	//alert($('#serviceURL').val()+'/download/query?solId='+$('#solId').val()+'&solAreaId='+$('#solAreaId').val());
+	var values = new Array();
+	
+	
+	setTimeout(function() {
+		$.ajaxSetup({async: false});
+		$.post("/checkSaveStatus",
+				{
+					solId:$('#solId').val(),
+					solAreaId:$('#currentSolAreaId').val(), 
+					testSolId:$("#testSolId").val(),
+					enbTestBtn:values.length
+				}, 
+				function(data, status){
+					//alert("Data: " + data + "\nStatus: " + status);
+					if(data!="Error: connect ECONNREFUSED"){
+						
+						if(data=="No"){
+							 if(count > 0){
+								 //$('a#advisorHome').click();
+								  console.log("data is NO and now dashboard");
+								 var addr= (window.location.href).split('/');	        		 
+								 window.location.href = addr[0]+"//"+addr[2]+"/dashboard";
+							 }else{
+								 console.log("data is NO and count <0");
+								$("#waitImg").hide();
+								$(".center").css("width","350px");
+								$("#waiText").show();
+								count++;
+								setTimeout(function() {
+									checkSaveStatus(1);
+								},timeCount);
+							}
+						}else{
+							//$("#waiText").hide();
+							//$(".showmodal").hide();
+							console.log("data is YES and now gotoSolutionsDetails");
+							document.getElementById("saveSolution").action = "/gotoSolutionDetails";
+							if(document.getElementById("testSolId").value == 'Y'){
+								document.getElementById("enbTestBtn").value = 1;
+							} else{
+								document.getElementById("enbTestBtn").value = 0;
+							}
+							document.getElementById("saveSolution").submit();
+							/* $.post("/gotoSolutionDetails",{solId:$('#solId').val(),enbTestBtn:values.length}, function(data, status){
+								
+							}); */
+						}
+					}else{
+						console.log("data can be Error: connect ECONNREFUSED");
+						$("#waitImg").hide();
+						$(".center").css("width","350px");
+						$("#waiText").hide();
+						$("#downText").show();
+						setTimeout(function() {
+							$("#downText").hide();
+							$(".showmodal").hide();
+						},3000);
+					}
+				}
+		);
+		$.ajaxSetup({async: true});
+	},timeCount);
+	
+}
+
+function setAmsFormData() {
+	 var amsyears = parseInt($("#amsyears option:selected").val());
+	 
+	//Flow from 
+	{% if defaultValues != null %}
+		//document.getElementById("productivityPercent").defaultValue = "{{defaultValues[0].productivity_percent}}";
+		var dbDate="{{defaultValues[0].start_transition_date}}";
+		console.log("date now 2"+typeof dbDate +dbDate.toString());
+		var existingDate = new Date(dbDate);
+		console.log("date from db "+JSON.stringify(existingDate)+"  date now "+existingDate.getDate()+existingDate.toString());
+		
+		var prodObj={
+				 prod1:"{{defaultValues[0].prod_yr1}}",
+				 prod2:"{{defaultValues[0].prod_yr2}}",
+				 prod3:"{{defaultValues[0].prod_yr3}}",
+				 prod4:"{{defaultValues[0].prod_yr4}}",
+				 prod5:"{{defaultValues[0].prod_yr5}}",
+			
+		 }
+		 const prodObjArr = Object.values(prodObj);
+		 var i=1;
+		 for (var key in prodObj) {
+			 if(i>amsyears){
+				break;
+			 }
+			 document.getElementById("productivityPercent"+i).defaultValue = prodObj[key];
+			 
+			 i++;
+		}
+		 
+	/* 	document.getElementById("productivityPercent1").defaultValue = "{{defaultValues[0].prod_yr1}}";
+		document.getElementById("productivityPercent2").defaultValue = "{{defaultValues[0].prod_yr2}}";
+		document.getElementById("productivityPercent3").defaultValue = "{{defaultValues[0].prod_yr3}}";
+		document.getElementById("productivityPercent4").defaultValue = "{{defaultValues[0].prod_yr4}}";
+		document.getElementById("productivityPercent5").defaultValue = "{{defaultValues[0].prod_yr5}}"; */
+		
+		document.getElementById("l15Support").defaultValue = "{{defaultValues[0].L1_5_tkts_percent}}";
+		document.getElementById("l2Support").defaultValue = "{{defaultValues[0].L2_tkts_percent}}";
+		document.getElementById("l3Support").defaultValue = "{{defaultValues[0].L3_tkts_percent}}";
+		 
+		$("#startTransitionDate").datepicker("setDate",dbDate);
+		document.getElementById("nonTicketingActPercent").defaultValue = "{{defaultValues[0].non_ticket_percent}}";
+		
+	{% endif %}
+}
+
+$(document).ready(function(){
+	
+	populateAMSYears();
+	var buttonState="new";
+	//$('#datetimepicker1').datetimepicker();
+	 $( "#startTransitionDate" ).datepicker({ dateFormat: 'yy-mm-dd' });
+	
+	$('#includeComponent_row').hide();
+	
+	$('[data-toggle="tooltip"]').tooltip();
+	var actions = $("table#componentTable td:last-child").html();
+	// Append table with add row form on add new button click
+    $(".add-new").click(function(){
+		$(this).attr("disabled", "disabled");
+		//$("#submit-form").prop("disabled", true);
+		buttonState = "add-new";
+		var index = $("table#componentTable tbody tr:last-child").index();
+		var currentIndex=index+1;
+		console.log("currentIndex--- "+currentIndex);
+		
+		var row = '<tr id="row'+currentIndex+'">' +
+         '<td ><input  class="form-control" style="line-height:30px;width:100%;" type="text" id="component-'+currentIndex+'" value="" ></td>'+
+		 '<td class="text-left"><input  class="form-control" style="line-height:30px;width:100%;" type="number" min="0" id="dcut-effort-'+currentIndex+'" value="" onChange="calculateFte('+currentIndex+')" ></td>'+
+		 '<td ><select class="form-control" id="complexity-'+currentIndex+'" onChange="calculateFte('+currentIndex+')" ></td>'+
+		 '<td class="text-left"><input class="form-control" style="line-height:30px;width:100%;" type="text"  id="complexityPercent-'+currentIndex+'" value="" onChange="calculateFte('+currentIndex+')" ></td>'+
+		 '<td class="text-left"><input disabled class="form-control" style="line-height:30px;width:100%;" type="text"  id="calculated-efforts-'+currentIndex+'" value="" ></td>'+
+		 '<td class="text-left"><input  class="form-control" style="line-height:30px;width:100%;" type="number" min="0" id="adjusted-efforts-'+currentIndex+'" value="" ></td>'+
+         '<td ><input  class="form-control" style="line-height:30px;width:100%;" type="text" id="justification-'+currentIndex+'" value="" ></td>'+
+		 '<td class="text-center" id="action-'+currentIndex+'">'+
+         	'<a class="add"  id="add" title="Add" data-toggle="tooltip"><i class="material-icons">check</i></a>'+
+         	'<a class="edit" id="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">build</i></a>'+
+         	'<a class="delete" id="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>' +
+         '</tr>';
+        
+       	$("table#componentTable").append(row);	
+    	$("table#componentTable tbody tr").eq(index + 1).find(".add, .edit").toggle();
+        $('[data-toggle="tooltip"]').tooltip();
+        $("#help"+currentIndex).attr("disabled", "disabled");
+        loadNewRow(currentIndex);
+       
+     });
+	
+    $(".editableBox").change(function(){         
+        $(".timeTextBox").val($(".editableBox option:selected").html());
+    });
+	// Add row on add button click
+	$(document).on("click", ".add", function(){
+		var emptyInput = false, emptySelect=false;
+		var selectedVal=[];
+		
+		var currentIndex=$(this).parents("tr").attr('id').slice(3);
+		var component=$(this).parents("tr").find("td:eq(0)").attr('id');
+	   
+		var existingKey=component;
+	   
+	 	
+		var input = $(this).parents("tr").find('input[type="number"]');
+		var inputSelect = $(this).parents("tr").find('select');
+		var inputText = $(this).parents("tr").find('input[type="text"]');
+				
+		input.each(function(){
+				if(!$(this).val()){
+				$(this).addClass("error");
+				emptyInput = true;
+			} else{
+                $(this).removeClass("error");
+             }
+		});
+        	 	
+      
+		inputSelect.each(function(){
+			if(!$(this).val()){
+				$(this).addClass("error");
+				emptySelect = true;
+			} else{
+				 //selectedVal.push($(this).find('option:selected').val());
+				 $(this).removeClass("error");
+              }
+		}); 
+		
+		 inputText.each(function(index, element){
+				if(!$(this).val()){
+					$(this).addClass("error");
+					empty = true;
+				} else{
+					if($(this).parents("tr").find("td:eq(0)"));
+						selectedVal.push($("#component-"+currentIndex).val());
+	           		$(this).removeClass("error");
+	        	 }
+			});
+		
+	    //checking in combination already exist of not
+	     var key =selectedVal[0];
+	    /*  for(sel = 1; sel<selectedVal.length; sel++){
+	    	  key+=selectedVal[sel];
+	      } */
+	    console.log("current row new key "+key+ " buttonstate "+buttonState+ " existing key "+existingKey);
+		var obj = entryList[key];
+		if(!emptySelect && !emptyInput){
+			if(buttonState=="add-new" ){
+					if(obj == undefined){
+					   		entryList[key]=10;
+					   } 
+					else{
+							alert("Given combination has already been added");
+					   		return;
+						} 
+				}
+			else if(buttonState="edit"){
+					if(obj == undefined){
+				   		entryList[key]=10;
+				   	} 
+					else{
+						delete entryList[existingKey];
+						if(entryList[key]==undefined){
+				   			entryList[key]=10;
+				   		}
+				   		else{
+				   			alert("Given combination has already been added");
+					   		return;
+				   		}
+					}
+				} 
+		
+			$(this).parents("tr").find(".error").first().focus();
+			
+			input.each(function(){
+					$(this).parent("td").html($(this).val());
+				});	
+				
+			inputSelect.each(function(){
+					var selectedVal=$(this).find('option:selected').val();
+					$(this).parent("td").attr('id', selectedVal);
+					$(this).parent("td").html($(this).find('option:selected').text());
+				});
+			inputText.each(function(){
+				$(this).parents("td").attr('id', $(this).val());
+				$(this).parents("td").html($(this).val());
+					
+			}); 
+			$(this).parents("tr").find(".add, .edit").toggle();
+			$(".add-new").removeAttr("disabled");
+			//$("#submit-form").prop("disabled", false);
+		}
+		//updatePerfEntries();
+		
+		
+    });
+	
+	// Delete row on delete button click
+	$(document).on("click", ".delete", function(){
+        $(this).parents("tr").remove();
+		$(".add-new").removeAttr("disabled");
+		var currentIndex= $(this).attr('id').slice(3);
+		//var component=$(this).parents("tr").find("td:eq(0)").attr('id');
+	 	var key = $("#component-"+currentIndex).val();
+		delete entryList[key];
+		//updatePerfEntries();
+		//$("#submit-form").prop("disabled", false);
+    });
+	//end
+	
+	// Edit row on edit button click
+	$(document).on("click",".edit", function(){
+		buttonState = "edit";
+		//$("#submit-form").prop("disabled", true);
+		var currentIndex= $(this).parents("tr").attr('id').slice(3);
+		console.log("current Index in edit "+currentIndex);
+		var selectedVal1=$(this).parents("tr").find("td:eq(0)").text();
+	    var selectedVal2=$(this).parents("tr").find("td:eq(1)").text();
+	    var selectedVal3=$(this).parents("tr").find("td:eq(3)").text();
+	    var selectedVal4=$(this).parents("tr").find("td:eq(4)").text();
+	    var selectedVal5=$(this).parents("tr").find("td:eq(5)").text();
+	    var selectedVal6=$(this).parents("tr").find("td:eq(6)").text();
+	    	       
+        $(this).parents("tr").find("td:not(:last-child)").each(function(){
+         
+	       $(this).parents("tr").find("td:eq(0)").html('<input  class="form-control" style="line-height:30px;width:100%;" type="text" name="component-'+currentIndex+'" id="component-'+currentIndex+'" value="'+$(this).val()+'" >');
+	       $(this).parents("tr").find("td:eq(1)").html('<input  class="form-control" style="line-height:30px;width:100%;" type="number" min="0" id="dcut-effort-'+currentIndex+'" value="'+$(this).val()+'" onChange="calculateFte('+currentIndex+')" >');
+	       $(this).parents("tr").find("td:eq(2)").html('<select class="form-control" id="complexity-'+currentIndex+'" onChange="calculateFte('+currentIndex+')">');
+	       $(this).parents("tr").find("td:eq(3)").html('<input  class="form-control" style="line-height:30px;width:100%;" type="text" min="0" id="complexityPercent-'+currentIndex+'" value="'+$(this).val()+'" onChange="calculateFte('+currentIndex+')">');
+		   $(this).parents("tr").find("td:eq(4)").html('<input  class="form-control" style="line-height:30px;width:100%;" type="text" min="0" id="calculated-efforts-'+currentIndex+'" value="'+$(this).val()+'" disabled >');
+	       $(this).parents("tr").find("td:eq(5)").html('<input  class="form-control" style="line-height:30px;width:100%;" type="number" min="0" id="adjusted-efforts-'+currentIndex+'" value="'+$(this).val()+'" >');
+	       $(this).parents("tr").find("td:eq(6)").html('<input  class="form-control" style="line-height:30px;width:100%;" type="text" id="justification-'+currentIndex+'" value="'+$(this).val()+'" >');
+	      
+        });	
+      
+        loadNewRow(currentIndex);
+         	        
+    	//$("#component-"+currentIndex).text(selectedVal1);
+    	
+    	$("#component-"+currentIndex).val(selectedVal1);
+    	$("#dcut-effort-"+currentIndex).val(selectedVal2);
+    	$("#complexityPercent-"+currentIndex).val(selectedVal3);
+    	$("#calculated-efforts-"+currentIndex).val(selectedVal4);
+    	$("#adjusted-efforts-"+currentIndex).val(selectedVal5);
+    	$("#justification-"+currentIndex).val(selectedVal6);
+    	
+    	//complexity
+    	
+    	$("#component-"+currentIndex).text(selectedVal1);
+    	$("#dcut-effort-"+currentIndex).text(selectedVal2);
+    	$("#complexityPercent-"+currentIndex).val(selectedVal3);
+    	$("#calculated-efforts-"+currentIndex).val(selectedVal4);
+    	$("#adjusted-efforts-"+currentIndex).text(selectedVal5);
+    	$("#justification-"+currentIndex).text(selectedVal6);
+    	
+    	$(this).parents("tr").find(".add, .edit").toggle();
+		$(".add-new").attr("disabled", "disabled");
+				
+    });
+	$(document).on("click", ".help", function(){
+		var url=$(this).attr("href");
+		window.open(url,"popup" , "width=800,height=600,scrollbars=yes,toolbar=no, menubar=no");
+		return false;
+	});
+
+		
+	//populate global var with keys for pre entered entries	
+	$( "tr[id^='row']" ).each(function( index, element ) {
+		var index=$(this).attr('id').slice(3);
+		//var component=$(this).find('td:eq(0)').attr('id'); 
+		
+	   	var key = $("#component-"+index).text();
+	   	calculateFteOnLoad(index);
+	   	console.log("key "+key);
+		var obj = entryList[key];
+		if(obj == undefined){
+			entryList[key]=10;
+		}
+	});
+	
+	$("#includeComponent").change(function(){
+		if(this.checked){
+			this.value='Y';
+		}else{
+			this.value='N';
+		}
+	});	
+	//updatePerfEntries();
+	setAmsFormData();
+	 {% if defaultValues==null %}
+		$("#addingNew").trigger("click");
+		for(var i=1;i<=5;i++){
+			$( "input[id^='productivityPercent"+i+"']").attr('disabled','disabled');
+		}
+	{% endif %}
+	//commenting the logic to enable/disable input based on no of ams years due to introduction of AMS Prod Calculator
+	
+	/* //setting productivityPercent
+	loadProductivityPercentTable();
+	
+	$("#amsyears").change(function(){
+		var newAmsYear=Number($('#amsyears :selected').text());
+		if(newAmsYear >0){
+			for(var i=1;i<=newAmsYear;i++){
+				$( "input[id^='productivityPercent"+i+"']").removeAttr('disabled');
+			}
+			for(var i=newAmsYear+1;i<=5;i++){
+				$( "input[id^='productivityPercent"+i+"']").attr('disabled','disabled');
+			}
+		}
+		else{
+			for(var i=1;i<=5;i++){
+				$( "input[id^='productivityPercent"+i+"']").attr('disabled','disabled');
+			}
+		}
+		
+	
+	});	 */
+	getStartWeek();
+	disableProductivityPercentTable();
+	$('#supportTable tr td').change(function() {
+	    console.log("call");
+	    if(parseInt($('#l15Support').val())>0 && parseInt($('#l2Support').val())>0 && parseInt($('#l3Support').val())>0){
+		    var total= parseInt($('#l15Support').val())+ parseInt($('#l2Support').val())+ parseInt($('#l3Support').val());
+		    console.log("call "+total);
+		    if(total!==100){
+		    	alert(" Support Level distribution should add to 100 :current "+total);
+		    	
+		    }
+	    } 
+	})
+	
+	
+});//end of ready
+
+function disableProductivityPercentTable(){
+	var amsyears=5;
+	
+	for(var i=1;i<=5;i++){
+	 $('#productivityPercent'+i).attr('disabled','disabled');
+	}
+}
+function getComplexity(){
+	var indexes =[];
+	var selected =[];
+	var complexityArray=['Simple','Medium','Complex'];
+	
+	for(var i=0;i<complexityArray.length;i++){
+		if(indexes.indexOf(complexityArray[i]) == -1){
+			indexes.push(complexityArray[i]);
+			selected.push(complexityArray[i]);
+		} 
+	}
+	return selected;
+	
+	
+}
+
+function calculateFte(currentIndex){
+	console.log("calculating complexity"+currentIndex);
+	var dcut=$('#dcut-effort-'+currentIndex).val();
+	var complexity=$('#complexity-'+currentIndex).find('option:selected').text()
+	var complexityPercent=$('#complexityPercent-'+currentIndex).val();
+	var calculatedFte=0;
+	
+	if(complexity!=="Select"){
+		calculatedFte=(dcut*(complexityobj[complexity]/100))/2070;
+		console.log("dcut-- "+dcut+" complexity "+complexity + " calculatedFte "+calculatedFte+" "+typeof $('#complexityPercent-'+currentIndex).val());
+				
+		if(complexityPercent.length==0){
+			$('#complexityPercent-'+currentIndex).val(complexityobj[complexity]);
+		}
+		else if(complexityPercent.length>0){
+			calculatedFte=(dcut*(complexityPercent/100))/2070;
+			console.log("dcut-- "+dcut+" complexity "+complexity + " complexityPercent "+complexityPercent);
+			//$('#calculated-efforts-'+currentIndex).val(calculatedFte.toFixed(2));
+		}
+		
+		$('#calculated-efforts-'+currentIndex).val(calculatedFte.toFixed(2));
+		$('#adjusted-efforts-'+currentIndex).val(calculatedFte.toFixed(2));
+	}
+	else
+		$('#calculated-efforts-'+currentIndex).val(0.00);
+	
+}
+
+function calculateNewFte(currentIndex){
+	console.log("calculating complexity"+currentIndex);
+	var dcut=$('#dcut-effort-'+currentIndex).val();
+	var complexity=$('#complexity-'+currentIndex).find('option:selected').text()
+	var complexityPercent=$('#complexityPercent-'+currentIndex).val();
+	if(complexity!=="Select"){
+		if(complexityPercent.length>0){
+			var calculatedFte=(dcut*(complexityPercent/100))/2070;
+			console.log("dcut-- "+dcut+" complexity "+complexity + " complexityPercent "+complexityPercent);
+			$('#calculated-efforts-'+currentIndex).val(calculatedFte.toFixed(2));
+		}
+	}
+	else
+		$('#calculated-efforts-'+currentIndex).val(0.00);
+	
+}
+
+function calculateFteOnLoad(currentIndex){
+	
+
+    var dcut=$('#row'+currentIndex).find("td:eq(1)").text();
+    var complexity=$('#row'+currentIndex).find("td:eq(2)").text();
+    var complexityPercent=$('#row'+currentIndex).find("td:eq(3)").text();
+    
+	if(complexity!=="Select"){
+		//var calculatedFte=(dcut*(complexityobj[complexity]/100))/2070;
+		var calculatedFte=(dcut*(complexityPercent/100))/2070;
+		console.log("dcut1-- "+dcut+" complexityPercent "+complexityPercent + " calculatedFte "+calculatedFte);
+		$('#row'+currentIndex).find("td:eq(4)").text(calculatedFte.toFixed(2));
+		$('#row'+currentIndex).find("td:eq(4)").attr('id',calculatedFte.toFixed(2));
+	}
+	else{
+		$('#row'+currentIndex).find("td:eq(4)").text(0.00);
+		$('#row'+currentIndex).find("td:eq(4)").attr('id',0.00);
+	}
+	
+}
+
+
+
+function toggleCheck(elm){
+	if(elm.checked){
+		$(elm).parent().parent().find('.testCheckBox').removeAttr("disabled");
+	}else{
+		$(elm).parent().parent().find('.testCheckBox').prop("checked", false);		
+		$(elm).parent().parent().find('.testCheckBox').attr("disabled", true);		
+	}
+	if(false == $(elm).prop("checked")){ //if this item is unchecked
+        $("#selectAllLOB").prop('checked', $(elm).prop("checked")); //change "select all" checked status to false
+    }
+}
+
+function loadNewRow(currentIndex){
+	var dropdown1 = $('#complexity-'+currentIndex);
+	var selectedVal1=dropdown1.parents("td").attr('id');
+	dropdown1.empty();
+ 	var option1 = $("<option/>");
+ 	option1.attr("value", "").text("Select");
+ 	dropdown1.append(option1);
+ 	
+ 	var results1 = getComplexity();
+ 	for(var i=0;i<results1.length;i++){
+ 		if (selectedVal1==results1[i]){
+ 				option1 = $("<option selected/>");
+ 			   // $('#workstream-'+currentIndex).text(selectedVal1);
+			}
+ 		  
+		else
+	 		option1 = $("<option/>");
+	 	option1.attr("value",results1[i]).text( results1[i]);
+	 	
+	 	dropdown1.append(option1);		
+	 }
+ 	
+ 	
+ 	
+ 	
+  }
+
+
+function populateAMSYears(){
+	var numbers = [1, 2, 3, 4, 5];
+	var option = $("<option/>");
+	var amsyears = $('#amsyears');
+	var selectionValue;
+	amsyears.empty();
+	option.attr("value", "0").text("-Select AMS Years-");
+	amsyears.append(option);
+	
+	{% if defaultValues %}
+		 selectionValue= {{defaultValues[0].num_ams_years}};
+	{% endif %}
+	
+	for (var i=0;i<numbers.length;i++){
+		if(selectionValue == numbers[i] )
+			option = $("<option selected/>");
+		else
+			option = $("<option/>");
+
+		option.attr("value", numbers[i]).text(Number(numbers[i]));
+		amsyears.append(option);
+	   //option += '<option value="'+ numbers[i] + '">' + numbers[i] + '</option>';
+	}
+	
+}
+
+function loadProductivityPercentTable(){
+	var amsyears=0;
+	{% if defaultValues!=null %}
+		amsyears= Number({{defaultValues[0].num_ams_years}});
+		if(amsyears>0){
+			for(var i=amsyears+1;i<=5;i++){
+				$( "input[id^='productivityPercent"+i+"']").attr('disabled','disabled');
+			}
+		}
+		else{
+			for(var i=1;i<=5;i++){
+				$( "input[id^='productivityPercent"+i+"']").attr('disabled','disabled');
+			}
+		}
+			
+	{% endif %}
+	
+}
+function getStartWeek(){
+	$.ajax({
+			url : '/getStartWeek',
+		    type : 'GET',
+		    data : {
+		    	'solId':$('#solId').val(),
+		    	'solAreaId':$('#SOL_AREA_ID').val()
+		    },
+		    dataType:'json',
+		    success : function(data) {              
+		        console.log('DataS: '+data[0].startWeek);
+		        $("#startWeek").val(data[0].startWeek);
+		        $("#range_weight_disp").text(data[0].startWeek);
+		    },
+		    error : function(request,error)
+		    {
+		    	console.log('DataE: '+JSON.stringify(data));
+		    }
+		});
+	  
+}  
+var entryList = {}; 
+</script>
+  </head>
+  <body class="mainInner" onscroll="setLoad()">
+	<div class="divWidth">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+			<div class="NavDiv">
+				<div class="nav">
+					<ul>
+						<li class="home"><a href="dashboard" id="advisorHome">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+					</ul>
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop">
+							<img src="/static/images/search.jpg">
+							<div id="two" class="popupBox">
+							<form method="post" action="/searchOpportunity" id="search">
+								<input type="text" value="" "searchOpportunity" id="searchOpportunity" required class="popInput placeholder-fix" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Opportunity Name">
+								<input type="submit" value="Search" class="popButton">
+							</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="InnDiv" ></div>
+<div class="container">
+ <form method="post" id="saveSolution" action="/saveAMSInfo" onsubmit="return validate()"> 
+<input type=hidden name="SL_ID" value="{{solAreaResult[0].sl_id}}">
+	<input type=hidden id="solId" name="solId" value="{{solId}}">
+	<input type=hidden id="SOL_AREA_ID" name="SOL_AREA_ID" value="{{solAreaResult[0].sol_area_id}}">
+	<input type=hidden id="indusId" name="INDUS_ID" value="{{solAreaResult[0].indus_id}}">
+	<input type=hidden name="useCaseInfoType" value="{{useCaseInfoType}}">
+	<input type=hidden id="currentSolAreaId" name="currentSolAreaId" value="{{solAreaResult[0].sol_area_id}}">
+	<input type=hidden id="testSolId" name="testSolId" value="{{testSolId}}" />
+	<input type=hidden id="soakTestId" name="soakTestId" value="{{soakTestId}}" />
+	<input type=hidden id="username" name="username" value="{{ user.emp_fname }} {{user.emp_lname}}" />
+
+	<input type=hidden id="model" name="model" value="{{model}}" />
+	<input type=hidden id="sprintWeeks" name="sprintWeeks" value="{{sprintWeeks}}" />
+	<input type=hidden id="enbTestBtn" name="enbTestBtn" value="" />
+	<input type=hidden id="isedit" name="isedit" value="{{isedit}}">
+	<input type=hidden id="amsValJson" name="amsValJson" value="" />
+	<!-- <input type=hidden id="defaultValues" name="defaultValues" value="{{defaultValues}}"> -->
+	&nbsp;&nbsp;
+	<div class="divWidth">
+	<!-- <div class="loginInfo ">Hello {{ user.emp_fname }} {{user.emp_lname}}</div> -->
+	<div class="loginInfo ">Hello {{ user.attributes.firstName }} {{user.attributes.lastName}}</div>
+	
+	<p>Capture your Use cases</p>
+			<table width="100%" cellpadding="1" cellspacing="0" border="0">		
+			<tr>
+				<td colspan="4" class="tdmarg">Solution Details</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Solution Id:</strong></td>
+				<td class="tdInputLabel" colspan="2">{{solId}}</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Lead Service Line:</strong></td>
+				<td class="tdInputLabel" colspan="2">{{solAreaResult[0].sl_name}}</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Solution Area:</strong></td>
+				<td class="tdInputLabel" colspan="2">{{solAreaResult[0].sol_area_name}}</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel">&nbsp;</td>
+				<td class="tdInputLabel"><strong>Industry:</strong></td>
+				<td class="tdInputLabel" colspan="2">{{solAreaResult[0].indus_name}}</td>
+			</tr>
+			<tr>
+				<td colspan="4" class="tdmarg"><font color="#000099"><b>{{solAreaResult[0].sol_area_name}}</b></font> in <font color="#000099"><b>{{solAreaResult[0].indus_name}}</b></font></td>
+			</tr>
+			<tr>
+				<td colspan="4" class="tdLabel">&nbsp;[ This tool is recommended for small and medium deals not for large deals at the moment ]</td>
+			</tr>
+		{% if errorMessage %}
+			<tr>
+				<td colspan="4" class="tdErrorMsg">{{errorMessage}}</td>
+			</tr>
+		{% endif %}			
+
+		</table>
+
+ &nbsp;&nbsp; &nbsp;&nbsp;
+  
+<!--First Table  -->
+<div class="row">
+<div class="col-md-offset-1 col-md-10"> 
+<table class="table " >
+	<tbody>
+		<tr>
+			<td style="border-top: none;" width="10%" class="text-left"><strong>Contract Duration<span class="asteriskField"><font color="RED">*</font></span></strong></td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+			<select style="line-height:34px;width:50%;" class="form-control" name="amsyears" id="amsyears" >
+		
+			</select>
+			</td>
+		</tr>
+		<tr id="productivityRow">
+			<td style="border-top: none;" width="10%" class="text-left"><strong>YoY Productivity(%)<span class="asteriskField"><font color="RED">*</font></span></strong> </td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+				<table id="productivityTable">
+					<tr>
+						<th> Year1</th>
+						<th> Year2</th>
+						<th> Year3</th>
+						<th> Year4</th>
+						<th> Year5</th>
+					</tr>
+					<tr>
+						<td>
+							<input name="productivityPercent1" id="productivityPercent1" class="form-control" type="number" min="0"  style="line-height:34px;" value="0">
+						</td>
+						<td>
+							<input name="productivityPercent2" id="productivityPercent2" class="form-control" type="number" min="0"  style="line-height:34px;" value="0">
+						</td>
+						<td>
+							<input name="productivityPercent3" id="productivityPercent3" class="form-control" type="number" min="0"  style="line-height:34px;" value="0">
+						</td>
+						<td>
+							<input name="productivityPercent4" id="productivityPercent4" class="form-control" type="number" min="0"  style="line-height:34px;" value="0">
+						</td>
+						<td>
+							<input name="productivityPercent5" id="productivityPercent5" class="form-control" type="number" min="0"  style="line-height:34px;" value="0">
+						</td>
+					</tr>
+				</table>
+		</td>
+		</tr>
+		<tr>
+			<td style="border-top: none;" width="10%" ></td>
+			<td style="border-top: none;" width="15%"  class="text-left alert-info"> 
+		 		<strong>Info!</strong> 
+				<br>Productivity can only be applied for AMS > 2 years</br>
+				<br>Productivity can be applied using productivity calculator once the ams solution has been created</br>
+			</td>
+		</tr> 
+		<tr id="includeComponent_row">
+			<td style="border-top: none;" width="10%" class="text-left"><strong>Include Design Build Components from Opportunity<span class="asteriskField"><font color="RED">*</font></span></strong> </td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+			<input type="checkbox"  class="focus" name="includeComponent" id="includeComponent" value="N" 
+				{% if defaultValues  != null %}
+					{% if defaultValues[0].is_include_component > 0 %}
+								 checked
+					{% endif %}
+				{% endif %}
+			/>
+			</td>
+		</tr>
+		<tr id="supportRow">
+					<td style="border-top: none;" width="10%" class="text-left"><strong>Level of Support<span class="asteriskField"><font color="RED">*</font></span></strong> </td>
+					<td style="border-top: none;" width="15%"  class="text-left"> 
+						<table id="supportTable">
+							<tr>
+								<th> L1.5 %</th>
+								<th> L2 %</th>
+								<th> L3 %</th>
+								
+							</tr>
+							<tr>
+								<td>
+									<input name="l15Support" id="l15Support" class="form-control" type="number" min="0"  style="line-height:34px;" value="0">
+								</td>
+								<td>
+									<input name="l2Support" id="l2Support" class="form-control" type="number" min="0"  style="line-height:34px;" value="0">
+								</td>
+								<td>
+									<input name="l3Support" id="l3Support" class="form-control" type="number" min="0"  style="line-height:34px;" value="0">
+								</td>
+								
+							</tr>
+						</table>
+				</td>
+				</tr>
+		<!--
+		<tr>
+			<td style="border-top: none;" width="10%" class="text-left"><strong>Transition Start Date<span class="asteriskField"><font color="RED">*</font></span></strong> </td>
+			<td style="border-top: none;" width="15%"  class="text-left"> 
+					<input name="startTransitionDate" type="text" id="startTransitionDate" style="line-height:34px;width:50%; ">
+			</td>
+			
+		</tr> -->
+			<tr>
+				<td style="border-top: none;" width="10%" class="text-left"><strong>Non-Ticketing activities(%)<span class="asteriskField"><font color="RED">*</font></span></strong> </td>
+				<td style="border-top: none;" width="15%"  class="text-left"> 
+						<input name="nonTicketingActPercent" type="number" class="form-control" id="nonTicketingActPercent" style="line-height:34px;width:50%;padding-left:10px;padding-right:10px;" value="10">
+				</td>
+				
+			</tr>
+			<tr>
+				<td style="border-top: none;" width="10%" class="text-left"><strong>Steady State Start Week<span class="asteriskField"><font color="RED">*</font></span></strong> </td>
+				<td style="border-top: none;" width="15%"  class="text-left"> 
+				<table id="startWeekTable">
+				<tr>
+					<td><input type="range" name="startWeek" id="startWeek" value="" min="1" max="100" style="line-height:34px;width:150%;" oninput="document.getElementById('range_weight_disp').innerHTML = startWeek.value"></td>
+   					<td style="padding-left:120px;"><label id="range_weight_disp"></label> Week</td>
+						
+					</tr>
+				</table>	
+   				</td>
+			</tr>
+					
+	</tbody> 
+</table>
+</div>
+</div>
+ &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+ &nbsp;&nbsp; &nbsp;&nbsp;
+ 
+<!--Section for 1st table  -->
+
+ <div class="row" >
+  	<div class="col-sm-10">
+   		 <h3 style="text-transform: uppercase"><span class="text-primary">Select Proposed Implementation</span></h3>
+   	</div>
+   <div class="col-sm-1" style="padding-top: 11px">
+         <button type="button" class="btn btn-color add-new" id="addingNew" > Add </button>
+    </div>
+ </div> 
+  <hr style="height: 5px !important; border: 0 !important;	box-shadow: 0 5px 5px -5px #8c8b8b inset !important;">
+<table class="table table-bordered order-list thead-light" id="componentTable">
+	<thead>
+		<tr>
+			<th  style="width:25%" >Functional Components</th>
+			<th  style="width:17%" >DCUT Efforts</th>
+			<th  style="width:15%" >Complexity</th>
+			<th  style="width:15%" >% Complexity</th>
+			<th  style="width:18%" >Calculated FTE</th>
+			<th  style="width:18%" >Adjusted FTE</th>
+			<th  style="width:18%" >Justification</th>
+			<th  style="width:12%" class="text-center" >Actions</th>  
+					
+		</tr>
+	</thead>
+	<tbody>
+	{% if defaultValues  != null %}
+	{% for ob in defaultValues %} 
+		<tr id="row{{loop.index0}}">
+	 
+			<td id="{{ob.func_component}}" >{{ob.func_component}}</td>
+			<td id="{{ob.dcut_efforts}}" class="text-left">{{ob.dcut_efforts}}</td>
+			<td id="{{ob.complexity}}" >{{ob.complexity}}</td>	
+			<td id="complexityPercent-{{ob.complexityPercent}}" >{{ob.complexityPercent}}</td>	
+			<td id="calculated-efforts-{{loop.index0}}" class="text-left"></td>
+			<td id="{{ob.adjusted_fte}}"class="text-left">{{ob.adjusted_fte}}</td>
+			<td id="{{ob.justification}}" >{{ob.justification}}</td>
+			
+			<!-- <td id="component-{{loop.index0}}" >{{ob.func_component}}</td>
+			<td id="dcut-effort-{{loop.index0}}" class="text-left">{{ob.dcut_efforts}}</td>
+			<td id="complexity-{{loop.index0}}" >{{ob.complexity}}</td>
+			<td id="calculated-efforts-{{loop.index0}}" class="text-left"></td>
+			<td id="adjusted-efforts-{{loop.index0}}"class="text-left">{{ob.adjusted_fte}}</td>
+			<td id="justification-{{loop.index0}}" >{{ob.justification}}</td>
+			 -->
+			<td class="text-center">
+				<a class="add"  id="add" title="Add" data-toggle="tooltip"><i class="material-icons">check</i></a>
+			 	<a class="edit"  id="edit"title="Edit" data-toggle="tooltip"><i class="material-icons">build</i></a>
+				<a class="delete" id="delete"title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+				
+            </td>
+		
+		</tr>
+	{% endfor %}
+	{% endif %}
+	</tbody>
+</table>
+<!-- <div > -->
+
+ <!--Section for 1st table  -->
+<!--<div class="col-md-13"> 
+<table class="table info table-bordered table-striped " id="totalTable">
+	<thead>
+		<tr>
+			<th width="55%" id="non-technical"><strong>Non Technical activities </strong></th>
+			<th  width="13%" class="text-left" >Units(in %)</th>
+			
+		</tr>
+	</thead>
+	<tbody>
+		<tr id="app_admin_row">
+			<td width="25%" >Application Administration</td>
+			<td width="15%"  class="text-left"><input name="app_admin" id="app_admin" class="form-control" type="number" min="0" max="200" style="line-height:34px;width:50%;" value="0">
+		</tr>
+		<tr id="batch_release_row">
+			<td width="25%" >Batch and Release Management</td>
+			<td width="15%"  class="text-left"><input name="batch_release" id="batch_release" class="form-control" type="number" min="0" max="200" style="line-height:34px;width:50%;" value="0">
+		</tr> 
+		<tr id="prev_maint_row">
+			<td width="25%" >Preventive Maintenance</td>
+			<td width="15%" class="text-left"><input name="prev_maint" id="prev_maint" class="form-control" type="number" min="0" max="200" style="line-height:34px;width:50%;" value="0">
+		</tr> 
+		<tr id="standy_buffer_row">
+			<td width="25%" >Stand by Buffer</td>
+			<td width="15%" class="text-left"><input name="standy_buffer" id="standy_buffer"  class="form-control" type="number" min="0" max="200" style="line-height:34px;width:50%;" value="0">
+		</tr> 
+		<tr id="cross_skill_row">
+			<td width="25%" >Cross Skill</td>
+			<td width="15%" class="text-left"><input name="cross_skill" id="cross_skill" class="form-control" type="number" min="0" max="200" style="line-height:34px;width:50%;" value="0">
+		</tr> 
+		<tr id="testing_row">
+			<td width="25%" >Testing</td>
+			<td width="15%"  class="text-left"><input name="testing"  id="testing"  class="form-control" type="number" min="0" max="200" style="line-height:34px;width:50%;" value="0">
+		</tr> 
+		
+		<tr id="productivity_row">
+			<td width="25%" >YoY Productivity(%)</td>
+			<td width="15%"  class="text-left"><input name="productivity" id="productivity" class="form-control" type="number" min="0" max="200" style="line-height:34px;width:50%;" value="0">
+		</tr> 
+		
+	</tbody>
+</table>
+</div>
+ -->
+
+<table align="center" width="100%" cellpadding="1" cellspacing="0" border="0">
+		<tr>
+			<td class="tdspace">
+				&nbsp;&nbsp;
+				<button name="submit-form" id="submit-form" class="bluebutton" >Submit</button>  
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="button" id="backButton" class="cancelbutton" value="Back" onclick="javascript:history.go(-1);">
+			</td>
+		</tr>
+</table> 
+</form> 
+
+<div id="showmodalid" class="showmodal" style="display:none">
+	<div class="center">
+	    <span id="downText" style="font-weight: bolder;font-size: x-large;display: none;"><blink>The back-end service is down. Please try after sometime</blink></span>
+	    <span id="waiText" style="font-weight: bolder;font-size: x-large;display: none;"><blink>We are saving your data...</blink></span>	    
+	     <img id="waitImg" alt="" src="/static/images/loader.gif" />
+   </div>
+</div>
+</body>
+</html>
