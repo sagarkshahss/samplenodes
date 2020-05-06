@@ -1,0 +1,461 @@
+<!doctype html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" (http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd') 
+Cache-Control:public;>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solution Advisor</title>
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<style type="text/css">
+.MainTable {
+    background-color:white;
+}
+.loginbutton {
+	width:294px;
+	height:41px;
+	border:0px;
+	background-color:rgb(123,165,206);
+	color:white;
+	font-size:14px;
+	cursor: pointer;
+	
+	}
+.HeaderTable {
+}
+body {background-color:rgb(70,106,132);margin:0px;padding:0px;}
+
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color:    white;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color:    white;
+    opacity:  1;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color:    white;
+    opacity:  1;
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color:    white;
+}
+
+
+input:focus,select:focus,textarea:focus,button:focus {
+    outline: none;
+}
+
+/* Change the white to any color ;) */
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px rgb(82,118,150) inset !important;
+    -webkit-text-fill-color: white !important;
+}
+
+input:required {
+    box-shadow:none;
+}
+            
+.disclaimer {
+    background-color: #456787;
+    width: 431px;
+    border: 4px solid #82a6cc;
+    padding: 11px;
+    margin: 11px;
+    font-size: 14px;
+   color: #FFF;
+   font-family:Arial,Helvetica, sans-serif;
+}
+.innerDialog{height:250px; overflow-y:auto;}
+.desmsg {
+   text-align:left;
+   color:#a4c9ee;
+}
+
+   .dialog_header{text-align: center;}
+   .dialog_header2{text-align: center;}
+   .ui-dialog-titlebar{background: #2763a7;
+    color: #fff;
+    border-radius: 0;}
+   .dialog_country{     min-width: 147px;
+    height: 27px;
+    border: 1px #c1c7d8 solid;
+    background: #f5f3fe;
+    border-radius: 4px;
+    padding: 2px;
+    margin: 10px 0 20px 5px;
+   }
+   .dialog_button{width:30%; margin:auto;}
+   .ui-dialog-titlebar-close{display:none;}
+   .ui-dialog{padding:0;font-family: Arial,Helvetica, sans-serif; }
+    .modelform label{font-weight: bold;font-size: 15px;color: #050308;}
+    .modelform ul li{font-size: 13px;font-family: Arial,Helvetica, sans-serif;}
+    .dialog_p1{font-size: 13px;font-family: Arial,Helvetica, sans-serif;}
+    .dialog_p2,.dialog_p3{width: 100%;margin: auto;font-size: 13px;font-family: Arial,Helvetica, sans-serif;}
+	.dialog_p3{margin: 2px 0 18px 0;}
+.ui-widget-overlay{opacity: .7 !important;background:#000 !important;}
+
+
+a:hover 
+{
+     color:#00A0C6; 
+     text-decoration:none; 
+     cursor:pointer;  
+}
+#myOverlay{position:absolute;height:100%;width:100%;overflow:hidden}
+#myOverlay{background:black;opacity:.7;z-index:2;display:none;}
+#loadingGIF{position:absolute;top:40%;left:45%;z-index:3;display:none;}
+#loadingGIF p{text-align: center;color: #ddd;font-size: 13px;margin-top: 22px;}
+#loadingGIF p:before{display: none;}
+
+</style>
+<link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+<script language="javascript">
+
+$(document).ready(function(){
+	$("#dialog-restricted-country").hide();
+	$("#dialog-message").hide();
+	
+	 var LeadCountryInfo = $('#leadCountryDialogBox');
+	    LeadCountryInfo.empty();  
+	    $.ajax({url: "/getLeadCountryInfo", success: function(data) {
+	    	var option = $("<option/>");
+	    	option.attr("value", "").text("-Your Country-");
+	    	LeadCountryInfo.append(option);
+	    	for (var i = 0; i < data.length; i++) {	
+	    		option = $("<option/>");
+	    		option.attr("value", data[i].COUNTRY_ID).text(data[i].COUNTRY_NAME);
+	    		LeadCountryInfo.append(option);
+	    	}
+	    }
+		});
+	    
+	    
+	      $(".decline").on("click",function(){
+	          $( "#dialog-message" ).dialog('close');
+
+	      });
+	      
+	      $(".modelform").on("submit",function(n){
+	          n.preventDefault();
+	          var privacy= $("#privacy_model").val();
+	          var leadCountry= $("#leadCountryDialogBox").val();
+	          var leadCountryName= $("#leadCountryDialogBox option:selected").text();
+	          var restrictedCountryCheck = getRestrictedCountryCheck(leadCountry,leadCountryName,privacy);
+	          if(restrictedCountryCheck)
+	          {
+	              $("#privacy").val(privacy);
+		          $("#leadCountry").val(leadCountry);
+		          $( "#dialog-message" ).dialog('close');
+		          $(".ajaxloader_pricing").show();
+		          document.getElementById("loginForm").submit();
+	          }
+	          
+	      });
+	
+	      
+	    	    
+	    	 
+	      
+	
+	      
+	 $("#loginbutton").click(function (){
+		$('#leadCountryDialogBox').prop('selectedIndex',0);
+		$('#privacy_model').attr('checked', false); // Unchecks it
+		//getConsentCheck(this)
+		$(".ajaxloader_pricing").show();
+		document.getElementById("loginForm").submit();
+	});
+	
+	 function getRestrictedCountryCheck(leadCountry,leadCountryName,privacy){
+			var restricted_country_consent = "";
+			var is_restricted_country=false;
+//			var query = "select * from LEAD_COUNTRY where COUNTRY_NAME in ('Malaysia','Colombia','Morocco','Tunisia','Senegal','Argentina','Korea')";
+			var restricted_country_list = ['9', '44', '122', '138', '178','206','153','188'];
+			var selected_leadCountry = leadCountry;
+			restricted_country_list.find(
+			    function(str) {
+			        if((str == selected_leadCountry))
+			        	is_restricted_country=true;
+			    }
+			);
+			
+			if(is_restricted_country){
+				//open Dialog message
+				$( "#dialog-restricted-country" ).dialog({
+		    	      resizable: false,
+		    	      height: "auto",
+		    	      width: 450,
+		    	      modal: true,
+		    	      open: function() {
+		    	          var markup = '<p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>The current tool may not be compliant with the PI laws of ';
+		    	          markup+= ' <b>'+leadCountryName+'</b>, do you want to proceed ?</p>';
+		    	          $(this).html(markup);
+		    	        },
+		    	      buttons: {
+		    	        "Yes": function() {
+		    	          $( this ).dialog( "close" );
+		    	          restricted_country_consent='Y';
+		    	          $("#privacy").val(privacy);
+				          $("#leadCountry").val(leadCountry);
+				          $("#restricted_country_consent").val(restricted_country_consent);				          
+				          $( "#dialog-message" ).dialog('close');
+				          $(".ajaxloader_pricing").show();
+				          document.getElementById("loginForm").submit();
+		    	        },
+		    	        Cancel: function() {
+		    	        	restricted_country_consent='N';
+		    	        	$("#restricted_country_consent").val(restricted_country_consent);
+		    	          $( this ).dialog( "close" );
+		    	          return false;
+		    	        }
+		    	      }
+		    	    });
+				return false;	
+				} 
+			else{
+				return true;
+			}
+			}
+		
+	 function getConsentCheck(obj){
+		var userid = $("#userName").val();
+		$.ajax({url: "/consentCheck/"+userid, success: function(data) {
+			
+			var consent="";
+			if(typeof data[0] !== 'undefined' && data[0] !== null) {
+				//alert("1:: " + data[0].privacy_consent_obtained );
+				consent = data[0].privacy_consent_obtained;
+			} 
+			
+			if(consent === 'N' || consent=='' ) {
+				//open Consent page
+			 //alert("inside else 2-1");
+
+				$( "#dialog-message" ).dialog({
+			        modal: true,
+			        width:1150
+			      });
+				
+			} else {
+				//submit Blue Page login
+				//alert("inside else 2");
+				$(".ajaxloader_pricing").show();
+				document.getElementById("loginForm").submit();
+				return true;
+			}
+		}
+		});
+	}
+
+	
+	
+	
+});
+
+</script>
+
+
+</head>
+
+<div class="ajaxloader_pricing" id="myOverlay"></div>
+<div class="ajaxloader_pricing"  id="loadingGIF"><img src="/static/images/demo_wait.gif" /><p>Logging in....</p></div>
+
+<body>
+<div id="dialog-restricted-country" title="Restricted Country">
+</div>
+
+<div id="dialog-message" title="Solution Advisor">
+   <h4 class="dialog_header">Privacy Statement</h4>
+
+  <p class="dialog_p1">Please choose your country below, read the privacy statement below, then check the box and <br>
+        click "Accept". </p>
+    <form class="modelform">
+            
+                <label for="name">Country</label>
+                <select required id="leadCountryDialogBox" class="dialog_country">
+        
+        
+                </select>
+                
+                <!-- Allow form submission with keyboard without duplicating the dialog button -->
+            
+           
+        <div style="padding: 0px;" class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix"></div>
+
+        <h4 class="dialog_header2"> {{appMsg[13].msg_desc}}</h4>
+        <div class="innerDialog">
+        <p class="dialog_p2">{{appMsg[5].msg_desc}} </p>
+        <ul>
+                <li>{{appMsg[6].msg_desc}}</li>
+                <li>{{appMsg[7].msg_desc}}</li>
+                <li>{{appMsg[8].msg_desc}}</li>
+                <li>{{appMsg[9].msg_desc}}</li>
+                <li>{{appMsg[10].msg_desc}}</li>
+                <li>{{appMsg[11].msg_desc}}</li>
+
+        </ul>
+        <p class="dialog_p3">{{appMsg[12].msg_desc}}<a style="color: #0060B6;text-decoration: none;" href="mailto:{{appMsg[14].msg_desc}}" target="_top">{{appMsg[14].msg_desc}}</a>{{appMsg[15].msg_desc}}</p>
+        </div>
+                <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix"></div>
+                
+                <p class="dialog_p3"><input required type="checkbox" id="privacy_model" value="Y" name="privacy_model">I have read and I agree that IBM may process data for the purposes indicated above and as described in the Global Solutioning Solution Advisor Privacy Statement.
+         </p>                <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix"></div>
+         
+         <p class="dialog_button"> <button type="submit" class="ui-button  ui-widget" id="accept">Accept</button> <button type="button" class="ui-button ui-corner-all ui-widget decline">Decline</button></p>
+        </form> 
+</div>
+
+
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" class="MainTable" align="center">
+  <tbody>
+    <tr>
+      <td><table width="100%" border="0" class="HeaderTable" border="0" cellpadding="0" cellspacing="0">
+  <tbody>
+          <tr>
+            <td><img src="static/images/GlobalSolutioning-logo.png" width="220" height="46" alt=""/></td>
+            <td width="100%">&nbsp;</td>
+            <td><img src="static/images/IBM-logo.png" width="87" height="46" alt=""/></td>
+          </tr>
+  </tbody>
+</table></td>
+    </tr>
+    <tr height="60" bgcolor="80a4ca">
+    	<!-- <td bgcolor="80a4ca" height="60">&nbsp;<div><marquee behavior="alternate" scrollamount="10"><span style="margin-left: 25rem;color:white;font-weight: bold;font-size: 20px;">Solution Advisor Tool is compatible with Firefox and Chrome</span></marquee></div></td>
+       -->
+       <td>
+      	<div>
+      		<marquee behavior="alternate" scrollamount="10">
+      			<span style="color:white;font-weight: bold;font-size: 20px;">Solution Advisor Tool is compatible with Firefox and Chrome
+      			</span>
+      		</marquee>
+      	</div>
+      </td>
+      
+    </tr>
+  </tbody>
+</table>
+<!-- validateLoginBluePages form START //-->
+<!-- <form action="/validateLoginBluePages" method="post" id="loginForm"> -->
+<form action="/login" method="get" id="loginForm">
+<table width="100%" border="0" border="0" cellpadding="0" cellspacing="0">
+  <tbody>
+     <input type="hidden" name="prevUrl" id="prevUrl" value="{{prevUrl}}">
+    <tr>
+      <td width="411" background="static/images/mid-login-strip-img.png">&nbsp;</td>
+      <td width="58" background="static/images/left-login-connect-img.png" style="background-size:100% 100%;">&nbsp;</td>
+      <td width="411" height="279" background="static/images/login-widget-bg.png" style="background-size:100% 100%;"><table width="100%" border="0">
+  <tbody>
+    <tr>
+      <td>&nbsp;</td>
+      <td align="center" valign="middle" width="311"><img src="static/images/Login-to-iXM-Sol-Adv-title.png" width="311" height="29" alt="" /></td>
+      <td>&nbsp;</td>
+    </tr>
+	<!--
+    <tr>
+      <td>&nbsp;
+      </td>
+      <td valign="middle" style="padding-bottom:10px;padding-left:10px;">
+          <div class="input-group" align="right" style="color:#FFFFFF;border:2px solid white;background-color:rgb(82,118,150);height:40px;width:287px;">
+          <input type="text" name="userName" id="userName" required style="background-color:transparent;width:230px;height:30px;color:white;border:0px;position:relative;top:-12px;font-size:13px;opacity:1" class="form-control" placeholder="User Name" >
+         <input type="hidden" name="leadCountry" id="leadCountry" value="">
+         <input type="hidden" name="privacy" id="privacy" value="">
+         <input type="hidden" name="restricted_country_consent" id="restricted_country_consent" value="">
+         <span class="input-group-addon"><img src="static/images/user-icon.png" width="25" height="29" alt="" style="margin:5px;"/></span>
+          </div>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+    
+    <tr>
+      <td>&nbsp;</td>
+      <td valign="middle" style="text-align:center;padding-left:10px;">
+          <div class="input-group" align="right" style="color:#FFFFFF;border:2px solid white;background-color:rgb(82,118,150);height:40px;width:287px;font-size:14px;">
+          <input type="password" name="password" id="password" required style="background-color:transparent;width:230px;height:30px;color:white;border:0px;position:relative;top:-12px;font-size:13px;opacity:1"  class="form-control" placeholder="Password">
+          <span class="input-group-addon"><img src="static/images/password-icon.png" width="25" height="29" alt="" style="margin:5px;"/></span>
+          </div>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+-->
+    <tr>
+      <td>&nbsp;</td>
+      <td align="center" height="70" valign="middle">
+          <!--<a href="#" onclick="document.getElementById('loginForm').submit();return;"><img src="static/images/login-btn.png" width="294" height="41" alt=""/></a>-->
+          <input type="button" id="loginbutton" value="Login" class="loginbutton"/>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td align="center" style="font-family:Gotham, 'Helvetica Neue', Helvetica, Arial, sans-serif; color:#FFFFFF;position:relative;top:-10px;font-size:13px;"><!--Forgot Password</td>//-->
+      <td>&nbsp;</td>
+    </tr>
+  </tbody>
+</table>
+</form>
+<!-- validateLoginBluePages form END //-->
+</td>
+      <td width="58" background="static/images/right-login-connect-img.png" style="background-size:100% 100%;">&nbsp;</td>
+      <td width="411" background="static/images/mid-login-strip-img.png">&nbsp;</td>
+    </tr>
+  </tbody>
+</table>
+<table width="100%" border="0" class="MainTable" border="0" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr>
+        <td style="background-color:rgb(90,129,160);color:red;text-align:center;">
+            <div style="width:400px;background-color:transparent;display:inline-block;padding-bottom:5px;text-align:left;font-family:Arial,Helvetica, sans-serif">
+                
+                {% if errorMessage %}
+                <div class="errorMessage">{{errorMessage}}</div>
+                {% endif %}
+                
+            </div>
+        </td>
+    </tr>
+    <tr>
+      <td width="100%" height="209" background="static/images/bottom-login-strip-img.png" border="0" cellpadding="0" cellspacing="0" valign="top">
+      <table width="294" border="0" align="center" >
+        <tbody>
+          <tr>
+            <td valign="top" align="center">
+            
+            <div class="disclaimer">
+            
+            <h2 style="text-align:left;"> {{appMsg[1].msg_desc}}</h2>
+
+				<ol style="text-align:left;" type="a">
+				  <li> {{appMsg[2].msg_desc}}</li>
+				  <li> {{appMsg[3].msg_desc}}</li>
+				  <li> {{appMsg[4].msg_desc}}</li>
+				</ol>
+			
+            <p class="desmsg">
+            {{appMsg[0].msg_desc}}
+            </p>
+            </div>
+
+            </td>
+          </tr>
+        </tbody>
+      </table></td>
+    </tr>
+    <tr>
+      <td bgcolor="466a84">&nbsp;</td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>
