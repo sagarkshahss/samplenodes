@@ -1,0 +1,21 @@
+ixm-solution-advisor-api
+
+
+{
+  "cleardb": [
+    {
+      "name": "ixm-db-advisor",
+      "label": "cleardb",
+      "plan": "spark",
+      "credentials": {
+        "jdbcUrl": "jdbc:mysql://us-cdbr-iron-east-03.cleardb.net/ad_6a020c452a859e7?user=b88ca39525760c&password=03063b25",
+        "uri": "mysql://b88ca39525760c:03063b25@us-cdbr-iron-east-03.cleardb.net:3306/ad_6a020c452a859e7?reconnect=true",
+        "name": "ad_6a020c452a859e7",
+        "hostname": "us-cdbr-iron-east-03.cleardb.net",
+        "port": "3306",
+        "username": "b88ca39525760c",
+        "password": "03063b25"
+      }
+    }
+  ]
+}

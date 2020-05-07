@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Solution Advisor</title>
+	<!-- Solution Details -->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="description" content="An interactive getting started guide for Edge Code CC.">
+	<link rel="stylesheet" href="static/css/style.css">
+	<script	src="static/js/main.js"></script>
+	<script	src="static/js/lib/jquery-2.1.4.js"></script>
+<!--	<script	src="static/js/lib/jquery-2.1.4.min.js"></script> -->
+	<link rel="stylesheet" href="static/css/jquery.modal.css">
+	<script	src="static/js/lib/nouislider.min.js"></script>
+	<link rel="stylesheet" href="static/css/nouislider.min.css">
+	<script	src="static/js/jquery.modal.js"></script>	
+	<script	src="static/js/close.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	
+<style type="text/css">
+.dialog_button{width:30%; margin:auto;}
+.ui-dialog-titlebar-close{display:none;}
+.ui-dialog{padding:0;font-family: Arial,Helvetica, sans-serif; }
+.modelform label{font-weight: bold;font-size: 15px;color: #050308;}
+.modelform ul li{font-size: 13px;font-family: Arial,Helvetica, sans-serif;}
+.dialog_p1{font-size: 13px;font-family: Arial,Helvetica, sans-serif;}
+.dialog_p2,.dialog_p3{width: 100%;margin: auto;font-size: 13px;font-family: Arial,Helvetica, sans-serif;}
+.dialog_p3{margin: 2px 0 18px 0;}
+.ui-widget-overlay{opacity: .7 !important;background:#000 !important;}
+.dialog_p1 p:before{display: none;}
+.dialog_button p:before{display: none;}
+.ui-widget-content {
+    border: 1px solid #dddddd;
+    background: #ffffff;
+    color: #606366;
+    
+}
+.ui-widget {
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 0.9em;
+}
+
+.ui-button {
+    margin-left: 43em;
+}
+
+.linepadding {
+padding-top: 5px;
+padding-bottom: 5px;
+}
+</style>
+
+
+	
+<script language="javascript">
+var timeCount = 5000;
+var manualWaitTime = 30000;
+
+function validate() {
+	if(document.getElementsById("useCaseInfoType").value="") {
+		alert("Please select use case view.");
+		return false;
+	}
+	if(document.getElementsById("solAreaId").value="") {
+		alert("Please select preferred solution area.");
+		return false;
+	}	
+	document.getElementById("submitButton").disabled=true;
+	return true;
+}
+
+function getSolutionArtifacts(solAreaId) {
+	document.getElementById("searchSolAreaId").value=solAreaId;
+	document.getElementById("solutionDetails").submit();
+	return true;
+}
+
+function ifWaterfall() {
+	//alert("vaue of " + document.getElementById("model").value);
+	if(document.getElementById("model").value=2) {
+		return false;
+	}
+	else
+		return true;
+	
+}
+
+function disableSprintWeeks() {
+	console.log("disable function");
+	document.getElementById("sprintWeeks").value=3;
+	document.getElementById("sprintWeeks").disabled = true;
+	updateModelAtServer(1);
+	
+}
+
+function enableSprintWeeks() {
+	console.log("Enable function");
+	document.getElementById("sprintWeeks").disabled = false;
+	updateModelAtServer(2);
+	
+}
+
+function updateModelAtServer(delvModel){
+		$("#showmodalid").show();
+		$.ajaxSetup({async: false});
+		$.post("/setSolDelvModel",{solId:$('#solId').val(),delvModel:delvModel, session_id:$('#session_id').val() }, function(data, status){
+			// do nthg
+		});
+		$.ajaxSetup({async: true});
+		checkSolutionStatus(24, $('#solId').val());
+}
+
+function checkSolutionStatus(count, solutionId){
+	console.log("count: "+count);
+	console.log("solutionId: "+solutionId);
+	setTimeout(function() {
+		$.ajaxSetup({async: false});
+		$.post("/checkSolutionStatus",{solId:solutionId}, function(data, status){
+	        console.log("Data: " + data + "\nStatus: " + status);
+	        if(data!="Error: connect ECONNREFUSED"){
+				if(new String(data).valueOf() == new String("NO").valueOf()){
+					console.log("inside NO");
+					 if(count == 0){
+						console.log("inside count ==0");
+						 var addr= (window.location.href).split('/');	        		 
+						 window.location.href = addr[0]+"//"+addr[2]+"/dashboard";
+					 }else{
+						console.log("inside count !=0");
+						$("#waitImg").hide();
+						$(".center").css("width","350px");
+						$("#waiText").show();
+						count--;
+						setTimeout(function() {
+							var solId = solutionId;
+							console.log("solId:: "+solId);
+							checkSolutionStatus(count, solId);
+						},timeCount);
+					}
+				}else{
+					console.log("inside YES");
+					console.log("solutionId:: "+solutionId);
+					console.log("val solutionId: "+ Number(solutionId));
+					console.log("val solutionId: "+ Number("1234"));
+					console.log("val solutionId: "+ parseInt("12345"));
+					var addr= (window.location.href).split('/');	        		 
+					window.location.href = addr[0]+"//"+addr[2]+"/getSolutionInfo?searchSolId="+solutionId;
+				}
+	        }else{
+	       		var addr= (window.location.href).split('/');	        		 
+				window.location.href = addr[0]+"//"+addr[2]+"/dashboard";
+	       	}
+	    });
+		$.ajaxSetup({async: true});
+	},timeCount);
+	
+}
+
+function updateSprintWeeksAtServer(){
+		var sweeks = document.getElementById("sprintWeeks").value;
+		$.ajaxSetup({async: false});
+		$.post("/setSprintWeeks",{solId:$('#solId').val(),sweeks:sweeks, session_id:$('#session_id').val()}, function(data, status){
+			// do nthg
+		});
+		$.ajaxSetup({async: true});
+}
+
+function isProperValue(val){
+	return ($.isNumeric(val) && (val >= 3) && (Math.floor(val) == val) && (val <= 6));
+}
+
+function submitForm(formDestimation,solAreaId){
+	document.getElementById("currentSolAreaId").value=solAreaId;
+	document.getElementById("solAreaId").value=solAreaId;
+	if( formDestimation == "captureUseCases"){
+		var sprintWeeksValue = document.getElementById("sprintWeeks").value;
+		if(!isProperValue(sprintWeeksValue)){
+			alert("Please provide proper value for Sprint Weeks");
+			return false;
+		}	
+		
+		//var len = document.getElementById("useCaseInfoType").length;
+		var len = document.solutionDetailsId.useCaseInfoType.length;
+		var checkFlag = false;
+		for (i = 0; i <len; i++) {
+			if ( document.solutionDetailsId.useCaseInfoType[i].checked) {
+				checkFlag = true;
+				break;
+			}
+		}
+		if(solAreaId > 7){
+			checkFlag = true;  //no need to check the flags for ESB cases
+		}
+		
+		//alert("Please select either value of Use Cases View"+checkFlag);
+		if(checkFlag){
+			//mark flag in db
+			$.ajaxSetup({async: false});
+			if(document.getElementById("use-user-estimate-"+solAreaId).checked){
+				$.post("/useUserEffortEstimates_db",{solId:$('#solId').val(),solAreaId:solAreaId,useEfforts:'1', session_id:$('#session_id').val()}, function(data, status){
+			});
+			}
+			else{
+					$.post("/useUserEffortEstimates_db",{solId:$('#solId').val(),solAreaId:solAreaId,useEfforts:'0', session_id:$('#session_id').val()}, function(data, status){
+				});
+				}
+			$.ajaxSetup({async: true});
+			document.getElementById("solutionDetailsId").action="/captureSolAreaUseCases";		
+		}
+		else{
+			alert("Please select either value of Use Cases View");
+			return false;			
+		}
+	}
+	else if( formDestimation == "getSolAreaRequirements"){
+		document.getElementById("solutionDetailsId").action="/getSolAreaRequirements";
+	}
+	
+	document.getElementById("solutionDetailsId").submit();
+	
+	return true;
+}
+
+function submitEditForm(formDestimation,solAreaId){
+	document.getElementById("currentSolAreaId").value=solAreaId;
+	document.getElementById("solAreaId").value=solAreaId;
+	document.getElementById("solutionDetailsId").action="/captureSolAreaUseCases";
+	document.getElementById("isedit").value=true;
+	document.getElementById("solutionDetailsId").submit();
+	return true;
+}
+	function getPricingRequest(obj){
+		
+		
+	
+		var orangehref= $(obj).attr("data-attr");
+		var solid = $("#solId").val();
+		//alert("solid " +  solid);
+		$.ajax({url: "/checkLeadCountryForExistingDeal/"+solid, success: function(data) {
+			//alert("counrtyr " + data[0].COUNTRY_ID);
+			var countryid;
+			if(typeof data[0] !== 'undefined' && data[0] !== null) {
+				countryid = data[0].COUNTRY_ID;
+			}
+			
+			//alert("After query found country from DB :::: countryid " + countryid);
+					
+			if(!countryid){
+						
+						var dialog, form;
+						
+						
+						dialog = $( "#dialog-form" ).dialog({
+						      autoOpen: false,
+						      height: 400,
+						      width: 350,
+						      modal: true,
+						      buttons: {
+						        "Ok": addLeadCountry,
+						        Cancel: function() {
+						          dialog.dialog( "close" );
+						        }
+						      },
+						      close: function() {
+						        //form[ 0 ].reset();
+						       // allFields.removeClass( "ui-state-error" );
+						      }
+						    });
+		
+						      dialog.dialog( "open" );
+							
+						
+						
+						
+					 
+					 
+					    
+						}  else {
+							$(".price_res").remove();
+							$(".ajaxloader_pricing").show();
+							
+							//alert("When country exist :::   orangehref " + orangehref);
+							
+							$.ajax({url: orangehref, success: function(data) {
+							     if(data){
+							 		$(".ajaxloader_pricing").hide();
+							 		$(".pricingstatus").html("");
+							 		$(".pricingstatus").append("<div class='price_res'>"+data.statusMessage+ ' - ' + data.reqSubmitTime   +" </div>");
+									console.log("disable function " + data);
+									//alert("JSON :----> "+JSON.stringify(data));
+							     }
+								}
+								});
+							
+						}
+			
+			
+	
+		}
+		
+		});
+
+	}
+	
+	
+	function getStaffingDownload(obj){
+		
+		
+		var orangehref= $(obj).attr("data-attr");
+		var solid = $("#solId").val();
+		$.ajax({url: "/checkLeadCountryForExistingDeal/"+solid, success: function(data) {
+			//alert("counrtyr " + data[0].COUNTRY_ID);
+			var countryid;
+			if(typeof data[0] !== 'undefined' && data[0] !== null) {
+				countryid = data[0].COUNTRY_ID;
+			}
+			
+					
+			if(!countryid){
+						var dialog, form;
+						
+						
+						dialog = $( "#dialog-form" ).dialog({
+						      autoOpen: false,
+						      height: 400,
+						      width: 350,
+						      modal: true,
+						      buttons: {
+						        "Ok": addLeadCountry,
+						        Cancel: function() {
+						          dialog.dialog( "close" );
+						        }
+						      },
+						      close: function() {
+						        //form[ 0 ].reset();
+						       // allFields.removeClass( "ui-state-error" );
+						      }
+						    });
+		
+						      dialog.dialog( "open" );
+							
+						
+					    function addLeadCountry() {
+					    	
+					      var countryid= $("#leadCountryDialogBox").val();
+					    	if(countryid){
+					    		$(".validateTips").hide();
+
+					    		orangehref = orangehref + "&countryid="+countryid;
+								//alert("When country not exist :::  orangehref " + orangehref);
+								
+									var a = document.createElement('a');
+							 		a.href =  orangehref;
+							 		a.target='_blank';
+							 		a.style.display = 'none';
+							 		document.body.appendChild(a);
+							 		a.click();
+							 		delete a;
+
+								 	dialog.dialog( "close" );
+
+							 
+					    	}
+					    	else{
+					    		$(".validateTips").show();
+					    		}
+					    }
+					 
+					    
+						}  else {
+							 		var a = document.createElement('a');
+							 		a.href =  orangehref;
+							 		a.target='_blank';
+							 		a.style.display = 'none';
+							 		document.body.appendChild(a);
+							 		a.click();
+							 		delete a;
+						}
+			
+	
+		}
+		
+		});
+
+	}
+	
+   function addLeadCountry() {
+					    	
+					      var countryid= $("#leadCountryDialogBox").val();
+					    	if(countryid){
+					    		$(".validateTips").hide();
+
+					    		orangehref = orangehref + "&countryid="+countryid;
+								//alert("When country not exist :::  orangehref " + orangehref);
+								
+								$.ajax({url: orangehref, success: function(data) {
+							     if(data){
+							 		$(".ajaxloader_pricing").hide();
+							 		$(".pricingstatus").html("");
+							 		$(".pricingstatus").append("<div class='price_res'>"+data.statusMessage+ ' - ' + data.reqSubmitTime   +" </div>");
+									console.log("disable function " + data);
+									//alert("JSON :----> "+JSON.stringify(data));
+							     }
+								}
+								});
+								$(".price_res").remove();
+								$(".ajaxloader_pricing").show();
+
+								 dialog.dialog( "close" );
+
+							 
+					    	}
+					    	else{
+					    		$(".validateTips").show();
+					    		}
+					    }
+$(document).ready(function(){
+	
+	
+	//Start - Staffing download help document window
+	
+	  $("#dialog-message").hide();
+	$("#submitpricebtn").hide();
+	$("#staffingbutton").hide();
+  
+    $(".decline").on("click",function(){
+        $( "#dialog-message" ).dialog('close');
+
+    });
+    
+    $("#loginbutton").click(function (){
+	  		getConsentCheck(this)
+	});
+	
+	 function getConsentCheck(obj){
+				$( "#dialog-message" ).dialog({
+			        modal: true,
+			        width:712
+			      });
+		}
+// END
+	
+	$(".price_res").remove();
+	
+	 var LeadCountryInfo = $('#leadCountryDialogBox');
+	    LeadCountryInfo.empty();  
+	    $.ajax({url: "/getLeadCountryInfo", success: function(data) {
+	    	var option = $("<option/>");
+	    	option.attr("value", "").text("-Lead Country-");
+	    	LeadCountryInfo.append(option);
+	    	for (var i = 0; i < data.length; i++) {	
+	    		option = $("<option/>");
+	    		option.attr("value", data[i].COUNTRY_ID).text(data[i].COUNTRY_NAME);
+	    		LeadCountryInfo.append(option);
+	    	}
+	    }
+		});
+	
+	
+	$("#reqprice").click(function (){
+		getPricingRequest(this)
+	});
+	
+	
+	$("#downloadstaffing").click(function (){
+		if(checkStaffingSheetStatus(9)){
+		getStaffingDownload(this)
+		}
+		else{
+			alert('We are saving your data. Please try after some time');
+		}
+	});
+	
+	
+	if(document.getElementById("perfbutton"))
+		document.getElementById("perfbutton").style.visibility = "hidden";
+	
+	var completedSolAreas = $('div').find('td:contains("COMPLETE")').filter(function(){
+												//alert("text: "+$(this).text());
+											  return $(this).text() == 'COMPLETE';   
+											});
+	//alert("completedSolAreas length: "+completedSolAreas.length);
+	if(completedSolAreas.length > 0 && document.getElementById("perfbutton")) {
+		document.getElementById("perfbutton").style.visibility = "visible";
+	}	
+	
+	/// apply event to test include
+	$("#soakTestTr").css('display','none');
+	$("#testSolId").change(function(){
+		if(this.checked){
+			$("#soakTestTr").css('display','');	
+			this.value='Y';
+		}else{
+			$("#soakTestTr").css('display','none');
+			this.value='N';
+		}
+	});	
+	$("#soakTestId").change(function(){
+		if(this.checked){
+			this.value='Y';
+		}else{
+			this.value='N';
+		}
+	});
+	var is_perf_test_in_scope = $("#is_perf_test_in_scope").val();
+	var is_soak_test_in_scope = $("#is_soak_test_in_scope").val();
+	if(is_perf_test_in_scope !=null && is_perf_test_in_scope !=""){
+		if(is_perf_test_in_scope == 1){
+			$("#testSolId").prop( "checked", true );
+			$("#testSolId").val('Y');
+			$("#soakTestTr").css('display','');
+		}else{
+			$("#testSolId").prop( "checked", false );
+		}
+	}
+	
+	if(is_soak_test_in_scope !=null && is_soak_test_in_scope !=""){
+		if(is_soak_test_in_scope == 1){
+			$("#soakTestId").prop( "checked", true );
+			$("#soakTestId").val('Y');
+		}else{
+			//$("#soakTestId").prop( "checked", false );
+		}
+	}
+	//block editing of global flags if any soln area has gone into completed state	
+	var solstatus = false;
+	$('[id^="solstatus-"]').each(function(ind,obj){
+		if(obj.innerHTML === 'COMPLETE'){
+			solstatus = true;
+			return false;
+		}
+	});
+	
+ //Adding proceed button logic for #142
+   var proceed= false;
+	$('[id^="proceed-td-"]').each(function(index,object){
+		var id = object.id.slice(object.id.indexOf("-") + 4);
+		var industryId= document.getElementById("industryId").value;
+		var solId= document.getElementById("solId").value;
+		$.ajax({url:"/getUseCaseListForSolArea/"+id+"/"+industryId+"/"+solId,success: function(data){
+			if(data.length==0){
+				$("#proceed-"+id).prop("disabled", true);
+				$("#proceed-"+id).removeClass().addClass('greybutton');
+				//alert("disabling Id"+id);
+				//force the checkbox to be checked & non clickable
+				$("#use-user-estimate-"+id).prop( "checked", true );
+				$("#use-user-estimate-"+id).prop("disabled", true);
+				$("#user-provided-efforts-"+id).prop("disabled", false);
+			}
+						
+		  }			
+		});
+	});
+		
+	if(solstatus === true){
+		$("[id=useCaseInfoType]").each(function(ind,obj){
+			//obj.disabled=true;
+		});
+		
+		/*if(solstatus === true){
+			alert("HIIII");
+			
+			$("#staffingbutton").css("visibility","visible");
+			$("#lStaffingSheet").css("visibility","visible");
+		}*/
+		if(document.getElementById("testSolId"))
+			document.getElementById("testSolId").disabled = true;
+		if(document.getElementById("soakTestId"))
+			document.getElementById("soakTestId").disabled = true;
+		if(document.getElementById("staffingbutton")) {
+			document.getElementById("staffingbutton").style.visibility = "visible";
+		$("#staffingbutton").show();
+		}
+		if(document.getElementById("submitpricebtn")) {
+			document.getElementById("submitpricebtn").style.visibility = "visible";
+			$("#submitpricebtn").show();
+		}
+		
+		/*
+		$("[id=model]").each(function(ind,obj){
+			obj.disabled=true;
+		});
+		document.getElementById("sprintWeeks").disabled = true; */
+		
+		//checkStaffingSheetStatus(0);
+	}	
+	
+	/*
+	var isIncomplete = false;
+	$("[id=solstatus]").each(function(ind,obj){
+		if(obj.innerHTML === 'INCOMPLETE'){
+			isIncomplete = true;
+		}
+	});
+	
+	//alert("isIncomplete: "+isIncomplete);
+	
+	if(!isIncomplete){
+	
+		//chk & enable staffing button
+		checkStaffingSheetStatus(0);
+	}
+	
+	*/
+	
+		//disable the inactive icons
+	$('[id^="save-user-estimate-enabled-"]').hide();
+	$('[id^="edit-disabled-"]').hide();
+	$('[id^="download-reqMatrix-disabled-"]').hide();
+	$('[id^="effort-disabled-"]').hide();
+	$('[id^="download-estimation-disabled-"]').hide();
+		
+	var matches = document.querySelectorAll("input[name^='use-user-estimate']:checked");
+	//var matches = document.querySelector("input[id^='use-user-estimate']");
+	//alert(matches);
+	for(var i=0;i<matches.length;i++){
+		var match = matches[i];
+		var id = match.id.slice(18);
+		//solstatus = true;
+	//	alert(id);
+		//enable the textbox
+		document.getElementById("user-provided-efforts-"+id).disabled = false;
+		
+		//disable regular icons
+		//$("#save-user-estimate-disabled-"+id).hide();
+		$("#edit-enabled-"+id).hide();
+		$("#download-reqMatrix-enabled-"+id).hide();
+		$("#effort-enabled-"+id).hide();
+		$("#download-estimation-enabled-"+id).hide();
+		
+		$("#proceed-"+id).prop("disabled", true);
+		 $("#proceed-"+id).removeClass().addClass('greybutton');
+		// $("#proceed-"+obj).removeClass().addClass('bluebutton'); 
+		//$("#proceed-"+obj).removeAttr('disabled');
+		
+		//enable the inactive icons
+		//$("#save-user-estimate-enabled-"+id).show();
+		$("#edit-disabled-"+id).show();
+		$("#download-reqMatrix-disabled-"+id).show();
+		$("#effort-disabled-"+id).show();
+		$("#download-estimation-disabled-"+id).show();
+	}
+	
+	if(document.getElementById("staffingbutton") && solstatus === true){
+		document.getElementById("staffingbutton").style.visibility = "visible";
+		$("#staffingbutton").show();
+	}
+	//populateDeliveryCenterInfo();
+});
+
+var timeCount = 5000;
+
+function checkStaffingSheetStatus(count){
+	var checkStatus= false;
+	//alert('solId : '+$('#solId').val());
+	if(count < 10){
+		setTimeout(function() {
+			$.ajaxSetup({async: false});
+			$.post("/checkSaveStatus",{solId:$('#solId').val(),solAreaId:'-1',artifactType:'1'}, function(data, status){
+				//alert("Data: " + data + "\nStatus: " + status);
+				if(data=="Yes"){
+					checkStatus= true;
+					document.getElementById("staffingbutton").enabled = true;
+					document.getElementById("staffingbutton").style.visibility = "visible";
+					$("#staffingbutton").css("visibility","visible");
+					$("#staffingbutton").show();
+				}else{
+					setTimeout(function() {
+						checkStaffingSheetStatus(++count);
+					},timeCount);
+				}
+			});
+			$.ajaxSetup({async: true});
+		
+		},1000);
+	}
+	checkStatus=true;
+	return checkStatus;
+}
+
+var sliders = [];
+
+
+function processOffSet(obj){
+	//alert("id is:"+obj.id);
+	//alert("checked: "+obj.checked);
+	var id = obj.id.slice(obj.id.indexOf("-") + 1);
+	//alert("id: "+id);
+
+	if(obj.checked){
+		
+		//fetch offset from Server for that solAreaId
+		$.ajaxSetup({async: false});
+		$.get("/getSolAreaOffSet",{solId:$('#solId').val(),solAreaId:id}, function(data, status){
+			//alert("Data: " + data + "\nStatus: " + status);
+			//document.querySelector("#row-"+id).querySelector("#edit").style.display = "none";
+			//document.querySelector("#row-"+id).querySelector("#reqMatrix").style.display = "none";
+			//document.querySelector("#row-"+id).querySelector("#estimation").style.display = "none";
+
+			document.querySelector("#row-"+id).querySelector("#manual_estimation-"+id).style.display = "none";
+			if(document.getElementById("uc_estimations-"+id))
+				document.querySelector("#row-"+id).querySelector("#uc_estimations-"+id).style.display = "none";
+			if(document.getElementById("proceed-td-" + id))
+				document.querySelector("#row-"+id).querySelector("#proceed-td-" + id).style.display = "none";
+			
+			var slider = document.getElementById("slider-"+id);
+			
+			var solWeeks = parseInt(data[0].solWeeks);//data.solWeeks;
+			var maxWeeks = 160;
+			var solAreaWeeks = parseInt(data[0].solAreaWeeks);//data.solAreaWeeks;
+			var offSet = parseInt(data[0].offset);//data.offSet;
+			
+			//if slider is not yet attached then attach one
+			if(sliders.indexOf(id) == -1){
+				sliders.push(id);
+				noUiSlider.create(slider, {
+					start: [offSet, offSet + solAreaWeeks],
+					connect: true,
+					behaviour: 'drag-fixed',
+					tooltips: false,
+					range: {
+						'min': 0,
+						'max': maxWeeks
+					},
+					pips: {
+						mode: 'values',
+						values: [0,maxWeeks],
+						density: 5,
+						stepped: true
+					},
+					format: {
+						from: function(value) {
+							return parseInt(value);
+						},
+						to: function(value) {
+							return parseInt(value);
+						}
+					}
+				});
+				
+			}
+			
+			var offset = document.querySelector("#row-"+id).querySelector("#solstatus-"+id);
+
+			slider.noUiSlider.on('update', function ( values, handle, unencoded, isTap, positions ) {
+				if(handle==0){
+					offset.innerHTML = values[handle] + "&nbsp;-to-&nbsp;"+ (Number(values[handle])+Number(solAreaWeeks));
+				}
+			});
+			slider.parentElement.style.display = "inline";
+			//slider.parentElement.colSpan="6";
+		});
+		$.ajaxSetup({async: true});
+		
+		($("#row-"+id).find("#solstatus-"+id)).show();
+		
+		
+	} else{
+		//get the new offset
+		//alert(document.querySelector("#slider-"+id));
+		//alert(document.querySelector("#slider-"+id).querySelector(".noUi-tooltip"));
+		var temp = document.querySelector("#row-"+id).querySelector("#solstatus-"+id).innerHTML;
+		var offSetVal = temp.substring(0,temp.indexOf("&"));
+
+		//alert("offSetVal: "+offSetVal);
+		$.ajaxSetup({async: false});
+		$.post("/setSolAreaOffSet",{solId:$('#solId').val(),solAreaId:id,offSet:offSetVal, session_id:$('#session_id').val()}, function(data, status){
+			//document.querySelector("#row-"+id).querySelector("#solstatus").innerHTML = "COMPLETE";
+			//document.querySelector("#row-"+id).querySelector("#edit").removeAttribute("style");
+			//document.querySelector("#row-"+id).querySelector("#reqMatrix").removeAttribute("style");
+			//document.querySelector("#row-"+id).querySelector("#estimation").removeAttribute("style");
+
+			document.querySelector("#row-"+id).querySelector("#manual_estimation-" + id).removeAttribute("style");
+			if(document.getElementById("uc_estimations-"+id))
+				document.querySelector("#row-"+id).querySelector("#uc_estimations-" + id).removeAttribute("style");
+			if(document.getElementById("proceed-td-" + id))
+				document.querySelector("#row-"+id).querySelector("#proceed-td-" + id).removeAttribute("style");
+			//alert("noUiSlider: "+noUiSlider);
+			var slider = document.getElementById("slider-"+id);
+			slider.parentElement.style.display = "none";
+			slider.parentElement.colSpan="3";
+		});
+		$.ajaxSetup({async: true});
+				
+		($("#row-"+id).find("#solstatus-"+id)).hide();
+	}
+
+}
+
+function estimationModelChanged(obj){
+		//alert(obj);
+		if(document.getElementById("use-user-estimate-"+obj).checked){
+			//enable the textbox
+			document.getElementById("user-provided-efforts-"+obj).disabled = false;
+
+			
+			//disable regular icons
+			//$("#save-user-estimate-disabled-"+obj).hide();
+			$("#edit-enabled-"+obj).hide();
+			$("#download-reqMatrix-enabled-"+obj).hide();
+			$("#effort-enabled-"+obj).hide();
+			$("#download-estimation-enabled-"+obj).hide();
+			
+			//enable the inactive icons
+			//$("#save-user-estimate-enabled-"+obj).show();
+			$("#edit-disabled-"+obj).show();
+			$("#download-reqMatrix-disabled-"+obj).show();
+			$("#effort-disabled-"+obj).show();
+			$("#download-estimation-disabled-"+obj).show();
+				
+			//mark flag in db
+			$.ajaxSetup({async: false});
+			$.post("/useUserEffortEstimates",{solId:$('#solId').val(),solAreaId:obj,useEfforts:'1', session_id:$('#session_id').val()}, function(data, status){
+				
+			});
+			$.ajaxSetup({async: true});
+		
+		} else{
+			//disable the textbox
+			document.getElementById("user-provided-efforts-"+obj).disabled = true;
+			
+			
+			//enable regular icons
+			$("#save-user-estimate-disabled-"+obj).show();
+			$("#edit-enabled-"+obj).show();
+			$("#download-reqMatrix-enabled-"+obj).show();
+			$("#effort-enabled-"+obj).show();
+			$("#download-estimation-enabled-"+obj).show();
+			
+			//disable the inactive icons
+			$("#save-user-estimate-enabled-"+obj).hide();
+			$("#edit-disabled-"+obj).hide();
+			$("#download-reqMatrix-disabled-"+obj).hide();
+			$("#effort-disabled-"+obj).hide();
+			$("#download-estimation-disabled-"+obj).hide();
+		
+			//mark flag in db
+			$.ajaxSetup({async: false});
+			$.post("/useUserEffortEstimates",{solId:$('#solId').val(),solAreaId:obj,useEfforts:'0', session_id:$('#session_id').val()}, function(data, status){
+				
+			});
+			$.ajaxSetup({async: true});
+		
+		}
+}
+//Defect fix for #142
+var classvalue;
+function setCheckedValueForProceed(obj)
+{
+	classvalue=document.getElementById("proceed-"+obj).className;
+}
+function getCheckedValueForProceed()
+{
+	return classvalue;
+}
+
+function estimationModelChanged_IC(obj){
+	//alert(obj);
+	if(document.getElementById("use-user-estimate-"+obj).checked){
+		//setting className value of buttton on click of checkbox for #142
+		setCheckedValueForProceed(obj);
+		//console.log("checked adding bluebutton classvalue=="+getCheckedValueForProceed());
+		//enable the textbox
+		document.getElementById("user-provided-efforts-"+obj).disabled = false;
+		$("#proceed-"+obj).prop("disabled", true);
+		 $("#proceed-"+obj).removeClass().addClass('greybutton');
+	
+		//mark flag in db
+		$.ajaxSetup({async: false});
+		$.post("/useUserEffortEstimates",{solId:$('#solId').val(),solAreaId:obj,useEfforts:'1', session_id:$('#session_id').val()}, function(data, status){
+			
+		});
+		$.ajaxSetup({async: true});
+
+	} else{
+			if(document.getElementById("user-provided-efforts-"+obj).value>0){
+				//document.getElementById("user-provided-efforts-"+obj).value='0';
+				document.getElementById("user-provided-efforts-"+obj).disabled = false;
+				document.getElementById("solstatus-"+obj).innerHTML='INCOMPLETE';
+				$("#save-user-estimate-enabled-"+obj).show();
+				$("#save-user-estimate-disabled-"+obj).hide();
+				var solstatus = false;
+				$('[id^="solstatus-"]').each(function(ind,obje){
+					if(obje.innerHTML === 'COMPLETE'){
+						solstatus = true;
+						return false;
+					}
+				});
+				if(document.getElementById("staffingbutton") && solstatus === true){
+					document.getElementById("staffingbutton").style.visibility = "visible";
+					$("#staffingbutton").show();
+				}
+				else{
+					document.getElementById("staffingbutton").style.visibility = "hidden";
+					$("#staffingbutton").hide();
+				}
+				if(document.getElementById("submitpricebtn") && solstatus === true){
+					document.getElementById("submitpricebtn").style.visibility = "visible";
+					$("#submitpricebtn").show();
+				}
+				else{
+					document.getElementById("submitpricebtn").style.visibility = "hidden";
+					$("#submitpricebtn").hide();
+				}
+			}
+			else
+			{
+				//disable the textbox
+				document.getElementById("user-provided-efforts-"+obj).disabled = true;
+			}
+							//mark flag in db
+				$.ajaxSetup({async: false});
+				$.post("/useUserEffortEstimates",{solId:$('#solId').val(),solAreaId:obj,useEfforts:'0', session_id:$('#session_id').val()}, function(data, status){
+					
+				});
+				$.ajaxSetup({async: true});
+				
+			//Enabling or Disabling the proceed button based on Use case for #143
+			//console.log("before adding  classvalue=="+getCheckedValueForProceed());
+			if(getCheckedValueForProceed()=='greybutton'){
+					$("#proceed-"+obj).prop("disabled", true);
+					$("#proceed-"+obj).removeClass().addClass('greybutton');
+					
+			}
+			else
+			{		$("#proceed-"+obj).removeClass().addClass('bluebutton'); 
+					$("#proceed-"+obj).removeAttr('disabled');
+			}
+			 
+			/* var industryId= document.getElementById("industryId").value;
+			var solId= document.getElementById("solId").value;
+			$.ajaxSetup({async: false});
+			$.get("/getUseCaseListForSolArea/"+obj+"/"+industryId+"/"+solId,function(data, status){
+				if(data.length==0){
+					$("#proceed-"+obj).prop("disabled", true);
+					$("#proceed-"+obj).removeClass().addClass('greybutton');
+				}
+				else{
+					$("#proceed-"+obj).removeClass().addClass('bluebutton'); 
+					$("#proceed-"+obj).removeAttr('disabled');
+				}
+			
+			});
+			$.ajaxSetup({async: true}); */
+	
+		/*
+		//mark flag in db
+		$.ajaxSetup({async: false});
+		$.post("/useUserEffortEstimates",{solId:$('#solId').val(),solAreaId:obj,useEfforts:'0', session_id:$('#session_id').val()}, function(data, status){
+			
+		});
+		$.ajaxSetup({async: true});
+	*/
+	}
+}
+
+
+
+
+function enableSaveEffortsIcon(obj){
+	$("#save-user-estimate-disabled-"+obj).hide();
+	$("#save-user-estimate-enabled-"+obj).show();
+}
+
+var userEstimates = 0;
+var userEstimatesHash = {};
+function saveUserEstimates(obj){
+	if(document.getElementById("use-user-estimate-"+obj).checked){
+		//mark flag in db
+		$.ajaxSetup({async: false});
+		$.post("/useUserEffortEstimates_db",{solId:$('#solId').val(),solAreaId:obj,useEfforts:'1', session_id:$('#session_id').val()}, function(data, status){
+		});
+		$.ajaxSetup({async: true});
+	} else{
+		//mark flag in db
+		$.ajaxSetup({async: false});
+		$.post("/useUserEffortEstimates_db",{solId:$('#solId').val(),solAreaId:obj,useEfforts:'0', session_id:$('#session_id').val()}, function(data, status){
+		});
+		$.ajaxSetup({async: true});
+	}
+
+	window.scrollTo(0, 0);
+	$(".showmodal").show();
+	setTimeout(function() {
+		$(".showmodal").hide();
+	},manualWaitTime);
+	$("#save-user-estimate-disabled-"+obj).show();
+	$("#save-user-estimate-enabled-"+obj).hide();
+	if(document.getElementById("staffingbutton")){
+		document.getElementById("staffingbutton").style.visibility = "visible";
+		$("#staffingbutton").show();
+	}
+	
+	if(document.getElementById("submitpricebtn")){
+		document.getElementById("submitpricebtn").style.visibility = "visible";
+		$("#submitpricebtn").show();
+	}
+	if(document.getElementById("processOffset-"+obj)){
+		document.getElementById("processOffset-"+obj).style.visibility = "visible";
+		$("#processOffset-"+obj).show();
+	}
+	if(document.getElementById("solstatus-"+obj)){
+		//document.getElementById("solstatus-"+obj).style.visibility = "hidden";
+		$("#solstatus-"+obj).hide();
+	}
+	document.getElementById("solstatus-"+obj).innerHTML = "COMPLETE";
+	
+	//alert(obj);
+	var newVal = document.getElementById("user-provided-efforts-"+obj).value;
+	//alert(Number(newVal));
+	//alert(Number(userEstimates));
+	var requireProcessing = false;
+	if (typeof(userEstimatesHash[obj]) != "undefined"){
+		//alert(userEstimatesHash.obj);
+		if(Number(userEstimatesHash[obj]) != Number(newVal)){
+			userEstimatesHash[obj]=newVal;
+			requireProcessing=true;
+		} else{
+			//alert("No Change in value");
+			requireProcessing=false;
+		}
+	} else{
+		//alert("first timer");
+		userEstimatesHash[obj]=newVal;
+		requireProcessing = true;
+	}
+//	if(Number(newVal) != Number(userEstimates)){
+//		userEstimates = newVal;
+//	}
+	if(requireProcessing){
+		$.ajaxSetup({async: false});
+		$.post("/saveUserProvidedEfforts",{solId:$('#solId').val(),solAreaId:obj,efforts:newVal, session_id:$('#session_id').val()}, function(data, status){
+			
+		});
+		$.ajaxSetup({async: true});
+		
+	}
+	
+}
+
+function populateDeliveryCenterInfo() {
+
+	$.ajax({url: "/getDeliveryCenterInfo", success: function(data) {
+		$( "select[id^='deliveryCenterInfo']" ).each(function( index, element ) {
+
+			var id = element.id;
+			var deliveryCenterInfo = document.getElementById(id);
+			
+			if(deliveryCenterInfo != undefined){
+				var selectionValue= document.getElementById("ppdc").value;
+
+				for (var i = 0; i < data.length; i++) {	
+						//alert("data[i].delivery_org_id"+data[i].delivery_org_id);
+					    var opt = document.createElement('option');
+						if(selectionValue == data[i].delivery_org_id){
+							opt.selected = 'selected';
+						}
+						
+						opt.value = data[i].delivery_org_type + " - "+data[i].delivery_org_name;
+						opt.innerHTML = data[i].delivery_org_type + " - "+data[i].delivery_org_name;
+						deliveryCenterInfo.appendChild(opt);
+				}
+			}
+		});
+	 }
+	});
+}
+
+
+</script>
+
+</head>
+
+<div class="ajaxloader_pricing" id="myOverlay"></div>
+<div class="ajaxloader_pricing"  id="loadingGIF"><img src="/static/images/demo_wait.gif" /><p>Please wait while tool is submitting costing request to GPE automation ....</p></div>
+
+<body class="mainInner">
+
+<div id="dialog-message" title="RCM PMP Staffing plan guide">
+
+  
+   		<span class="linepadding"><b>The Zip contains the following 2 Files:</b> </span>
+		<ol style="text-align:left; " type="1">
+		  <li class="linepadding"> Generated CS Solution Workbook for current opportunity.</li>
+		  <li class="linepadding"> RCM PMP Staffing plan template.</li>
+		 </ol>
+   
+   		<span class="linepadding"><b>Important point to be remembered:</b> </span>
+   		<ol style="text-align:left; " type="1">
+			      <li class="linepadding"> Please <b>Enable Content</b> on opening these File to enable Macros.</li>
+				  <li class="linepadding"> Both files should be placed in the same folder.</li>
+				  <li class="linepadding"> Make sure to browse appropriate PMP staffing plan from "CS Bid overview" of CS staffing, this must be picked up from same folder, PMP staffing template must be supported as per WIKI latest version.</li>
+				  <li class="linepadding"> Generally the predefined latest PMP staffing template is already mentioned from the current directory, if not, browse it appropriately.</li>
+  				  <li class="linepadding"> Go to "CS Staffing" sheet to click on "2. Update PMP Staffing".</li>
+  				  <li class="linepadding"> All the existing entries from RCM PMP file must be removed automatically and updated with latest from current CS Staffing file</li>
+  				  <li class="linepadding"> The updated RCM PMP Staffing plan must be generated on the same path as CS Staffing workbook.</li>
+				  <li class="linepadding"> For more details, please visit : <a style="color: #118;" href="https://apps.na.collabserv.com/wikis/home?lang=en-us#!/wiki/Wdfccd761fc38_4951_8acc_819d6c978820/page/Staffing%20Plan%20Generator" target="_blank"> 
+    				Client Solutioning Innovation Center Community Wiki </a></li>
+		</ol>
+		
+		
+		
+		
+  <form class="modelform">
+     <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix"></div>
+     <button type="button" class="ui-button ui-corner-all ui-widget decline">Close</button>
+  </form> 
+  
+</div>
+
+
+	<div class="divWidth">
+		<div style="height:90px">
+			<div class="LogDiv"><img src="/static/images/logo.png" style="padding-top:18px;"></div>
+			<div class="NavDiv">
+				<div class="nav">
+					<ul>
+					
+						<li class="home"><a href="dashboard">Home</a></li>
+						<li class="contact"><a href='mailto:kanwsing@in.ibm.com,jayant.sinha@ie.ibm.com,joypatra@in.ibm.com?subject=Solution%20Advisor%20Support%20Request'>Contact</a></li>
+						<li class="logout"><a href="static/logout.html" id="btnLogout" rel="modal:open">Logout</a></li>
+					</ul>
+					<div class="SeaDiv">
+						<div id="popUpButton" class="popupHoverElement mainOutPop">
+							<img src="/static/images/search.jpg">
+							<div id="two" class="popupBox">
+							<form method="post" action="/searchOpportunity" id="search">
+								<input type="text" value="" name="searchOpportunity" id="searchOpportunity" required class="popInput placeholder-fix" style="width: 80%;margin-top: 5px;margin-left: 5px;" placeholder="Opportunity Name">
+								<input type="submit" value="Search" class="popButton">
+							</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="InnDiv" ></div>
+	<form method="post" name="solutionDetailsId" id="solutionDetailsId" class="smart-green" action="/captureSolAreaUseCases">
+	<input type=hidden id="ppdc" name="ppdc" value="{{solDetailsInfo[0].PROPOSED_DELIVERY_CENTER}}">
+	<input type=hidden id="solId" name="solId" value="{{solDetailsInfo[0].sol_id}}">
+	<input type=hidden  id="SL_ID" name="SL_ID" value="{{solDetailsInfo[0].sl_id}}">
+	<input type=hidden id="industryId" name="industryId" value="{{solDetailsInfo[0].indus_id}}">
+	<input type=hidden id="solAreaId" name="solAreaId" value="{{solDetailsInfo[0].sol_area_id}}">
+	<input type=hidden id="currentSolAreaId" name="currentSolAreaId" value="{{solDetailsInfo[0].sol_area_id}}">
+	<input type=hidden id="solReqAreaId" name="solReqAreaId" value="">
+	<input type=hidden id="is_perf_test_in_scope" name="is_perf_test_in_scope" value="{{solDetailsInfo[0].is_perf_test_in_scope}}">
+	<input type=hidden id="is_soak_test_in_scope" name="is_soak_test_in_scope" value="{{solDetailsInfo[0].is_soak_test_in_scope}}">
+	<input type=hidden id="enbTestBtn" name="enbTestBtn" value="{{enbTestBtn}}">
+	
+	<input type=hidden id="edit_delivery_model" name="edit_delivery_model" value="{{solDetailsInfo[0].delivery_model}}">
+	<input type=hidden id="edit_usecase_info_type" name="edit_usecase_info_type" value="{{solDetailsInfo[0].usecase_info_type}}">
+	<input type=hidden id="edit_sprint_weeks" name="edit_sprint_weeks" value="{{solDetailsInfo[0].sprint_weeks}}">
+	<input type=hidden id="session_id" name="session_id" value="{{ sid }}">
+	<input type=hidden id="isedit" name="isedit" 
+	{% if isedit %}
+		value={{ isedit }}
+	{% else %}
+		value="false"
+	{% endif %}	>
+	
+	
+	<div class="divWidth">
+	<div class="loginInfo ">Hello {{ user.emp_fname }} {{user.emp_lname}}</div>
+	
+	<p>Capture your Use Cases</p>
+		<table width="100%" cellpadding="1" cellspacing="0" border="0">		
+			<tr>
+				<td colspan="2" class="tdmarg">Solution Details</td>
+				<td colspan="4" class="pricingstatus tdmarg" style="font-family: helvetica; font-size: 13px;color: #4b6988;">{{priceSubmitStatus}}</td>
+			</tr>
+			<tr>
+				<td class="tdInputLabel"><strong>Solution Id:</strong></td>
+				<td class="tdInputLabel">{{solDetailsInfo[0].sol_id}}</td>
+				<td class="tdInputLabel" colspan="4" style="text-align: left">
+				
+				
+				<span id="submitpricebtn">
+										
+										<button class="orangebutton" id="reqprice" data-attr="http://{{serviceURL}}/downloadgpe/csstaffinggen?sessionId={{sid}}&solId={{solDetailsInfo[0].sol_id}}" type="button">Submit costing request</button>
+
+							
+					</span>
+				
+				</td> 
+				
+				
+			</tr>
+			<!-- <tr>
+				<td class="tdInputLabel"><strong>Lead Service Line:</strong></td>
+				<td class="tdInputLabel" colspan="5">{{solDetailsInfo[0].sl_name}}</td>
+			</tr> -->
+			<tr>
+				<td class="tdInputLabel"><strong>Industry:</strong></td>
+				<td class="tdInputLabel">{{solDetailsInfo[0].indus_name}}</td>
+				<td class="tdInputLabel" colspan="4" style="text-align: right">
+				<!--
+				<span id="downloadpricebtn">
+						{% set keepgoing = true %}
+						{% for ob in solDetailsInfo%}
+							{% if ob.sol_status== 'COMPLETE' && keepgoing %}
+									<a href="http://{{serviceURL}}/ target="_blank">				
+										<button class="orangebutton" type="button">Download pricing</button>
+									</a>
+								{% set keepgoing = false %}
+							{% endif %}
+						{% endfor %}
+					</span>
+				-->
+				</td> 
+			</tr>
+		{% if errorMessage %}
+			<tr>
+				<td colspan="6" class="tdErrorMsg">{{errorMessage}}</td>
+			</tr>
+		{% endif %}
+			<tr>
+					{% if !screenField.isUsecaseHidden && !screenField.isPerfTestHidden && !screenField.isModelHidden && !screenField.isSprintWeeksHidden %}
+				<td colspan="6" class="tdmarg">Selected Solution Areas</td>
+				{% endif %}
+			</tr>
+			<tr>
+					{% if !screenField.isUsecaseHidden %}
+				<td class="tdInputLabel" style="height:35px"><strong>Use Cases View:</strong></td>
+				<td class="tdInputLabel" colspan="5">
+					<input type="radio" name="useCaseInfoType" id="useCaseInfoType" value="1"  
+					{% if solDetailsInfo[0].usecase_info_type == 1 %}
+					 checked
+					{% endif %}
+					/>&nbsp;&nbsp;High Level View&nbsp;&nbsp;&nbsp;&nbsp;
+					<input type="radio" name="useCaseInfoType" id="useCaseInfoType" value="2"
+					{% if solDetailsInfo[0].usecase_info_type != 1 %}
+					 checked
+					{% endif %}
+					/>&nbsp;&nbsp;Detailed View
+				</td>
+				{% else %}
+				<input type="hidden" name="useCaseInfoType" id="useCaseInfoType" value="2" />
+				{% endif %}
+			</tr>
+			{% if !screenField.isUsecaseHidden && screenField.usecaseMsg %}
+			<tr><td><font color="red" style="font-size: 12px;">{{ screenField.usecaseMsg }}</font></td></tr></label>
+		{% endif %}
+			<tr>
+					{% if !screenField.isPerfTestHidden %}
+				<td class="tdInputLabel" style="height:35px"><strong>Performance test in scope:</strong></td>
+				<td class="tdInputLabel" >
+					<input type="checkbox"  class="focus" name="testSolId" id="testSolId" value="N"  
+					{% if solDetailsInfo[0].is_perf_test_in_scope > 0 %}
+						 checked
+					{% endif %}
+					/>
+				</td>	
+			<!-- <td class="tdInputLabel"></td>	<td class="tdInputLabel"></td>	
+			<td class="tdLabel"></td> -->
+			<td class="tdLabel" align="left">
+					<span id="perfbutton">				
+						{% set keepgoing = true %}
+						{% for ob in solDetailsInfo%}
+							{% if ob.is_perf_test_in_scope == 1 && ob.sol_status== 'COMPLETE' && keepgoing %}
+								<a href="http://{{serviceURL}}/download/request?sessionId={{sid}}&solId={{solDetailsInfo[0].sol_id}}&solAreaId=0&nfrType=performance" target="_blank">
+								<button class="greenbutton" type="button">Download Perf Test Estimation</button>
+								</a>
+								{% set keepgoing = false %}
+							{% endif %}
+						{% endfor %}
+					</span>
+				</td>	
+				{% else %}	
+				<!--<input type="hidden" name="testSolId" id="testSolId" value={% if solDetailsInfo[0].is_perf_test_in_scope > 0 %} "N"{% endif %} />-->
+				{% endif %}				
+			</tr>
+			{% if !screenField.isPerfTestHidden && screenField.perfTestMsg %}
+				<tr><td><font color="red" style="font-size: 12px;">{{ screenField.perfTestMsg }}</font></td></tr></label>
+			{% endif %}	
+			<tr id="soakTestTr">
+					{% if !screenField.isPerfTestHidden %}
+				<td class="tdInputLabel" style="height:35px"><strong>Soak Test Required:</strong></td>
+				<td class="tdInputLabel" colspan="5">
+					<input type="checkbox"  class="focus" name="soakTestId" id="soakTestId" value="Y"
+					{% if solDetailsInfo[0].is_soak_test_in_scope > 0 %}
+						 checked
+					{% endif %}
+					/>
+				</td>							
+				{% endif %}							
+			</tr>
+
+			<tr>
+					{% if !screenField.isModelHidden %}
+				<td class="tdInputLabel" style="height:35px"><strong>Model:</strong></td>
+				<td class="tdInputLabel" >
+					<input type="radio" name="model" id="model" value="1" onchange="disableSprintWeeks()" 
+					{% if solDetailsInfo[0].delivery_model == 1 %}
+						 checked
+					{% endif %}
+					
+					/>&nbsp;&nbsp;Waterfall&nbsp;&nbsp;&nbsp;&nbsp;
+					<input type="radio" name="model" id="model" value="2" onchange="enableSprintWeeks()"
+					{% if solDetailsInfo[0].delivery_model == 2 %}
+						 checked
+					{% endif %}
+					/>&nbsp;&nbsp;Agile
+				</td>
+				
+				
+				{% else %}
+				<input type="hidden" name="model" id="model" value="{{ solDetailsInfo[0].delivery_model }}" />
+				<td class="tdInputLabel" style="height:35px"><strong id="lStaffingSheet">Staffing Sheet : </strong></td>
+				<td class="tdInputLabel" colspan="3"><strong> </strong></td>
+			{% endif %}
+			
+			
+				<!-- <td class="tdInputLabel"></td> -->
+				<!-- <td class="tdLabel" align="right" > -->
+				<td class="tdLabel" align="left" >						
+										
+				    <table>
+				    <tr><td>
+					<span id="staffingbutton">
+
+									<button class="greenbutton" id="downloadstaffing" data-attr="http://{{serviceURL}}/download/request?sessionId={{sid}}&solId={{solDetailsInfo[0].sol_id}}&artifactType=1" type="button">Download Staffing Estimation</button>
+
+					</span>
+				    </td></tr>	
+				    <tr><td>
+					<sup>
+					    <a id="loginbutton"  href="/" onclick="return false;">
+					    How to generate PMP file from this staffing file on Windows?</a>
+					</sup>
+				    </td></tr>	
+				    </table>
+												
+				</td>
+				
+			</tr>
+			
+			<tr>
+				<td colspan="12">
+			{% for ob in solDetailsInfo%}
+					{% if ob.sol_area_id == 166 %}
+						<lable><font color="red" size="2px">"Note: Staffing sheet for agile delivery model is not implemented for Unica!"
+Choose only Waterfall model, Agile will be available in subsequent releases.</font></lable>
+				{% endif %}
+			{% endfor %}
+				</td>
+			</tr>
+			
+			
+			
+			{% if !screenField.isModelHidden && screenField.modelMsg %}
+			<tr><td><font color="red" style="font-size: 12px;">{{ screenField.modelMsg }}</font></td></tr>
+			{% endif %}
+			<tr>
+					{% if !screenField.isSprintWeeksHidden %}
+				<td class="tdInputLabel" style="height:35px"><strong>Sprint Weeks:</strong></td>
+				<td class="tdInputLabel" colspan="5" style="height:35px;width:40px;">	
+					<input type = "number" name="sprintWeeks" min="3" max="6" id="sprintWeeks" value=		 	
+					{% if solDetailsInfo[0].sprint_weeks %}
+							{{solDetailsInfo[0].sprint_weeks}}
+					{% else %}
+						"3" 
+					{% endif %}
+					{% if solDetailsInfo[0].delivery_model != 2 %}
+						 disabled 
+					{% endif %}		
+					onchange="updateSprintWeeksAtServer()" />&nbsp;&nbsp;Sprint Weeks
+				</td>
+				
+				{% else %}
+				<input type = "hidden" name="sprintWeeks" id="sprintWeeks" value={% if solDetailsInfo[0].sprint_weeks %}{{solDetailsInfo[0].sprint_weeks}}{% else %}"3"{% endif %} />
+				{% endif %}
+			</tr>
+			{% if !screenField.isSprintWeeksHidden && screenField.sprintweeksMsg %}
+			<tr><td><font color="red" style="font-size: 12px;">{{ screenField.sprintweeksMsg }}</font></td></tr>
+			{% endif %}
+			
+			<!-- <tr style="display: none">
+			<td class="tdInputLabel" style="height:35px">
+				Batch process :
+			</td>
+			<td class="tdInputLabel" colspan=3>
+					<input type="text"  class="focus" name="simpleId" id="simpleId" value="{{simpleId}}" placeholder="Enter Simple..." pattern="[0-9]+"  maxlength=3 autocomplete="off" />
+					<input type="text"  class="focus" name="mediumId" id="mediumId" value="{{mediumId}}" placeholder="Enter Medium..." pattern="[0-9]+"  maxlength=3 autocomplete="off" />
+					<input type="text"  class="focus" name="simpleId" id="comlexId" value="{{comlexId}}" placeholder="Enter Complex..." pattern="[0-9]+"  maxlength=3 autocomplete="off" />
+				</td>
+			</tr> -->
+			<tr>					
+				<td colspan="6">
+					
+			<table width="100%" cellpadding="1" cellspacing="0" border="0">	
+				<tr>				
+				
+				<td class="tdmarg" align=center width="30%" style="border-bottom: 3px solid blue"><!-- <str style="font-size: 12px;"ong> --> <strong>Solution Area</strong></td>				
+				<!--<td class="tdmarg" width="10%" align="left">Offset&nbsp;<sup><a href="#" onclick="alert('Use this to set starting week for solution area.')">&quest;</a></sup></td> -->
+				<td class="tdmarg" width="3%"></td>
+				<td class="tdmarg" width="17%" align="left" style="border-bottom: 3px solid blue">&nbsp;
+					{% set keepgoing = true %}
+					{% for ob in solDetailsInfo%}
+						{% if ob.sol_status== 'COMPLETE' && keepgoing %}
+							{% set isCompleted = true %}
+							<strong>Planned Weeks </strong>&nbsp;<sup><a href="#" onclick="alert('Use this to set starting week for solution area.')">&quest;</a></sup>								
+							
+							{% set keepgoing = false %}
+						{% endif %}
+					{% endfor %}				
+				</td>
+				<td class="tdmarg" width="3%"></td>
+				<td class="tdmarg" align=center width="17%" style="border-bottom: 3px solid blue"><strong>Manual Estimation</strong></td>
+				<td class="tdmarg" width="3%"></td>
+				<td class="tdmarg" align=center width="30%" style="border-bottom: 3px solid blue"><strong>Use Cases Estimation</strong></td>
+				</tr>
+			</table>
+				</td>
+			</tr>
+		{% for ob in solDetailsInfo%}
+			<tr style="height:35px">
+			
+				{% if  ob.sol_status== 'COMPLETE' %}
+				<td colspan="6">
+					<div id="row-{{ ob.sol_area_id }}">
+						<table width="100%" cellpadding="1" cellspacing="0" border="0">
+							<tr>
+							<td class="tdLabel" width="30%" align="center">
+									<table border="0" width="100%">
+									<tr><td class="tdLabel" width="5%"></td>
+									<td>							
+									<strong>{{ ob.sol_area_name }}</strong></td>												
+									</tr></table>
+								</td>												
+							<td class="tdLabel" width="3%"></td>
+							<td class="tdLabel" width="17%" align="center">
+								<label class="switch">
+								<!-- <img name="switch-{{ob.sol_area_id}}" id="switch-{{ob.sol_area_id}}" src="/static/images/edit_icon.png" onclick="processOffSet(this)"/> -->
+								 <input type="checkbox" name="switch-{{ob.sol_area_id}}" id="switch-{{ob.sol_area_id}}" onchange="processOffSet(this)">
+								  <div class="slider"></div>								 
+								</label>
+							</td>
+							<td class="tdLabel" width="3%"></td>
+							<td class="tdLabel" id="solstatus-{{ob.sol_area_id}}" align="center" style="display: none;" width="8%">{{ ob.sol_status }}</td>
+							<td id="manual_estimation-{{ob.sol_area_id}}" class="tdLabel" width="17%">
+							{% if ob.sol_area_id != 105 && ob.sol_area_id != 104 %}
+							
+							<table border="0" width="100%">
+							<tr>
+							
+							<td align="left">
+								<input type="checkbox" width="20%" name="use-user-estimate-{{ob.sol_area_id}}" id="use-user-estimate-{{ob.sol_area_id}}" 
+								
+								{% if ob.totalEfforts > 0 %}
+										 onchange="estimationModelChanged({{ob.sol_area_id}}) "
+								{% else %}		 
+										 onchange="estimationModelChanged_IC({{ob.sol_area_id}}) "
+									{% endif %}
+									
+									{% if ob.use_provided_efforts > 0 %}
+										 checked
+									{% endif %}									
+								/>
+							</td>
+							
+							<td align="left" width="40%">
+								<input type="text" disabled="" class ="foo" size="10" name="user-provided-efforts-{{ob.sol_area_id}}" id="user-provided-efforts-{{ob.sol_area_id}}" value="{{ob.provided_efforts}}" onclick="enableSaveEffortsIcon({{ob.sol_area_id}})"/>
+							</td>
+							<td width="20%" align="left">hours</td>
+							<td align="left" width="20%" name="save-user-estimate-enabled-{{ob.sol_area_id}}" id="save-user-estimate-enabled-{{ob.sol_area_id}}">
+							
+								<img id="efforts-backup-enabled-{{ob.sol_area_id}}" src="/static/images/efforts_backup_enabled.png" onclick="saveUserEstimates({{ob.sol_area_id}})" class="effort-enable">
+							</td>
+							</td>
+							<td align="left" width="20%" name="save-user-estimate-disabled-{{ob.sol_area_id}}" id="save-user-estimate-disabled-{{ob.sol_area_id}}">
+							
+								<img src="/static/images/efforts_backup_disabled.png">
+							</td>
+							</tr>
+							</table>
+							{% endif %}
+							</td>
+							<td class="tdLabel" style="display:none;" width="50%" align="top">								
+								<div id="slider-{{ ob.sol_area_id }}">								
+								</div>
+							</td>
+							<td class="tdLabel" width="3%"></td>
+							
+							{% if ob.totalEfforts > 0 %}
+							
+							<td id="uc_estimations-{{ob.sol_area_id}}" class="tdLabel" align="center" width="30%">
+							<table border="0" width="100%">
+								<tr>
+								<td class="tdLabel" name = "edit" id = "edit-disabled-{{ob.sol_area_id}}"  align="left" width="20%">
+									<img src="/static/images/edit_icon_disabled.png">
+								</td>			
+								<td class="tdLabel" align="left" width="20%" id="download-reqMatrix-disabled-{{ob.sol_area_id}}">
+										<img id="download-uc-estimate-{{ob.sol_area_id}}" src="/static/images/download_icon_disabled.png" title="Download Requirement Matrix">
+								</td>
+								<td class="tdLabel" id="effort-disabled-{{ob.sol_area_id}}" align="left" width="40%"><strike>{{ ob.totalEfforts }} hours</strike></td>
+								<td class="tdLabel" align="left" id="download-estimation-disabled-{{ob.sol_area_id}}" width="20%">
+									<img src="/static/images/download_icon_disabled.png" title="Download Use Cases Estimation">				
+								</td>
+								
+								
+								<td class="tdLabel" name = "edit" id = "edit-enabled-{{ob.sol_area_id}}"  align="left" width="20%">
+									<a href="javascript:void(0);" onclick="return submitEditForm('captureUseCases', {{ ob.sol_area_id }})">
+									<img src="/static/images/edit_icon_enabled.png">
+									<!-- <button class="greenbutton">Edit</button>  -->
+									</a>
+								</td>				
+								<td class="tdLabel" align="left" width="20%" id="download-reqMatrix-enabled-{{ob.sol_area_id}}">
+									<a href="javascript:void(0);" >
+										<!--<button class="greenbutton">Requirement Matrix</button>-->
+										<img src="/static/images/download_icon_enabled.png" title="Download Requirement Matrix" onclick="return submitForm('getSolAreaRequirements',{{ob.sol_area_id}})">
+									</a>
+								</td>
+								<td class="tdLabel" id="effort-enabled-{{ob.sol_area_id}}" align="left" width="40%">{{ ob.totalEfforts }} hours</td>
+								<td class="tdLabel" align="left" id="download-estimation-enabled-{{ob.sol_area_id}}" width="20%">
+									<a href="http://{{serviceURL}}/download/request?sessionId={{sid}}&solId={{solDetailsInfo[0].sol_id}}&solAreaId={{ob.sol_area_id}}" target="_blank">	
+									<img id="download-eff-estimate-{{ob.sol_area_id}}" src="/static/images/download_icon_enabled.png" title="Download Use Cases Estimation">				
+									<!--<button id="DUCE" class="greenbutton2" type="button">Download Use Cases Estimation</button>-->
+									</a>
+								</td>
+								</tr>
+							</table>
+							</td>
+							{% else %}
+							
+							<td class="tdLabel" width="30%" align="center" id="proceed-td-{{ob.sol_area_id}}" ><input id="proceed-{{ob.sol_area_id}}" type="submit" class="bluebutton" onclick="return submitForm('captureUseCases',{{ob.sol_area_id}})"  value=" Proceed " ></td>
+							{% endif %}
+							</tr>
+						</table>
+					</div>			
+				</td>
+
+			{% endif %}
+			{% if  ob.sol_status== 'INCOMPLETE' %}
+				<td colspan="6">
+					<div id="row-{{ ob.sol_area_id }}">
+						<table width="100%" cellpadding="1" cellspacing="0" border="0">
+							<tr>
+							<td class="tdLabel" width="30%" align="center">
+									<table border="0" width="100%">
+									<tr><td class="tdLabel" width="5%"></td>
+									<td>							
+									<strong>{{ ob.sol_area_name }}</strong></td>												
+									</tr></table>
+								</td>												
+							<td class="tdLabel" width="3%"></td>
+							<td class="tdLabel" width="17%" align="center" style="display: none;" id="processOffset-{{ob.sol_area_id}}">
+								<label class="switch">
+								 <input type="checkbox" name="switch-{{ob.sol_area_id}}" id="switch-{{ob.sol_area_id}}" onchange="processOffSet(this)">
+								  <div class="slider"></div>								 
+								</label>
+							</td>
+							
+							<td class="tdLabel" width="17%" align="center" id="solstatus-{{ob.sol_area_id}}">{{ ob.sol_status }}
+							</td>
+							<td class="tdLabel" width="3%"></td>
+							<td class="tdLabel" id="effort" align="center" width="10%" style="display: none;">{{ ob.totalEfforts }} hours</td>				
+							<td id="manual_estimation-{{ob.sol_area_id}}" class="tdLabel" width="17%">
+							
+							{% if ob.sol_area_id != 105 && ob.sol_area_id != 104 %}
+							<table border="0" width="100%">
+							<tr>
+							
+							<td align="left">
+								<input type="checkbox" width="20%" name="use-user-estimate-{{ob.sol_area_id}}" id="use-user-estimate-{{ob.sol_area_id}}" onchange="estimationModelChanged_IC({{ob.sol_area_id}}) "
+									{% if ob.use_provided_efforts > 0 %}
+										 checked
+									{% endif %}
+								/>
+							</td>
+							
+							<td align="left" width="40%">
+								<input type="text" disabled="" class ="foo" size="10" name="user-provided-efforts-{{ob.sol_area_id}}" id="user-provided-efforts-{{ob.sol_area_id}}" value="{{ob.provided_efforts}}" onclick="enableSaveEffortsIcon({{ob.sol_area_id}})"/>
+							</td>
+							<td width="20%" align="left">hours</td>
+							<td align="left" width="20%" name="save-user-estimate-enabled-{{ob.sol_area_id}}" id="save-user-estimate-enabled-{{ob.sol_area_id}}">
+							
+								<img id="efforts-backup-enabled-{{ob.sol_area_id}}" src="/static/images/efforts_backup_enabled.png" onclick="saveUserEstimates({{ob.sol_area_id}})" class="effort-enable">
+							</td>
+							</td>
+							<td align="left" width="20%" name="save-user-estimate-disabled-{{ob.sol_area_id}}" id="save-user-estimate-disabled-{{ob.sol_area_id}}">
+							
+								<img src="/static/images/efforts_backup_disabled.png">
+							</td>
+							</tr>
+							</table>
+							{% endif %}
+							</td>
+							<td class="tdLabel" style="display:none;" width="50%" align="top">								
+								<div id="slider-{{ ob.sol_area_id }}">								
+								</div>
+							</td>
+							
+							<td class="tdLabel" width="3%"></td>
+							
+							<td class="tdLabel" width="30%" align="center" id="proceed-td-{{ob.sol_area_id}}" ><input id="proceed-{{ob.sol_area_id}}" type="submit" class="bluebutton" onclick="return submitForm('captureUseCases',{{ob.sol_area_id}})"  value=" Proceed " ></td>
+							</tr>
+							</table>
+							</div>
+							</td>
+			{% endif %}
+			<!-- </tr></table></td>	 -->
+			</tr>
+		{% endfor %}
+
+			<tr>
+				<td colspan="6" class="tdLabel">&nbsp;</td>
+			</tr>	
+
+		</table>
+	</div>
+	</form>
+	<div id="dialog-form" style="display:none;" title="Lead country selection">
+ 
+  <form>
+    
+      <label >Lead Country</label>
+      <select id="leadCountryDialogBox">
+      </select>
+      <div class="validateTips" style="color: red;font-size: 13px;">Please select country before proceed !</div>
+      
+      <!-- Allow form submission with keyboard without duplicating the dialog button -->
+      <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+    
+  </form>
+</div>
+ 
+	
+    <div id="showmodalid" class="showmodal" style="display:none">
+	
+	    <div class="center">
+	    <span id="downText" style="font-weight: bolder;font-size: large;display: none;"><blink>The back-end service is down. Please try after sometime</blink></span>
+	    <span id="waiText" style="font-weight: bolder;font-size: large;display: none;">We are processing your request...</span>
+	    <img id="waitImg" alt="" src="/static/images/loader.gif" />
+		<span id="waiText2" style="font-weight: bolder;font-size: large;">This may take few seconds</span>
+	    </div>
+	</div>
+	</body>
+</html>
+
+
+<style>
+input[type="text"].foo
+{
+  width: 80%;
+  
+}
+</style>

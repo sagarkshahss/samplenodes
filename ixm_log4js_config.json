@@ -1,0 +1,18 @@
+{
+  "appenders": [
+    { 
+    	"type": "console",
+    	"filename": "logs/ixm_sol_adv.log", 
+    	"maxLogSize": 20480,
+        "backups": 3
+    },
+    { 
+    	"type": "file", 
+    	"filename": "logs/ixm_sol_adv.log", 
+    	"maxLogSize": 20480,
+        "backups": 3,
+        "category": "file_logger" 
+    }
+  ],
+  "replaceConsole": true
+}

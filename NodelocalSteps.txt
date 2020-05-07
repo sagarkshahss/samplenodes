@@ -1,0 +1,28 @@
+Git Checked in code is in accordance to Local workspace setting.
+
+In order to run in Test/Prod server 
+1. Take backup of login.html & app_sol_test.js
+2. UnComment SAML lines from app_sol_test.js (lines 42-134)
+3. In login.html @ line 340, Uncomment  GET line for Form Submission & comment POST line
+
+		<!-- <form action="/validateLoginBluePages" method="post" id="loginForm"> -->
+		  <form action="/login" method="get" id="loginForm">  
+		  
+4. Comment username/password <tr> entries in login.html
+
+
+In order to run in Local workspace
+1. Take backup of login.html & app_sol_test.js
+2. Comment SAML lines from app_sol_test.js (lines 42-134)
+3. In login.html @ line 340, comment  GET line for Form Submission & uncomment POST line
+
+		 <form action="/validateLoginBluePages" method="post" id="loginForm"> 
+		 <!-- <form action="/login" method="get" id="loginForm">  -->
+		  
+4. UnComment username/password <tr> entries in login.html
+ 
+
+Need more fixing
+
+
+
