@@ -1,1 +1,0 @@
-cf: 'log' is not a registered command. See 'cf help'
