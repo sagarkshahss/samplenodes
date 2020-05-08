@@ -9,14 +9,11 @@ var express = require('express'),
     var dns = require('dns');
     var https = require('https');
     var http = require('http');
-    //var http = require('follow-redirects').http;
     var util = require('util');
     var passport = require("passport");
     var OpenIDConnectStrategy = require('passport-idaas-openidconnect').IDaaSOIDCStrategy;
     var openIdSettings = require('./config/openIdSettings.js');
     var settings=openIdSettings.openIdConfigObj
-
-
     //Initialize Passport
     app.use(passport.initialize());
     app.use(passport.session());
@@ -37,9 +34,6 @@ var express = require('express'),
     var configAms = require('./config/configAms');
     var session = require('express-session');
     var constants = require('./custom-modules/ixmConstants');
-
-    //var MySQLStore = require('express-mysql-session');
-
     var MemoryStore = session.MemoryStore;
     var sessionStore = new MemoryStore();
 
@@ -104,7 +98,10 @@ var express = require('express'),
     var key;
     var cert;
     var ca;
-
+    var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
+    ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0';
+  
+    
     if(config.envCheck == 'prod') {
     	console.log("SSL Certificate used from prod :: Go Ahead!");
     	key = fs.readFileSync('./encryption/soladvisor.prod.key');
@@ -131,23 +128,6 @@ var express = require('express'),
       ca: ca
     };
 
-    console.log("serviceURL  @@@@@@@@@@@@@@@@@@ :::: "+serviceURL);
-
-    //Start of OpenId Logic
-    //app.get('/login', passport.authenticate('openidconnect', {}));
-
-    app.get('/login', function (req, res, next) {
-    	var prevUrl = req.query.prevUrl; 
-    	req.session.requestedURL =prevUrl;
-    	   passport.authenticate('openidconnect', {})(req, res, next);
-    	});
-
-    app.get('/rfp/auth/sso/callback', function (req, res, next) {
-    	   passport.authenticate('openidconnect', {
-    		    successRedirect:'/processLogin', //redirect_url
-    		    failureRedirect: '/errorPage',
-    		})(req, res, next);
-    	});
 
     //Configure the OpenId Connect Strategy with credentials obtained from OneLogin
     var Strategy = new OpenIDConnectStrategy({
@@ -184,17 +164,9 @@ var express = require('express'),
     app.use(bodyParser.json())
     app.set('view engine', 'html')
     app.use('/static', express.static(__dirname + '/public'));
-
     var cookieParser = require('cookie-parser');
-
     var mysql      = require('mysql');
-
-
-
     var pool = mysql.createPool(config.database.connectionString);
-
-
-
     var domain = require('domain'), d = domain.create();
 
     d.on('error', function(err) {
@@ -204,8 +176,6 @@ var express = require('express'),
     var  HashMap = require('hashmap');
     var timeOutSidMap = new HashMap();
 
-
-    //var validator = function(req, res, next) {
     function ensureAuthenticated(req, res, next) {
     	//console.log("req.session.user: "+req.session.user);
     	
@@ -272,37 +242,6 @@ var express = require('express'),
     		});
     };
 
-    //require('./controller/routes.js')(app,pool);
-
-    //require('./controller/routesPost.js')(app,pool,ipAddress);
-    var handleTimeOut = function(clientSessionId) {
-    			if(clientSessionId) {
-    			pool.getConnection(function(err, connection) {
-    				if (err) {
-    					console
-    							.log("Error obtaining connection from pool: "
-    									+ err);
-    					connection.release();
-    					throw err;
-    				}
-    		
-    				var sessionQuery = "insert into session_log (session_id, event_type) values ('"+clientSessionId +"',"+ event.Session_Timeout+")";
-    				console.log(sessionQuery);
-    				var queryEx = pool.query(sessionQuery, function(err, sessionResult) {
-    					if (err) {
-    						//connection.release();
-    						console.log(err);
-    					}
-    					
-    					
-    					sessionStore.destroy(clientSessionId);
-    				//res.render('login');
-    				//logger.info('Exiting route /logout');				
-    				});	
-    			});
-    			}	
-
-    		};
 
     app.get('/', function(req, res) {
     	if(req.session) {
@@ -330,275 +269,10 @@ var express = require('express'),
     });
 
 
-
-
-    app.post('/logout', function(req, res) {
-    	console.log('Entered route get /logout');
-    	pool.getConnection(function(err, connection) {
-    					if (err) {
-    						console
-    								.log("Error obtaining connection from pool: "
-    										+ err);
-    						connection.release();
-    						throw err;
-    					}
-
-    					req.session.destroy();
-    					
-    					sqlQuery = "SELECT msg_id, msg_type, msg_desc, seq FROM app_msg order by seq";	
-    					sqlAppMsg = pool.query(sqlQuery, function(err, appMsg){
-    						if (err) {
-    							console.log("error while executionapp msg"); 
-    							console.log(err);	
-    						}
-    						console.log("appMsg >>>>>> "+sqlQuery+"\n");
-    						console.log(JSON.stringify(appMsg));
-    						res.render('login', {'appMsg':appMsg });	
-    					});
-    					
-    					
-    					
-    					//logger.info('Exiting get /logout');				
-    						
-
-    				});
-    	
-    });
-
-
-
-    app.get('/d1', ensureAuthenticated, function(req, res) {
-    	
-    	console.log('*** Entered route GET /d1 **** \n');
-    	res.render('d1', {'user' : req.session.user});
-    });
-
-    app.get('/test', ensureAuthenticated, function(req, res) {
-    	
-    	console.log('*** Entered route GET /test **** \n');
-    	res.render('test', {'user' : req.session.user});
-    });
-
     function getCreatedBy(user){
     	return (user == 'sa_superuser@in.ibm.com' ? "select distinct(created_by) from solution_basic_details_trx" : "\'" + user + "\'");
     };
 
-
-
-
-    app.get('/launchUrl', ensureAuthenticated, function(req, res) {	
-    console.log('*** Entered route POST /login **** \n');
-    	
-    	console.log(JSON.stringify(req.body));
-    	//res.render('advisorHome', {'user' : req.session.user});
-    	res.render('cogArchLaunchButton');
-    	
-    });
-
-    app.post('/register', ensureAuthenticated, function(req, res) {
-    	
-    	console.log('*** Entered route POST /register **** \n');
-    	
-    	console.log(JSON.stringify(req.body));
-    	res.render('advisorHome', {'user' : req.session.user});
-    });
-
-
-    app.post('/login', function(req, res) {
-    	
-    	console.log('*** Entered route POST /login 2 **** \n');
-    	
-    	console.log(JSON.stringify(req.body));
-    	
-    	sqlQuery = "SELECT msg_id, msg_type, msg_desc, seq FROM app_msg order by seq";	
-    	sqlAppMsg = pool.query(sqlQuery, function(err, appMsg){
-    		if (err) {
-    			console.log("error while executionapp msg"); 
-    			console.log(err);	
-    		}
-    		console.log("appMsg >>>>>> "+sqlQuery+"\n");
-    		console.log(JSON.stringify(appMsg));
-    		res.render('login', {'appMsg':appMsg, 'user' : req.session.user });	
-    	});
-    	
-    });
-
-
-
-
-
-
-    app.get('/consentCheck/:userid', ensureAuthenticated, function(req, res) {
-    	
-    	var userid=req.params.userid;
-    	pool.getConnection(function(err, connection) {
-    		if (err) {
-    			console
-    					.log("Error obtaining connection from pool: "
-    							+ err);
-    			connection.release();
-    			throw err;
-    		}
-    		
-    		var consentQuery = "SELECT privacy_consent_obtained from  users where Emp_EmailId ='"+ userid +"'";
-    		
-    		var query = pool.query(consentQuery , function(err, result) {
-    			res.send(result);
-    		});
-    		connection.release();
-    	});
-    });
-
-    app.post('/validateLoginBluePages', function(req, res) {
-
-    	console.log("Inside validateLoginBluePages::::::" );
-    	
-    	console.log("Inside validateLoginBluePages:::::::::-" + config.authHostString );
-    	
-    	pool.getConnection(function(err, connection) {
-    		if (err) {
-    			console
-    					.log("Error obtaining connection from pool: "
-    							+ err);
-    			connection.release();
-    			throw err;
-    		}
-    		var sqlLoginQuery = "select emp_emailid,emp_id,emp_fname,emp_lname from users WHERE emp_EmailId='"+req.body.userName.trim()+"' AND password='"+req.body.password.trim()+"';"
-    		//var sqlLoginQuery = "select emp_emailid,emp_id,emp_fname,emp_lname from users WHERE emp_EmailId='ajay.thakral@in.ibm.com' AND password='test'";
-
-    		var loginQuery = pool.query(sqlLoginQuery, function(err, loginResult) {
-    			//Pass the user information in session
-    			if (err){
-    				connection.release();
-    				throw err;
-    				
-    			} 		
-    				
-    			if(loginResult.length>0){
-    				//Pass the user details in the session
-    				sess=req.session;
-    				sess.user = user;
-    				console.log("loginResult[0]: "+loginResult[0]);
-    				//req.session.user.attributes = loginResult[0];
-    				//req.session.user.emailAddress = req.body.userName.trim();
-    		    	var var1 = {'emailaddress': req.body.userName.trim()};						    	
-    		    	req.session.user.attributes = var1;
-    				processLogin(req, res);
-    			//	res.render('advisorHome', {'loginResult': loginResult,'userName':req.body.userName});
-    				
-    				
-    			}
-    			else {											
-    				
-    				var base64uid = req.body.userName.trim() + ":" + req.body.password.trim();
-    				var options = {
-
-    				  //hostname: 'adikbservices.mybluemix.net',
-    				  hostname: config.authHostString,
-    				  method: 'GET',
-    				  auth: base64uid, 	
-    				  path: '/kbsso'
-
-    				};
-    				
-    				var httprequest = https.get(options, function(responseHttp) {
-    					console.log("HTTP Response code for the authentication -------- "+ responseHttp.statusCode );
-
-    					if(responseHttp.statusCode===200) {
-    						var url = 'http://bluepages.ibm.com/BpHttpApisv3/slaphapi?ibmperson/(mail=' + req.body.userName.trim()+').list,printable/byjson';
-
-    						request({
-    						    url: url,
-    						    json: true
-    						}, function (error, response, body) {
-
-    						    if (!error && response.statusCode === 200) {
-    						    	sess=req.session;
-    						    	sess.user = user;
-    						    	//console.log(JSON.stringify(req.session.user));						    	
-    						    	var var1 = {'emailaddress': req.body.userName};						    	
-    						    	req.session.user.attributes = var1;
-    						    	console.log("req.session.user.emailAddress-->"+req.session.user.emailAddress);
-    						    	for (var i = body.search.entry.length - 1; i >= 0; i--) {
-    						        	for (var j = body.search.entry[i].attribute.length - 1; j >= 0; j--) {
-
-    						        		if(body.search.entry[i].attribute[j].name === "givenname") {
-    						        			req.session.user.attributes["firstName"] = body.search.entry[i].attribute[j].value[0];
-    						        			console.log("Mail id: "+ req.session.user.emailAddress );
-    						        			console.log("Given Name: "+ req.session.user.firstName );
-    						        		}
-    						        		else if(body.search.entry[i].attribute[j].name === "co") {
-    						        			req.session.user.country = body.search.entry[i].attribute[j].value[0];
-    						        			//Populate IOT as per country receeived
-    						        			for(var code in iotData.mapData) {
-    												 // console.log("printing key code " +iotData.mapData[code].iot + " stringify " +JSON.stringify(iotData.mapData[code]));
-
-    										    					    
-    										        if(req.session.user.country == iotData.mapData[code].name) {
-    										          req.session.user.iot = iotData.mapData[code].iot;
-    										         				          
-    										          console.log("IOT received is " + req.session.user.iot);
-    										          break;
-    										        }
-
-    										      
-    										    }
-
-    						    			
-    										    console.log("IOT received is " + req.session.user.iot);
-    						        			console.log("Mail id: "+ req.session.user.emp_emailid );
-    						        			console.log("Country: "+ req.session.user.country );
-    						        		}
-    						        	}
-    						        }
-    						    	processLogin(req, res);
-    						    }
-    						    else {						    	
-    						    	res.render('login', {errorMessage:"Some problem, please login again."});
-    						    	
-    						    }
-
-    						});
-    						
-    					}	else {				    					    	
-    							res.render('login', {errorMessage:"User credential are not verified. Please provide correct user name and password."});							
-    					}
-    					
-    				});
-    				
-    			}
-
-    		});
-    		connection.release();
-    	});
-    });
-
-
-
-    app.get("/processLogin", ensureAuthenticated, function(req, res){
-    	
-    	var obj_str = util.inspect(req.session.passport.user._json);
-    	console.log(obj_str);
-    	
-    	console.log(JSON.stringify("req: "+req));
-    	console.log(" req ::---- "+util.inspect(req));
-    	if(req.session.passport.user){
-    		var claims = req.session.passport.user['_json'];
-    		console.log(JSON.stringify("claims: "+claims));
-    		console.log(" req ::---- "+util.inspect(claims));
-    		 user.name=claims.firstName+" "+claims.lastName;
-    		 user.firstName = claims.firstName;
-    		 user.lastName = claims.lastName;
-    		 user.emailAddress	=claims.emailAddress;
-    		 req.session.user = user;
-
-    		 req.session.claims = claims;
-    		 req.session.userEmail=user.emp_emailid;
-    		 req.session.originalUrl = req.originalUrl;
-
-    	}
-    	processLogin(req, res);
-    });
 
 
 
@@ -614,14 +288,6 @@ var express = require('express'),
     	return uniqueArr;
     }
 
-
-
-
-
-    //Getting IOT and IMT information based on Country
-
-
-
     var appEnv = cfenv.getAppEnv();
     app.listen(config.port, '0.0.0.0', function() {
 
@@ -630,7 +296,7 @@ var express = require('express'),
 
     });
 
-    https.createServer(options, app).listen(config.httpsPort, '0.0.0.0', function() {
+   https.createServer(options, app).listen(config.httpsPort, '0.0.0.0', function() {
 
             // print a message when the server starts listening
                      console.log("Secure server starting on " + config.httpsPort + ", Rest API Url::::: " +serviceURL);
@@ -638,32 +304,9 @@ var express = require('express'),
                      });                 
 
 
+ //  app.listen(port, ip);
+  // console.log('Server running on http://%s:%s', ip, port);
 
-
-    function callUseCaseInfoEstimation(req, res, connection, indus_id){}
-
-
-
-    //Dirty logic Fix for #143
-    function setStaffingFlagDirty(req, res){
-    	console.log("*****Entered setStaffingFlagDirty *****  ");
-    	var updateStaffingQry=null;
-    	if(req.body.solId=== undefined)
-    			updateStaffingQry='update solution_basic_details_trx set is_staffing_dirty = 1 where SOL_ID = '+req.body.sol_id;
-    	else
-    		updateStaffingQry='update solution_basic_details_trx set is_staffing_dirty = 1 where SOL_ID = '+req.body.solId;
-
-    	console.log("*****setStaffingFlagDirty  updateStaffingQry  "+updateStaffingQry);
-    	var query = pool.query(updateStaffingQry, function(err, updateRes) {	
-    		if(err){
-    			console.log("Error in updating is_staffing "+ err);
-    		}
-    		
-    	});
-    }
-
-
-
-
+    
 
  
