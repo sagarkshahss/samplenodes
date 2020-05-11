@@ -1,72 +1,70 @@
 //  OpenShift sample Node application
 var express = require('express'),
-    app     = express();var express = require('express');
-    var app = express();
-    var bodyParser = require('body-parser');
-    var fs = require('fs');
-    var request=require('request');
-    var swig = require('swig');
-    var dns = require('dns');
-    var https = require('https');
-    var http = require('http');
-    var util = require('util');
-    var passport = require("passport");
-    var OpenIDConnectStrategy = require('passport-idaas-openidconnect').IDaaSOIDCStrategy;
-    var openIdSettings = require('./config/openIdSettings.js');
-    var settings=openIdSettings.openIdConfigObj
-    //Initialize Passport
-    app.use(passport.initialize());
-    app.use(passport.session());
+    app     = express(),
+    morgan  = require('morgan');
 
-    passport.serializeUser(function(user, done) {
-    	done(null, user);
-    });
-    passport.deserializeUser(function(obj, done) {
-    	done(null, obj);
-    });
+/* Added By saket Starts here ...*/
 
-    var timeoutLength = 6000000;
-    var dbutils = require('./public/js/dbutils');
+var bodyParser = require('body-parser');
+var fs = require('fs');
+var request=require('request');
+var swig = require('swig');
+var dns = require('dns');
+var https = require('https');
+var http = require('http');
+var util = require('util');
+var passport = require("passport");
+var OpenIDConnectStrategy = require('passport-idaas-openidconnect').IDaaSOIDCStrategy;
+var openIdSettings = require('./config/openIdSettings.js');
+var settings=openIdSettings.openIdConfigObj
+//Initialize Passport
+/*
+app.use(passport.initialize());
+//app.use(passport.session());
+passport.serializeUser(function(user, done) {
+	done(null, user);
+});
+passport.deserializeUser(function(obj, done) {
+	done(null, obj);
+});
+*/
+var timeoutLength = 6000000;
+var dbutils = require('./public/js/dbutils');
+var iotData = require('./public/data/map_data');
+var config = require('./config/configTest');
+var configAms = require('./config/configAms');
+var session = require('express-session');
+var constants = require('./custom-modules/ixmConstants');
+var MemoryStore = session.MemoryStore;
+var sessionStore = new MemoryStore();
+var user = {
+	emp_fname: String,
+	emp_emailid: String
+};
 
-    var iotData = require('./public/data/map_data');
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
-    var config = require('./config/configTest');
-    var configAms = require('./config/configAms');
-    var session = require('express-session');
-    var constants = require('./custom-modules/ixmConstants');
-    var MemoryStore = session.MemoryStore;
-    var sessionStore = new MemoryStore();
+//In session.destroy release the db connection 
+app.use(session({
+		 key: 'soladv_app',	
+		 secret: 'anystringoftext',
+         saveUninitialized: true,
+         store: sessionStore,
+         resave: true}));
+/*
+var forceSsl = require('express-force-ssl');
+//app.use(forceSsl);
 
-    var user = {
-    	emp_fname: String,
-    	emp_emailid: String
-    };
-
-    app.use(bodyParser.urlencoded({
-      extended: true
-    }));
-
-    //In session.destroy release the db connection 
-    app.use(session({
-    		 key: 'soladv_app',	
-    		 secret: 'anystringoftext',
-             saveUninitialized: true,
-             store: sessionStore,
-             resave: true}));
-
-
-    var forceSsl = require('express-force-ssl');
-    app.use(forceSsl);
-
-    app.set('forceSSLOptions', {
-      enable301Redirects: true,
-      trustXFPHeader: false,
-      httpsPort: config.httpsPort,
-      sslRequiredMessage: 'SSL Required.'
-    });
-
-
-    var event = { 
+app.set('forceSSLOptions', {
+  enable301Redirects: true,
+  trustXFPHeader: false,
+  httpsPort: config.httpsPort,
+  sslRequiredMessage: 'SSL Required.'
+});
+*/
+var event = { 
     	'Login': 1,
     	'Logout': 2,
     	'Session_Timeout':3,
@@ -98,10 +96,14 @@ var express = require('express'),
     var key;
     var cert;
     var ca;
-    var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
-    ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0';
-  
-    
+    //var serviceURL = ipAddress+ config.restApiSubString; 
+    var serviceURL = config.restApiServer + config.restApiSubString;
+    var options = {
+      key: key,
+      cert: cert,
+      ca: ca
+    };
+
     if(config.envCheck == 'prod') {
     	console.log("SSL Certificate used from prod :: Go Ahead!");
     	key = fs.readFileSync('./encryption/soladvisor.prod.key');
@@ -118,44 +120,6 @@ var express = require('express'),
     	cert = fs.readFileSync('./encryption/new.cert.cert');
     	ca = fs.readFileSync('./encryption/new.ssl.csr');
     }
-      
-    //var serviceURL = ipAddress+ config.restApiSubString; 
-    var serviceURL = config.restApiServer + config.restApiSubString;
-
-    var options = {
-      key: key,
-      cert: cert,
-      ca: ca
-    };
-
-
-    //Configure the OpenId Connect Strategy with credentials obtained from OneLogin
-    var Strategy = new OpenIDConnectStrategy({
-        authorizationURL: settings.authorization_url,
-        tokenURL: settings.token_url,
-        clientID: settings.client_id,
-        scope: 'openid profile email',
-        response_type: 'code',
-        clientSecret: settings.client_secret,
-        callbackURL: settings.callback_id,
-        skipUserProfile: true,
-        addCACert: true,
-        CACertPathList: ['/cert/oidc_w3id_staging.cer','/encryption/soladvisor.prod.cert'],
-        issuer: settings.issuer_id
-    },
-        function (iss, sub, profile, jwtClaims,accessToken, refreshToken, params, done) {
-            process.nextTick(function () {
-            	profile.accessToken = accessToken;
-                profile.refreshToken = refreshToken;
-                done(null, profile);
-            })
-        });
-
-    passport.use(Strategy);
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
-
-
     app.engine('html', swig.renderFile); 
     var cfenv = require('cfenv');
     var bodyParser = require('body-parser')
@@ -175,30 +139,6 @@ var express = require('express'),
 
     var  HashMap = require('hashmap');
     var timeOutSidMap = new HashMap();
-
-    function ensureAuthenticated(req, res, next) {
-    	//console.log("req.session.user: "+req.session.user);
-    	
-        if (req.isAuthenticated() || req.session.UsingSSO || typeof req.session.passport != 'undefined') {
-        	console.log("req  is already authenticated ");
-            return next();
-        } else {
-        	console.log("req not authenticated ");
-        	//check for SSO token
-        	if(typeof req.query.token != 'undefined'){
-      		  Check(req, function(err) {
-      		    // Validation failed, or an error occurred during the external request.
-      		    if (err) return res.sendStatus(400);
-      		    // Validation passed.
-      		    return next();
-      		  });
-        	} else{
-        		res.redirect('/');
-        	}
-        }
-      
-    };
-
     function Check(req, callback) {
     	console.log(" req.body ::>>>>> "+util.inspect(req.body));
     	
@@ -241,72 +181,79 @@ var express = require('express'),
     		     return callback(null, true);
     		});
     };
-
-
-    app.get('/', function(req, res) {
-    	if(req.session) {
-    		req.session.destroy();
-
-    	}
-    	else {
-    		console.log("This must be session timeout");
-    	}
-    	
-    	console.log("This is my login page============================================================================================");
-    	
-    	sqlQuery = "SELECT msg_id, msg_type, msg_desc, seq FROM app_msg order by seq";	
-    		sqlAppMsg = pool.query(sqlQuery, function(err, appMsg){
-    			if (err) {
-    				console.log("error while executionapp msg"); 
-    				console.log(err);	
-    			}
-    			console.log("appMsg >>>>>> "+sqlQuery+"\n");
-    			console.log(JSON.stringify(appMsg));
-    			res.render('login', {'appMsg':appMsg });	
-    			//return res.redirect('/login');
-    		});
-    	
-    });
-
-
-    function getCreatedBy(user){
-    	return (user == 'sa_superuser@in.ibm.com' ? "select distinct(created_by) from solution_basic_details_trx" : "\'" + user + "\'");
-    };
-
-
-
-
-    function arrayUnique(array) {
-    	var uniqueArr = array.concat();
-    	for (var i = 0; i < uniqueArr.length; ++i) {
-    		for (var j = i + 1; j < uniqueArr.length; ++j) {
-    			if (uniqueArr[i].LOGICAL_COMP_ID === uniqueArr[j].LOGICAL_COMP_ID)
-    				uniqueArr.splice(j--, 1);
-    		}
-    	}
-
-    	return uniqueArr;
-    }
-
-    var appEnv = cfenv.getAppEnv();
-    app.listen(config.port, '0.0.0.0', function() {
-
-    	// print a message when the server starts listening
-    	console.log("server starting on " + config.port + ", Rest API Url: " +serviceURL);
-
-    });
-
-   https.createServer(options, app).listen(config.httpsPort, '0.0.0.0', function() {
-
-            // print a message when the server starts listening
-                     console.log("Secure server starting on " + config.httpsPort + ", Rest API Url::::: " +serviceURL);
-            
-                     });                 
-
-
- //  app.listen(port, ip);
-  // console.log('Server running on http://%s:%s', ip, port);
-
+/*Added by saket Ends here ...*/
     
+Object.assign=require('object-assign')
 
- 
+var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
+    ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0';
+
+
+app.get('/', function(req, res) {
+	if(req.session) {
+		req.session.destroy();
+
+	}
+	else {
+		console.log("This must be session timeout");
+	}
+	
+	console.log("This is my login page============================================================================================");
+	
+	sqlQuery = "SELECT msg_id, msg_type, msg_desc, seq FROM app_msg order by seq";	
+	sqlAppMsg = pool.query(sqlQuery, function(err, appMsg){
+			if (err) {
+				console.log("error while executionapp msg"); 
+				console.log(err);	
+			}
+		//	console.log("appMsg >>>>>> "+sqlQuery+"\n");
+			//console.log(JSON.stringify(appMsg));
+			res.render('login', {'appMsg':appMsg });	
+			//return res.redirect('/login');
+		})
+	 //res.render('login.html');// This was just for testing.
+});
+/* Added by saket2 starts here*/ 
+
+
+function getCreatedBy(user){
+	return (user == 'sa_superuser@in.ibm.com' ? "select distinct(created_by) from solution_basic_details_trx" : "\'" + user + "\'");
+};
+
+function arrayUnique(array) {
+	var uniqueArr = array.concat();
+	for (var i = 0; i < uniqueArr.length; ++i) {
+		for (var j = i + 1; j < uniqueArr.length; ++j) {
+			if (uniqueArr[i].LOGICAL_COMP_ID === uniqueArr[j].LOGICAL_COMP_ID)
+				uniqueArr.splice(j--, 1);
+		}
+	}
+	return uniqueArr;
+}
+var appEnv = cfenv.getAppEnv();
+app.listen(config.port, '0.0.0.0', function() {
+
+	// print a message when the server starts listening
+	console.log("server starting on " + config.port + ", Rest API Url: " +serviceURL);
+
+});
+https.createServer(options, app).listen(config.httpsPort, '0.0.0.0', function() {
+
+    // print a message when the server starts listening
+             console.log("Secure server starting on " + config.httpsPort + ", Rest API Url::::: " +serviceURL);
+    
+             });    
+
+/*Added by saket ends here2*/
+
+// error handling
+app.use(function(err, req, res, next){
+  console.error(err.stack);
+  res.status(500).send('Something bad happened!');
+});
+
+
+app.listen(port, ip);
+console.log('Server running on http://%s:%s', ip, port);
+
+module.exports = app ;
