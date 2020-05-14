@@ -12,7 +12,7 @@ module.exports = {
 			}
 		},
 		port: 6002,
-		httpsPort: 6004,
+		httpsPort: 8080,
 		restApiPort: 8080,
 		javaWarName: "ixm",
 		restApiServer: "localhost",
